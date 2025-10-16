@@ -46,17 +46,17 @@ class ProductModel extends BaseModel
         return $this->belongsTo(CategoryModel::class, 'category_id', 'category_id');
     }
 
-    public function product_translations(): HasMany
+    public function translations(): HasMany
     {
         return $this->hasMany(ProductTranslationModel::class, 'product_id', 'product_id');
     }
 
-    public function product_images(): HasMany
+    public function images(): HasMany
     {
         return $this->hasMany(ProductImageModel::class, 'product_id', 'product_id')->orderBy('sort_order');
     }
 
-    public function product_videos(): HasMany
+    public function videos(): HasMany
     {
         return $this->hasMany(ProductVideoModel::class, 'product_id', 'product_id')->orderBy('sort_order');
     }
