@@ -1,9 +1,9 @@
 {
     "model": {
-        "table": "cat_product_image",
-        "primaryKey": "product_image_id",
+        "table": "def_cat_language",
+        "primaryKey": "language_id",
         "enabled": true,
-        "sort_order": 3
+        "sort_order": 1
     },
     "operations": {
         "active": {"sort_order": 1, "plural": true, "singular": false},
@@ -11,7 +11,7 @@
         "delete": {"sort_order": 2, "plural": true, "singular": false}
     },
     "fields": {
-        "product_image_id": {
+        "language_id": {
             "actions": ["index", "show", "store", "update"],
             "table": ["showing", "filtering", "sorting", "hiding"],
             "form": {
@@ -33,14 +33,6 @@
             "form": {
                 "type": "text",
                 "sort_order": 3
-            }
-        },
-        "product_id": {
-            "actions": ["index", "show"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {
-                "type": "number",
-                "sort_order": 1
             }
         },
         "name": {

@@ -1,19 +1,17 @@
 {
     "model": {
-        "table": "def_cat_language",
-        "primaryKey": "language_id",
+        "table": "def_cat_category_translation",
+        "primaryKey": "category_translation_id",
         "enabled": true,
-        "sort_order": 1
+        "sort_order": 2
     },
     "operations": {
         "active": {"sort_order": 1, "plural": true, "singular": false},
         "passive": {"sort_order": 2, "plural": true, "singular": false},
-        "delete": {"sort_order": 2, "plural": true, "singular": false},
-        "confirmed": {"sort_order": 3, "plural": true, "singular": false},
-        "order_create": {"sort_order": 4, "plural": true, "singular": true}
+        "delete": {"sort_order": 2, "plural": true, "singular": false}
     },
     "fields": {
-        "language_id": {
+        "category_translation_id": {
             "actions": ["index", "show", "store", "update"],
             "table": ["showing", "filtering", "sorting", "hiding"],
             "form": {
