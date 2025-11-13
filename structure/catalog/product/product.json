@@ -9,111 +9,113 @@
         "active": {"sort_order": 1, "plural": true, "singular": false},
         "passive": {"sort_order": 2, "plural": true, "singular": false},
         "delete": {"sort_order": 3, "plural": true, "singular": false},
-        "copy": {"sort_order": 4, "plural": true, "singular": false},
-        "close": {"sort_order": 5, "plural": true, "singular": true}
+        "close": {"sort_order": 5, "plural": true, "singular": true},
+        "copy": {"sort_order": 4, "plural": true, "singular": false}
     },
     "fields": {
         "product_id": {
-            "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
+            "database": {"variable": "bigIncrements", "nullable": false},
+            "actions": ["index", "show", "destroy"],
+            "table": ["showing", "filtering", "sorting"],
             "form": {"type": "number", "sort_order": 1}
         },
         "uuid": {
-            "actions": ["index", "show", "store", "update"],
+            "database": {"variable": "string", "nullable": false, "unique": true},
+            "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting", "hiding"],
             "form": {"type": "text", "sort_order": 1}
         },
         "code": {
-            "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
+            "database": {"variable": "string", "nullable": false, "unique": true},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting"],
             "form": {"type": "text", "sort_order": 3}
         },
         "name": {
+            "database": {"variable": "string", "nullable": true},
+            "validations": ["max:255"],
             "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "text", "sort_order": 2}
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "text", "required": true, "sort_order": 2}
         },
         "description": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
             "actions": ["index", "show", "store", "update"],
             "table": ["showing", "filtering", "sorting", "hiding"],
             "form": {"type": "textarea", "sort_order": 4}
         },
         "image_path": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
             "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "image", "sort_order": 5}
+            "table": [],
+            "form": {"type": "image", "required": true, "sort_order": 5}
         },
         "price": {
+            "database": {"variable": "decimal", "nullable": true, "default": 0},
+            "validations": ["numeric", "min:0"],
             "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "number", "sort_order": 6}
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "number", "required": true, "sort_order": 6}
         },
         "currency_code": {
+            "database": {"variable": "string", "nullable": true},
+            "validations": ["max:3", "exists:def_loc_currency,code"],
             "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "modal", "relationship": {"type": "currency", "route": "definition/localization/currency", "fields": {"id": "code", "label": "name"}}, "sort_order": 7}
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "modal", "required": true, "relationship": {"type": "currency", "route": "definition/localization/currency", "fields": {"id": "code", "label": "name"}}, "sort_order": 7}
         },
         "stock": {
-            "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "number", "sort_order": 8}
+            "database": {"variable": "integer", "nullable": false, "default": 0},
+            "validations": ["max:5"],
+            "actions": [],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "number", "required": true, "sort_order": 8}
         },
         "sku": {
+            "database": {"variable": "string", "nullable": true, "unique": true},
+            "validations": ["max:50"],
             "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "text", "sort_order": 9}
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "text", "required": true, "sort_order": 9}
         },
         "category_id": {
+            "database": {"variable": "integer", "nullable": true, "default": 0},
+            "validations": ["exists:def_cat_category,category_id"],
             "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "select", "relationship": {"type": "currency", "route": "definition/catalog/category", "fields": {"id": "category_id", "label": "name"}}, "sort_order": 10}
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "select", "required": true, "relationship": {"type": "currency", "route": "definition/catalog/category", "fields": {"id": "category_id", "label": "name"}}, "sort_order": 10}
         },
-        "is_active": {
+        "status": {
+            "database": {"variable": "boolean", "nullable": true, "default": true},
             "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "select", "default": "true", "options": {"true": "active", "false": "passive"}, "sort_order": 11}
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "boolean", "required": true, "default": true, "options": {"true": "active", "false": "passive"}, "sort_order": 11}
         },
         "created_at": {
+            "database": {"variable": "timestamp", "nullable": true, "default": 0},
             "actions": ["index", "show"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
+            "table": ["showing", "filtering", "sorting"],
             "form": {"type": "datetime", "sort_order": 12}
         },
         "created_by": {
+            "database": {"variable": "unsignedBigInteger", "nullable": true},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting", "hiding"],
             "form": {"type": "modal", "relationship": {"name": "created_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 13}
         },
+        "updated_at": {
+            "database": {"variable": "timestamp", "nullable": true},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "datetime", "sort_order": 15}
+        },
         "updated_by": {
+            "database": {"variable": "unsignedBigInteger", "nullable": true, "default": 0},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting", "hiding"],
             "form": {"type": "modal", "relationship": {"name": "updated_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 14}
-        },
-        "updated_at": {
-            "actions": ["index", "show"],
-            "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "datetime", "sort_order": 15}
-        }
-    },
-    "validations": {
-        "store": {
-            "name": ["required", "string", "max:255"],
-            "description": ["nullable", "string"],
-            "image_path": ["nullable", "string", "max:255"],
-            "price": ["required", "numeric", "min:0"],
-            "currency_code": ["required", "string", "max:3", "exists:def_loc_currency,code"],
-            "sku": ["required", "string", "max:50"],
-            "category_id": ["required", "integer", "exists:def_cat_category,category_id"],
-            "is_active": ["required", "boolean"]
-        },
-        "update":  {
-            "name": ["required", "string", "max:255"],
-            "description": ["nullable", "string"],
-            "image_path": ["nullable", "string", "max:255"],
-            "price": ["required", "numeric", "min:0"],
-            "currency_code": ["required", "string", "max:3", "exists:def_loc_currency,code"],
-            "sku": ["required", "string", "max:50"],
-            "category_id": ["required", "integer", "exists:def_cat_category,category_id"],
-            "is_active": ["required", "boolean"]
         }
     }
 }

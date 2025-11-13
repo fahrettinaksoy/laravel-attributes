@@ -9,6 +9,7 @@ class FormField
 {
     public function __construct(
         public string $type,
+        public bool $required = false,
         public string $default = '',
         public string $value = '',
         public array $relationship = [],
