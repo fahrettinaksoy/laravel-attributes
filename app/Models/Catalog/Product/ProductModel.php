@@ -9,6 +9,14 @@ use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
 use App\Models\Catalog\Product\ProductField;
 
+use App\Models\Definition\Localization\Currency\CurrencyModel;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Definition\Catalog\Category\CategoryModel;
+use App\Models\Catalog\Product\Pivots\ProductImage\ProductImageModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Catalog\Product\Pivots\ProductTranslation\ProductTranslationModel;
+use App\Models\Catalog\Product\Pivots\ProductVideo\ProductVideoModel;
+
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
@@ -26,4 +34,38 @@ class ProductModel extends BaseModel
     public $table = 'cat_product';
     public $primaryKey = 'product_id';
     public string $defaultSorting = '-product_id';
+
+    public array $allowedRelations = [
+        'currency',
+        'category',
+        'images',
+        'translations',
+        'videos',
+    ];
+
+    public function currency(): HasOne
+    {
+        return $this->hasOne(CurrencyModel::class, 'code', 'currency_code');
+    }
+
+    public function category(): HasOne
+    {
+        return $this->hasOne(CategoryModel::class, 'category_id', 'category_id');
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImageModel::class, 'product_id', 'product_id');
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(ProductTranslationModel::class, 'product_id', 'product_id');
+    }
+
+    public function videos(): HasMany
+    {
+        return $this->hasMany(ProductVideoModel::class, 'product_id', 'product_id');
+    }
+
 }

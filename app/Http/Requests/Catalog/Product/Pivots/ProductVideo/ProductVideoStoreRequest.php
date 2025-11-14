@@ -11,36 +11,18 @@ class ProductVideoStoreRequest extends BaseStoreRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            'product_video_id' => ['nullable'],
-            'uuid' => ['nullable'],
-            'code' => ['nullable'],
-            'name' => ['nullable'],
-            'description' => ['nullable'],
-            'image_path' => ['nullable'],
-            'price' => ['nullable'],
-            'currency_code' => ['nullable'],
-            'stock' => ['nullable'],
-            'sku' => ['nullable'],
-            'category_id' => ['nullable'],
-            'is_active' => ['nullable'],
+            'source' => ['required', 'max:255'],
+            'content' => ['required', 'max:255'],
         ]);
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'product_video_id.nullable' => 'Product Video Id alanı için nullable kuralı geçersizdir.',
-            'uuid.nullable' => 'Uuid alanı için nullable kuralı geçersizdir.',
-            'code.nullable' => 'Code alanı için nullable kuralı geçersizdir.',
-            'name.nullable' => 'Name alanı için nullable kuralı geçersizdir.',
-            'description.nullable' => 'Description alanı için nullable kuralı geçersizdir.',
-            'image_path.nullable' => 'Image Path alanı için nullable kuralı geçersizdir.',
-            'price.nullable' => 'Price alanı için nullable kuralı geçersizdir.',
-            'currency_code.nullable' => 'Currency Code alanı için nullable kuralı geçersizdir.',
-            'stock.nullable' => 'Stock alanı için nullable kuralı geçersizdir.',
-            'sku.nullable' => 'Sku alanı için nullable kuralı geçersizdir.',
-            'category_id.nullable' => 'Category Id alanı için nullable kuralı geçersizdir.',
-            'is_active.nullable' => 'Is Active alanı için nullable kuralı geçersizdir.',
+            'source.required' => 'Source alanı için required kuralı geçersizdir.',
+            'source.max' => 'Source alanı için max kuralı geçersizdir.',
+            'content.required' => 'Content alanı için required kuralı geçersizdir.',
+            'content.max' => 'Content alanı için max kuralı geçersizdir.',
         ]);
     }
 }

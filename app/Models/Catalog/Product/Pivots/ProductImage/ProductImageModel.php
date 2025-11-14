@@ -9,12 +9,15 @@ use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
 use App\Models\Catalog\Product\Pivots\ProductImage\ProductImageField;
 
-#[ModuleUsage(enabled: true, sort_order: 3)]
+use App\Models\Catalog\Product\ProductModel;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+#[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
         ['code' => 'active', 'plural' => true, 'singular' => false, 'route_name' => 'catalog.product.product.image.active', 'sort_order' => 1],
         ['code' => 'passive', 'plural' => true, 'singular' => false, 'route_name' => 'catalog.product.product.image.passive', 'sort_order' => 2],
-        ['code' => 'delete', 'plural' => true, 'singular' => false, 'route_name' => 'catalog.product.product.image.delete', 'sort_order' => 2],
+        ['code' => 'delete', 'plural' => true, 'singular' => false, 'route_name' => 'catalog.product.product.image.delete', 'sort_order' => 3],
     ]
 )]
 class ProductImageModel extends BaseModel
@@ -24,4 +27,14 @@ class ProductImageModel extends BaseModel
     public $table = 'cat_product_image';
     public $primaryKey = 'product_image_id';
     public string $defaultSorting = '-product_image_id';
+
+    public array $allowedRelations = [
+        'product',
+    ];
+
+    public function product(): HasOne
+    {
+        return $this->hasOne(ProductModel::class, 'product_id', 'product_id');
+    }
+
 }

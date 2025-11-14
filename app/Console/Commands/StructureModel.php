@@ -10,11 +10,12 @@ use Illuminate\Support\Str;
 
 class StructureModel extends Command
 {
-    protected $signature = 'structure:model {--Requests}';
+    protected $signature = 'structure:model {--Requests} {--Migration}';
     protected $description = 'Generate Models, Field traits, Pivot Models and optionally FormRequests from /structure JSON files.';
 
     public function handle(): void
     {
+        $timestamp = date('Y_m_d_His');
         $basePath = base_path('structure');
         $jsonFiles = File::allFiles($basePath);
 
@@ -26,75 +27,71 @@ class StructureModel extends Command
                 continue;
             }
 
-            // Model + Field
-            $this->generateModelAndField($file, $json);
+            $this->generateModelAndField($file, $json, $jsonFiles);
 
-            // Requests
             if ($this->option('Requests')) {
                 $this->generateRequests($file, $json);
             }
+
+            if ($this->option('Migration')) {
+
+                $info = $this->resolveModelInfo($file);
+                $this->generateMigration($file, $json, $info, $timestamp);
+            }
         }
 
-        $this->info("\n✅ structure:model completed — Models, Fields and Requests generated.\n");
+        $this->info("\n✅ structure:model completed — Models, Fields, Relations and Requests generated.\n");
     }
 
-    /* ========================================================================
-     *  COMMON PATH RESOLUTION (MODEL + REQUEST İÇİN AYNI)
-     * ====================================================================== */
     /**
      * @return array{namespaceParts: array<int,string>, modelName: string, isPivot: bool, segments: array<int,string>, filename: string}
      */
     private function resolveModelInfo($file): array
     {
         $relative = str_replace(['\\', '/'], '/', $file->getRelativePath());
-        $segments = array_filter(explode('/', $relative));              // e.g. ['catalog','product']
-        $segmentsStudly = array_map(fn($s) => Str::studly($s), $segments); // ['Catalog','Product']
+        $segments = array_filter(explode('/', $relative));
+        $segmentsStudly = array_map(fn($s) => Str::studly($s), $segments);
 
-        $filename = pathinfo($file->getFilename(), PATHINFO_FILENAME); // e.g. product, product_image
+        $filename = pathinfo($file->getFilename(), PATHINFO_FILENAME);
         $isPivot = Str::contains($filename, '_');
 
         if ($isPivot) {
-            [$parent, $child] = explode('_', $filename, 2);            // product + image
-            $parentStudly = Str::studly($parent);                      // Product
-            $childStudly = Str::studly($child);                        // Image
+            [$parent, $child] = explode('_', $filename, 2);
+            $parentStudly = Str::studly($parent);
+            $childStudly = Str::studly($child);
 
-            // Son klasör parent ile aynı değilse ekle
             if (empty($segmentsStudly) || end($segmentsStudly) !== $parentStudly) {
                 $segmentsStudly[] = $parentStudly;
             }
 
             $segmentsStudly[] = 'Pivots';
-            $segmentsStudly[] = $parentStudly . $childStudly;          // ProductImage
+            $segmentsStudly[] = $parentStudly . $childStudly;
             $modelName = $parentStudly . $childStudly;
         } else {
-            $modelName = Str::studly($filename);                       // Product
+            $modelName = Str::studly($filename);
             $last = $segmentsStudly ? end($segmentsStudly) : null;
 
-            // Eğer dizin sonu zaten Product ise bir daha ekleme (çift klasör engeli)
             if ($last !== $modelName) {
                 $segmentsStudly[] = $modelName;
             }
         }
 
         return [
-            'namespaceParts' => $segmentsStudly,       // Models/Catalog/Product/... veya Pivots/...
+            'namespaceParts' => $segmentsStudly,
             'modelName'      => $modelName,
             'isPivot'        => $isPivot,
-            'segments'       => $segments,            // orijinal küçük harfli path ['catalog','product']
+            'segments'       => $segments,
             'filename'       => $filename,
         ];
     }
 
-    /* ========================================================================
-     *  MODEL + FIELD
-     * ====================================================================== */
-    private function generateModelAndField($file, array $json): void
+    private function generateModelAndField($file, array $json, $allFiles): void
     {
-        $info          = $this->resolveModelInfo($file);
+        $info           = $this->resolveModelInfo($file);
         $namespaceParts = $info['namespaceParts'];
-        $modelName     = $info['modelName'];
-        $segments      = $info['segments'];
-        $filename      = $info['filename'];
+        $modelName      = $info['modelName'];
+        $segments       = $info['segments'];
+        $filename       = $info['filename'];
 
         $modelNamespace = 'App\\Models\\' . implode('\\', $namespaceParts);
         $modelDir       = app_path('Models/' . implode('/', $namespaceParts));
@@ -108,8 +105,9 @@ class StructureModel extends Command
         $traitName  = "{$modelName}Field";
         $modelClass = "{$modelName}Model";
 
-        // ---------- FIELD TRAIT ----------
+        // Field trait
         $fieldProps = $this->generateFieldProperties($json['fields'], $primaryKey);
+
         $traitContent = <<<PHP
 <?php
 
@@ -126,13 +124,26 @@ trait {$traitName}
 {$fieldProps}
 }
 PHP;
+
         File::put("{$modelDir}/{$traitName}.php", $traitContent);
 
-        // ---------- MODULE ATTRIBUTES ----------
-        $moduleUsage = "#[ModuleUsage(enabled: {$enabled}, sort_order: {$sortOrder})]";
+        // Relations + allowedRelations + imports
+        $relations        = $this->generateRelationshipMethods($file, $json, $info, $allFiles);
+        $importBlock      = $relations['imports'];
+        $relationMethods  = $relations['methods'];
+        $allowedRelations = $relations['allowed'];
+
+        if (empty($allowedRelations)) {
+            $allowedRelationsCode = '[]';
+        } else {
+            $allowedRelationsCode = "[\n        '" . implode("',\n        '", $allowedRelations) . "',\n    ]";
+        }
+
+        // Module attributes
+        $moduleUsage     = "#[ModuleUsage(enabled: {$enabled}, sort_order: {$sortOrder})]";
         $moduleOperation = $this->generateOperationAttribute($json['operations'] ?? [], $segments, $filename);
 
-        // ---------- MODEL CLASS ----------
+        // Model class
         $modelContent = <<<PHP
 <?php
 
@@ -145,6 +156,7 @@ use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
 use {$modelNamespace}\\{$traitName};
 
+{$importBlock}
 {$moduleUsage}
 {$moduleOperation}
 class {$modelClass} extends BaseModel
@@ -154,34 +166,143 @@ class {$modelClass} extends BaseModel
     public \$table = '{$table}';
     public \$primaryKey = '{$primaryKey}';
     public string \$defaultSorting = '-{$primaryKey}';
+
+    public array \$allowedRelations = {$allowedRelationsCode};
+
+{$relationMethods}
 }
 PHP;
 
         File::put("{$modelDir}/{$modelClass}.php", $modelContent);
         $this->info("📘 Model generated: {$modelClass}");
     }
+    private function generateRelationshipMethods($file, array $json, array $info, $allFiles): array
+    {
+        $imports = [];
+        $methods = [];
+        $allowed = [];
+
+        $primaryKey   = $json['model']['primaryKey'];
+        $baseFilename = $info['filename'];
+        $baseSegments = $info['segments'];
+
+        /* ---------------------------------------------------------
+         * HasOne ilişkiler (fields[].form.relationship)
+         * --------------------------------------------------------- */
+        foreach ($json['fields'] as $fieldName => $meta) {
+            $form = $meta['form'] ?? [];
+            $rel  = $form['relationship'] ?? null;
+
+            if (
+                !$rel ||
+                empty($rel['type']) ||
+                empty($rel['route']) ||
+                empty($rel['fields']['id'])
+            ) {
+                continue;
+            }
+
+            $methodName = Str::camel($rel['type']);
+            $allowed[]  = $methodName;
+
+            $relatedFqn = $this->resolveRelationshipModel($rel['route']);
+            if (!$relatedFqn) {
+                continue;
+            }
+
+            $short = class_basename($relatedFqn);
+
+            $imports[] = "use {$relatedFqn};";
+            $imports[] = "use Illuminate\\Database\\Eloquent\\Relations\\HasOne;";
+
+            $foreignKey = $rel['fields']['id']; // related table column
+            $localKey   = $fieldName;           // this model column
+
+            $methods[] = <<<PHP
+    public function {$methodName}(): HasOne
+    {
+        return \$this->hasOne({$short}::class, '{$foreignKey}', '{$localKey}');
+    }
+PHP;
+        }
+
+        /* ---------------------------------------------------------
+         * Pivot HasMany (product_image, product_translation, ...)
+         * --------------------------------------------------------- */
+        foreach ($allFiles as $pivotFile) {
+            $pivotFilename = pathinfo($pivotFile->getFilename(), PATHINFO_FILENAME);
+
+            // sadece product_* gibi pivotlar
+            if (!Str::startsWith($pivotFilename, $baseFilename . '_')) {
+                continue;
+            }
+
+            $pivotInfo = $this->resolveModelInfo($pivotFile);
+
+            // aynı modül dizini olmalı
+            if ($pivotInfo['segments'] !== $baseSegments) {
+                continue;
+            }
+
+            // child slug: image, translation, video...
+            $childSlug = Str::after($pivotFilename, $baseFilename . '_');
+            if ($childSlug === '') {
+                continue;
+            }
+
+            $pivotNamespaceParts = $pivotInfo['namespaceParts'];
+            $pivotModelName      = $pivotInfo['modelName'];
+            $pivotFqn            = 'App\\Models\\' . implode('\\', $pivotNamespaceParts) . '\\' . $pivotModelName . 'Model';
+            $pivotShort          = $pivotModelName . 'Model';
+
+            $imports[] = "use {$pivotFqn};";
+            $imports[] = "use Illuminate\\Database\\Eloquent\\Relations\\HasMany;";
+
+            $methodName = Str::camel(Str::plural($childSlug)); // images, translations, videos...
+            $allowed[]  = $methodName;
+
+            $methods[] = <<<PHP
+    public function {$methodName}(): HasMany
+    {
+        return \$this->hasMany({$pivotShort}::class, '{$primaryKey}', '{$primaryKey}');
+    }
+PHP;
+        }
+
+        $imports = array_unique($imports);
+        $allowed = array_values(array_unique($allowed));
+
+        $importBlock = '';
+        if (!empty($imports)) {
+            $importBlock = implode("\n", $imports) . "\n";
+        }
+
+        $methodsBlock = '';
+        if (!empty($methods)) {
+            $methodsBlock = implode("\n\n", $methods) . "\n";
+        }
+
+        return [
+            'imports' => $importBlock,
+            'methods' => $methodsBlock,
+            'allowed' => $allowed,
+        ];
+    }
 
     /* ========================================================================
-     *  REQUESTS
+     * REQUEST GENERATION
      * ====================================================================== */
     private function generateRequests($file, array $json): void
     {
-        /* ===============================================================
-           PATH ÇÖZÜMLEME (Model ile aynı dizin kültürü)
-        ============================================================== */
         $info           = $this->resolveModelInfo($file);
-        $namespaceParts = $info['namespaceParts'];   // Catalog/Product/Product veya Pivots/ProductImage
+        $namespaceParts = $info['namespaceParts'];
         $modelName      = $info['modelName'];
 
-        // Requests için aynı klasör, sadece prefix farklı
         $requestDir       = app_path('Http/Requests/' . implode('/', $namespaceParts));
         $requestNamespace = 'App\\Http\\Requests\\' . implode('\\', $namespaceParts);
         File::ensureDirectoryExists($requestDir);
 
-        /* ===============================================================
-           FIELD → ACTION HARİTASI
-        ============================================================== */
-        $fields = $json['fields'] ?? [];
+        $fields     = $json['fields'] ?? [];
         $actionsMap = [];
 
         foreach ($fields as $fieldName => $meta) {
@@ -191,9 +312,6 @@ PHP;
             }
         }
 
-        /* ===============================================================
-           BİLİNEN ACTION → BaseRequest sınıfları
-        ============================================================== */
         $baseMap = [
             'index'   => 'BaseIndexRequest',
             'show'    => 'BaseShowRequest',
@@ -202,73 +320,51 @@ PHP;
             'destroy' => 'BaseDestroyRequest',
         ];
 
-        /* ===============================================================
-           HER ACTION İÇİN REQUEST DOSYASI OLUŞTUR
-        ============================================================== */
         foreach ($actionsMap as $action => $fieldsByAction) {
-
             $baseClassName = $baseMap[$action] ?? 'FormRequest';
 
             if ($baseClassName === 'FormRequest') {
-                // Bilinmeyen action (copy, close vs.)
-                $useBase = "use Illuminate\Foundation\Http\FormRequest;";
+                $useBase = "use Illuminate\\Foundation\\Http\\FormRequest;";
                 $extends = "FormRequest";
                 $merge   = false;
-
             } else {
-                // Bilinen action → BaseXRequest extends
-                // BaseXRequest dosyaları App\Http\Requests altında (Base klasörü yok)
                 $useBase = "use App\\Http\\Requests\\{$baseClassName};";
                 $extends = $baseClassName;
                 $merge   = true;
             }
 
-            /* ===============================================================
-               RULES & MESSAGES ÜRETİMİ
-               required/nullable mantığı:
-                 - form.required === true → required
-                 - yok veya false → nullable
-            ============================================================== */
-            $rulesLines = [];
+            $rulesLines    = [];
             $messagesLines = [];
 
             foreach ($fieldsByAction as $field => $meta) {
-                $form = $meta['form'] ?? [];
-                $required = $form['required'] ?? false;
-
-                // validations JSON'dan gelen kurallar
+                $form       = $meta['form'] ?? [];
+                $required   = $form['required'] ?? false;
                 $validations = $meta['validations'] ?? [];
 
                 if ($required) {
-                    // required varsa nullable asla olmayacak
-                    if (!in_array('required', $validations)) {
+                    if (!in_array('required', $validations, true)) {
                         array_unshift($validations, 'required');
                     }
-                    // nullable varsa sil
                     $validations = array_values(array_filter($validations, fn($r) => $r !== 'nullable'));
                 } else {
-                    // required yoksa nullable EKLE
-                    if (!in_array('nullable', $validations)) {
+                    if (!in_array('nullable', $validations, true)) {
                         array_unshift($validations, 'nullable');
                     }
-                    // required varsa sil
                     $validations = array_values(array_filter($validations, fn($r) => $r !== 'required'));
                 }
 
-                // RULE satırı ekle
                 $rulesLines[] =
                     "            '{$field}' => ['" . implode("', '", $validations) . "'],";
 
-                // MESSAGE satırları
                 foreach ($validations as $rule) {
                     $ruleKey = Str::before($rule, ':');
-                    $label = Str::title(str_replace('_', ' ', $field));
+                    $label   = Str::title(str_replace('_', ' ', $field));
                     $messagesLines[] =
                         "            '{$field}.{$ruleKey}' => '{$label} alanı için {$ruleKey} kuralı geçersizdir.',";
                 }
             }
 
-            $rulesBlock = implode("\n", $rulesLines);
+            $rulesBlock    = implode("\n", $rulesLines);
             $messagesBlock = implode("\n", $messagesLines);
 
             if ($merge) {
@@ -307,11 +403,8 @@ PHP;
 PHP;
             }
 
-            /* ===============================================================
-               REQUEST DOSYASI YAZ
-            ============================================================== */
             $requestClass = "{$modelName}" . Str::studly($action) . "Request";
-            $filePath = "{$requestDir}/{$requestClass}.php";
+            $filePath     = "{$requestDir}/{$requestClass}.php";
 
             $content = <<<PHP
 <?php
@@ -334,48 +427,22 @@ PHP;
             $this->info("🧾 Request generated: {$requestClass}");
         }
     }
-
     /* ========================================================================
-     *  FIELD TRAIT ATTRIBUTE GENERATION
+     * FIELD TRAIT + HELPERS
      * ====================================================================== */
     private function generateFieldProperties(array $fields, string $primaryKey): string
     {
         $lines = [];
 
         foreach ($fields as $name => $meta) {
-            $form      = $meta['form'] ?? [];
-            $table     = $meta['table'] ?? ['showing', 'hiding', 'filtering', 'sorting'];
-            $database  = $meta['database'] ?? [];
+            $form     = $meta['form'] ?? [];
+            $table    = $meta['table'] ?? ['showing', 'hiding', 'filtering', 'sorting'];
+            $database = $meta['database'] ?? [];
 
-            $type      = $form['type'] ?? 'text';
-            $sortOrder = $form['sort_order'] ?? 0;
-            $required  = $form['required'] ?? false;
+            // FormField
+            $formFieldAttr = $this->buildFormFieldAttribute($meta);
 
-            $relationship = isset($form['relationship'])
-                ? $this->inlineArray($form['relationship'])
-                : '[]';
-
-            $options = isset($form['options'])
-                ? $this->inlineArray($form['options'])
-                : '[]';
-
-            // ---- FormField params (gereksiz default'lar yok) ----
-            $params = ["type: '{$type}'"];
-            if ($relationship !== '[]') {
-                $params[] = "relationship: {$relationship}";
-            }
-            if ($options !== '[]') {
-                $params[] = "options: {$options}";
-            }
-            if ($required) {
-                $params[] = "required: true";
-            }
-            if ($sortOrder) {
-                $params[] = "sort_order: {$sortOrder}";
-            }
-            $paramStr = implode(', ', $params);
-
-            // ---- TableColumn (her alanda) ----
+            // TableColumn
             $tableList = $this->simpleList($table);
             if ($name === $primaryKey) {
                 $sorting   = "['{$primaryKey}' => 'desc']";
@@ -384,17 +451,17 @@ PHP;
                 $tableAttr = "#[TableColumn({$tableList})]";
             }
 
-            // ---- ActionType: JSON'daki actions birebir ----
-            $actions = $meta['actions'] ?? [];
-            $actionList = empty($actions) ? '[]' : $this->simpleList($actions);
+            // ActionType (JSON'daki actions birebir)
+            $actions    = $meta['actions'] ?? [];
+            $actionList = $this->simpleList($actions);
             $actionAttr = "#[ActionType({$actionList})]";
 
-            // ---- PHP type + nullable (database.nullable) ----
-            $phpType  = $this->phpType($type);
+            // PHP type + nullable
+            $phpType  = $this->phpType($form['type'] ?? 'text');
             $nullable = !empty($database['nullable']) ? '?' : '';
 
             $lines[] =
-                "    #[FormField({$paramStr})]\n" .
+                "    {$formFieldAttr}\n" .
                 "    {$tableAttr}\n" .
                 "    {$actionAttr}\n" .
                 "    protected {$nullable}{$phpType} \${$name};";
@@ -403,9 +470,48 @@ PHP;
         return implode("\n\n", $lines);
     }
 
-    /* ========================================================================
-     *  HELPERS
-     * ====================================================================== */
+    private function buildFormFieldAttribute(array $meta): string
+    {
+        $form = $meta['form'] ?? [];
+
+        $type      = $form['type'] ?? 'text';
+        $required  = $form['required'] ?? false;
+        $sortOrder = $form['sort_order'] ?? 0;
+        $default   = $form['default'] ?? null;
+        $value     = $form['value'] ?? null;
+        $relationship = $form['relationship'] ?? [];
+        $options      = $form['options'] ?? [];
+
+        $parts = [];
+        $parts[] = "type: '{$type}'";
+        $parts[] = $required ? "required: true" : "required: false";
+
+        if ($default !== null && $default !== '') {
+            $parts[] = "default: '{$default}'";
+        }
+
+        if ($value !== null && $value !== '') {
+            $parts[] = "value: '{$value}'";
+        }
+
+        if (!empty($relationship)) {
+            $rel = var_export($relationship, true);
+            $rel = str_replace(["array (", ")"], ["[", "]"], $rel);
+            $rel = preg_replace('/\s+/', ' ', $rel);
+            $parts[] = "relationship: {$rel}";
+        }
+
+        if (!empty($options)) {
+            $opt = var_export($options, true);
+            $opt = str_replace(["array (", ")"], ["[", "]"], $opt);
+            $opt = preg_replace('/\s+/', ' ', $opt);
+            $parts[] = "options: {$opt}";
+        }
+
+        $parts[] = "sort_order: {$sortOrder}";
+
+        return "#[FormField(" . implode(', ', $parts) . ")]";
+    }
 
     private function phpType(string $formType): string
     {
@@ -416,19 +522,6 @@ PHP;
         };
     }
 
-    private function inlineArray(array $arr): string
-    {
-        if (empty($arr)) {
-            return '[]';
-        }
-
-        $out = var_export($arr, true);
-        $out = str_replace(["array (", ")"], ["[", "]"], $out);
-        $out = preg_replace('/\s+/', ' ', $out);
-
-        return $out;
-    }
-
     private function simpleList(array $arr): string
     {
         if (empty($arr)) {
@@ -436,8 +529,26 @@ PHP;
         }
 
         $vals = array_map(fn($v) => "'" . addslashes((string) $v) . "'", $arr);
-
         return '[' . implode(', ', $vals) . ']';
+    }
+
+    private function resolveRelationshipModel(string $route): ?string
+    {
+        if ($route === '') {
+            return null;
+        }
+
+        $parts  = explode('/', $route);
+        $studly = array_map(fn($p) => Str::studly($p), $parts);
+
+        if (empty($studly)) {
+            return null;
+        }
+
+        $namespace = 'App\\Models\\' . implode('\\', $studly);
+        $className = end($studly) . 'Model';
+
+        return $namespace . '\\' . $className;
     }
 
     private function generateOperationAttribute(array $operations, array $segments, string $filename): string
@@ -446,21 +557,18 @@ PHP;
             return '';
         }
 
-        $prefix = strtolower(implode('.', $segments)); // e.g. "catalog.product"
+        $prefix = strtolower(implode('.', $segments));
 
         $items = [];
         foreach ($operations as $code => $op) {
-            $plural   = !empty($op['plural'])   ? 'true' : 'false';
+            $plural   = !empty($op['plural']) ? 'true' : 'false';
             $singular = !empty($op['singular']) ? 'true' : 'false';
             $sort     = $op['sort_order'] ?? 0;
 
-            // route_name: eğer dizin sonu filename ise tekrar etmeyelim
             $lastSegment = end($segments);
             if ($lastSegment && $lastSegment === $filename) {
-                // catalog.product + active
                 $routeName = "{$prefix}.{$code}";
             } else {
-                // catalog.product + product_image + active
                 $namePart  = Str::of($filename)->replace('_', '.')->lower();
                 $routeName = "{$prefix}.{$namePart}.{$code}";
             }
@@ -472,5 +580,141 @@ PHP;
         $itemsBlock = implode("\n", $items);
 
         return "#[ModuleOperation(\n    items: [\n{$itemsBlock}\n    ]\n)]";
+    }
+
+    private function generateMigration($file, array $json, array $info, string $timestamp): void
+    {
+        $table      = $json['model']['table'];
+        $primaryKey = $json['model']['primaryKey'];
+        $fields     = $json['fields'];
+
+        $className = 'Create' . Str::studly($table) . 'Table';
+        $path      = database_path("migrations/{$timestamp}_create_{$table}_table.php");
+
+        $columnsCode = $this->buildMigrationColumns($fields, $primaryKey);
+        $foreignKeys = $this->buildMigrationForeignKeys($fields);
+
+        $content = <<<PHP
+<?php
+
+use Illuminate\\Database\\Migrations\\Migration;
+use Illuminate\\Database\\Schema\\Blueprint;
+use Illuminate\\Support\\Facades\\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('{$table}', function (Blueprint \$table) {
+{$columnsCode}
+
+{$foreignKeys}
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('{$table}');
+    }
+};
+PHP;
+
+        File::put($path, $content);
+        $this->info("📦 Migration generated: {$className}");
+    }
+
+    private function buildMigrationColumns(array $fields, string $primaryKey): string
+    {
+        $lines = [];
+
+        foreach ($fields as $name => $meta) {
+            $db = $meta['database'] ?? [];
+            $type = $db['variable'] ?? 'string';
+            $nullable = $db['nullable'] ?? false;
+            $unique = $db['unique'] ?? false;
+            $default = $db['default'] ?? null;
+
+            // Primary key
+            if ($name === $primaryKey && $type === 'bigIncrements') {
+                $lines[] = "            \$table->bigIncrements('{$name}');";
+                continue;
+            }
+
+            // TYPE
+            switch ($type) {
+                case 'bigIncrements':
+                    $lines[] = "            \$table->bigIncrements('{$name}');";
+                    continue 2;
+
+                case 'unsignedBigInteger':
+                    $col = "\$table->unsignedBigInteger('{$name}')";
+                    break;
+
+                case 'integer':
+                    $col = "\$table->integer('{$name}')";
+                    break;
+
+                case 'boolean':
+                    $col = "\$table->boolean('{$name}')";
+                    break;
+
+                case 'decimal':
+                    $col = "\$table->decimal('{$name}', 15, 2)";
+                    break;
+
+                case 'timestamp':
+                    $col = "\$table->timestamp('{$name}')";
+                    break;
+
+                default:
+                    $col = "\$table->{$type}('{$name}')";
+                    break;
+            }
+
+            // NULLABLE
+            if ($nullable) {
+                $col .= "->nullable()";
+            }
+
+            // UNIQUE
+            if ($unique) {
+                $col .= "->unique()";
+            }
+
+            // DEFAULT
+            if ($default !== null) {
+                $defaultValue = is_bool($default) ? ($default ? 'true' : 'false') : "'{$default}'";
+                $col .= "->default({$defaultValue})";
+            }
+
+            $col .= ";";
+            $lines[] = "            {$col}";
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function buildMigrationForeignKeys(array $fields): string
+    {
+        $lines = [];
+
+        foreach ($fields as $name => $meta) {
+            $valid = $meta['validations'] ?? [];
+
+            foreach ($valid as $rule) {
+                if (!str_starts_with($rule, 'exists:')) {
+                    continue;
+                }
+
+                [$table, $col] = explode(',', str_replace('exists:', '', $rule));
+
+                $lines[] =
+                    "            \$table->foreign('{$name}')
+                ->references('{$col}')
+                ->on('{$table}')
+                ->nullOnDelete();";
+            }
+        }
+
+        return implode("\n\n", $lines);
     }
 }

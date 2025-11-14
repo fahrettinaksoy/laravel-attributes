@@ -85,7 +85,7 @@
             "validations": ["exists:def_cat_category,category_id"],
             "actions": ["index", "show", "store", "update"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "select", "required": true, "relationship": {"type": "currency", "route": "definition/catalog/category", "fields": {"id": "category_id", "label": "name"}}, "sort_order": 10}
+            "form": {"type": "select", "required": true, "relationship": {"type": "category", "route": "definition/catalog/category", "fields": {"id": "category_id", "label": "name"}}, "sort_order": 10}
         },
         "status": {
             "database": {"variable": "boolean", "nullable": true, "default": true},

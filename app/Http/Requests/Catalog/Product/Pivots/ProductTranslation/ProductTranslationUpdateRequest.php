@@ -11,36 +11,33 @@ class ProductTranslationUpdateRequest extends BaseUpdateRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            'product_translation_id' => ['nullable'],
-            'uuid' => ['nullable'],
-            'code' => ['nullable'],
-            'name' => ['nullable'],
-            'description' => ['nullable'],
-            'image_path' => ['nullable'],
-            'price' => ['nullable'],
-            'currency_code' => ['nullable'],
-            'stock' => ['nullable'],
-            'sku' => ['nullable'],
-            'category_id' => ['nullable'],
-            'is_active' => ['nullable'],
+            'name' => ['required', 'max:255'],
+            'summary' => ['nullable', 'max:255'],
+            'description' => ['nullable', 'max:255'],
+            'slug' => ['required', 'max:255'],
+            'meta_title' => ['required', 'max:255'],
+            'meta_description' => ['required', 'max:255'],
+            'meta_keyword' => ['required', 'max:255'],
         ]);
     }
 
     public function messages(): array
     {
         return array_merge(parent::messages(), [
-            'product_translation_id.nullable' => 'Product Translation Id alanı için nullable kuralı geçersizdir.',
-            'uuid.nullable' => 'Uuid alanı için nullable kuralı geçersizdir.',
-            'code.nullable' => 'Code alanı için nullable kuralı geçersizdir.',
-            'name.nullable' => 'Name alanı için nullable kuralı geçersizdir.',
+            'name.required' => 'Name alanı için required kuralı geçersizdir.',
+            'name.max' => 'Name alanı için max kuralı geçersizdir.',
+            'summary.nullable' => 'Summary alanı için nullable kuralı geçersizdir.',
+            'summary.max' => 'Summary alanı için max kuralı geçersizdir.',
             'description.nullable' => 'Description alanı için nullable kuralı geçersizdir.',
-            'image_path.nullable' => 'Image Path alanı için nullable kuralı geçersizdir.',
-            'price.nullable' => 'Price alanı için nullable kuralı geçersizdir.',
-            'currency_code.nullable' => 'Currency Code alanı için nullable kuralı geçersizdir.',
-            'stock.nullable' => 'Stock alanı için nullable kuralı geçersizdir.',
-            'sku.nullable' => 'Sku alanı için nullable kuralı geçersizdir.',
-            'category_id.nullable' => 'Category Id alanı için nullable kuralı geçersizdir.',
-            'is_active.nullable' => 'Is Active alanı için nullable kuralı geçersizdir.',
+            'description.max' => 'Description alanı için max kuralı geçersizdir.',
+            'slug.required' => 'Slug alanı için required kuralı geçersizdir.',
+            'slug.max' => 'Slug alanı için max kuralı geçersizdir.',
+            'meta_title.required' => 'Meta Title alanı için required kuralı geçersizdir.',
+            'meta_title.max' => 'Meta Title alanı için max kuralı geçersizdir.',
+            'meta_description.required' => 'Meta Description alanı için required kuralı geçersizdir.',
+            'meta_description.max' => 'Meta Description alanı için max kuralı geçersizdir.',
+            'meta_keyword.required' => 'Meta Keyword alanı için required kuralı geçersizdir.',
+            'meta_keyword.max' => 'Meta Keyword alanı için max kuralı geçersizdir.',
         ]);
     }
 }

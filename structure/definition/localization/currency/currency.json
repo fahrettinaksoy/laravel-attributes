@@ -1,0 +1,146 @@
+{
+    "model": {
+        "table": "def_loc_currency",
+        "primaryKey": "currency_id",
+        "enabled": true,
+        "sort_order": 1
+    },
+    "operations": {
+        "active": {"sort_order": 1, "plural": true, "singular": false},
+        "passive": {"sort_order": 2, "plural": true, "singular": false},
+        "delete": {"sort_order": 3, "plural": true, "singular": false}
+    },
+    "fields": {
+        "currency_id": {
+            "database": {"variable": "bigIncrements", "nullable": false},
+            "actions": ["index", "show", "destroy"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "number", "sort_order": 1}
+        },
+        "uuid": {
+            "database": {"variable": "string", "nullable": false, "unique": true},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting", "hiding"],
+            "form": {"type": "text", "sort_order": 1}
+        },
+        "code": {
+            "database": {"variable": "string", "nullable": false, "unique": true},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "text", "sort_order": 3}
+        },
+        "name": {
+            "database": {"variable": "string", "nullable": true},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "text", "required": true, "sort_order": 2}
+        },
+        "description": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": ["showing", "filtering", "sorting", "hiding"],
+            "form": {"type": "textarea", "sort_order": 4}
+        },
+        "image_path": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": [],
+            "form": {"type": "image", "required": true, "sort_order": 5}
+        },
+        "symbol_left": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": [],
+            "form": {"type": "image", "required": true, "sort_order": 5}
+        },
+        "symbol_right": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": [],
+            "form": {"type": "image", "required": true, "sort_order": 5}
+        },
+        "decimal_place": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": [],
+            "form": {"type": "image", "required": true, "sort_order": 5}
+        },
+        "decimal_point": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": [],
+            "form": {"type": "image", "required": true, "sort_order": 5}
+        },
+        "thousand_point": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": [],
+            "form": {"type": "image", "required": true, "sort_order": 5}
+        },
+        "value": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": [],
+            "form": {"type": "image", "required": true, "sort_order": 5}
+        },
+        "source": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": [],
+            "table": [],
+            "form": {"type": "textarea", "sort_order": 4}
+        },
+        "last_synced_at": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "textarea", "sort_order": 4}
+        },
+        "is_crypto": {
+            "database": {"variable": "boolean", "nullable": true, "default": true},
+            "actions": ["index", "show", "store", "update"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "boolean", "required": true, "default": false, "options": {"true": "yes", "false": "no"}, "sort_order": 11}
+        },
+        "status": {
+            "database": {"variable": "boolean", "nullable": true, "default": true},
+            "actions": ["index", "show", "store", "update"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "boolean", "required": true, "default": true, "options": {"true": "active", "false": "passive"}, "sort_order": 11}
+        },
+        "created_at": {
+            "database": {"variable": "timestamp", "nullable": true, "default": 0},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "datetime", "sort_order": 12}
+        },
+        "created_by": {
+            "database": {"variable": "unsignedBigInteger", "nullable": true},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting", "hiding"],
+            "form": {"type": "modal", "relationship": {"name": "created_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 13}
+        },
+        "updated_at": {
+            "database": {"variable": "timestamp", "nullable": true},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "datetime", "sort_order": 15}
+        },
+        "updated_by": {
+            "database": {"variable": "unsignedBigInteger", "nullable": true, "default": 0},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting", "hiding"],
+            "form": {"type": "modal", "relationship": {"name": "updated_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 14}
+        }
+    }
+}
