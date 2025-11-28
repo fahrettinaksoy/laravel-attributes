@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Definition\Catalog\Category\Pivots\CategoryTranslation;
+namespace App\Models\Definition\Catalog\Brand\Subs\BrandTranslation;
 
 use App\Models\BaseModel;
 use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Definition\Catalog\Category\Pivots\CategoryTranslation\CategoryTranslationField;
+use App\Models\Definition\Catalog\Brand\Subs\BrandTranslation\BrandTranslationField;
 
 use App\Models\Definition\Localization\Language\LanguageModel;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use App\Models\Definition\Catalog\Category\CategoryModel;
+use App\Models\Definition\Catalog\Brand\BrandModel;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
@@ -21,9 +21,9 @@ use App\Models\Definition\Catalog\Category\CategoryModel;
         ['code' => 'delete', 'plural' => true, 'singular' => false, 'route_name' => 'definition.catalog.category.category.translation.delete', 'sort_order' => 3],
     ]
 )]
-class CategoryTranslationModel extends BaseModel
+class BrandTranslationModel extends BaseModel
 {
-    use CategoryTranslationField;
+    use BrandTranslationField;
 
     public $table = 'def_category_translation';
     public $primaryKey = 'category_translation_id';
@@ -41,7 +41,7 @@ class CategoryTranslationModel extends BaseModel
 
     public function category(): HasOne
     {
-        return $this->hasOne(CategoryModel::class, 'category_id', 'category_id');
+        return $this->hasOne(BrandModel::class, 'category_id', 'category_id');
     }
 
 }

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Definition\Catalog\Category;
+namespace App\Models\Definition\Catalog\Brand;
 
 use App\Models\BaseModel;
 use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Definition\Catalog\Category\CategoryField;
+use App\Models\Definition\Catalog\Brand\BrandField;
 
-use App\Models\Definition\Catalog\Category\Subs\CategoryTranslation\CategoryTranslationModel;
+use App\Models\Definition\Catalog\Brand\Subs\BrandTranslation\BrandTranslationModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
@@ -20,9 +20,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
         ['code' => 'delete', 'plural' => true, 'singular' => false, 'route_name' => 'definition.catalog.category.delete', 'sort_order' => 3],
     ]
 )]
-class CategoryModel extends BaseModel
+class BrandModel extends BaseModel
 {
-    use CategoryField;
+    use BrandField;
 
     public $table = 'def_cat_category';
     public $primaryKey = 'category_id';
@@ -34,7 +34,7 @@ class CategoryModel extends BaseModel
 
     public function translations(): HasMany
     {
-        return $this->hasMany(CategoryTranslationModel::class, 'category_id', 'category_id');
+        return $this->hasMany(BrandTranslationModel::class, 'category_id', 'category_id');
     }
 
 }

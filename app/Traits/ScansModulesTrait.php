@@ -262,7 +262,7 @@ trait ScansModulesTrait
                 'actions' => $this->extractActionsFromModel($fullyQualifiedClassName),
                 'fields' => $this->extractFieldsFromModel($fullyQualifiedClassName),
             ],
-            'pivots' => $this->extractPivotRelations($fullyQualifiedClassName),
+            'subs' => $this->extractPivotRelations($fullyQualifiedClassName),
         ];
     }
 
@@ -725,7 +725,7 @@ trait ScansModulesTrait
         try {
             $classReflection = new ReflectionClass($fullyQualifiedClassName);
             $modelInstance = $classReflection->newInstanceWithoutConstructor();
-            $discoveredPivots = [];
+            $discoveredSubs = [];
 
             foreach ($classReflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
                 if (! $this->isValidRelationMethod($method, $fullyQualifiedClassName, $modelInstance)) {
@@ -735,11 +735,11 @@ trait ScansModulesTrait
                 try {
                     $relationInstance = $modelInstance->{$method->getName()}();
                     $relatedClassName = get_class($relationInstance->getRelated());
-                    $pivotData = $this->buildPivotDefinition($fullyQualifiedClassName, $method->getName(), $relatedClassName);
-                    $pivotKey = $this->generatePivotKey($relatedClassName);
-                    $discoveredPivots[$pivotKey] = $pivotData;
+                    $subData = $this->buildPivotDefinition($fullyQualifiedClassName, $method->getName(), $relatedClassName);
+                    $subKey = $this->generatePivotKey($relatedClassName);
+                    $discoveredSubs[$subKey] = $subData;
                 } catch (Throwable $exception) {
-                    Log::debug("Failed to process pivot relation: {$method->getName()}", [
+                    Log::debug("Failed to process sub relation: {$method->getName()}", [
                         'model' => $fullyQualifiedClassName,
                         'exception' => $exception->getMessage(),
                     ]);
@@ -748,11 +748,11 @@ trait ScansModulesTrait
                 }
             }
 
-            ksort($discoveredPivots);
+            ksort($discoveredSubs);
 
-            return $discoveredPivots;
+            return $discoveredSubs;
         } catch (ReflectionException $exception) {
-            Log::error("Failed to extract pivot relations from model: {$fullyQualifiedClassName}", [
+            Log::error("Failed to extract sub relations from model: {$fullyQualifiedClassName}", [
                 'exception' => $exception->getMessage(),
             ]);
 
@@ -865,9 +865,9 @@ trait ScansModulesTrait
     private function generatePivotKey(string $relatedClassName): string
     {
         $relatedBaseName = class_basename($relatedClassName);
-        $pivotName = str_ireplace(self::MODEL_SUFFIX, '', $relatedBaseName);
+        $subName = str_ireplace(self::MODEL_SUFFIX, '', $relatedBaseName);
 
-        return $this->convertToSnakeCase($pivotName);
+        return $this->convertToSnakeCase($subName);
     }
 
     public function getModuleStatistics(): array

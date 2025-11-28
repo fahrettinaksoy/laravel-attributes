@@ -8,15 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('cat_product_translation', function (Blueprint $table) {
+        Schema::create('def_category_translation', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
 
-            $table->bigIncrements('product_translation_id');
-            $table->unsignedBigInteger('product_id');
+            $table->bigIncrements('category_translation_id');
             $table->uuid('uuid');
             $table->string('code', 64);
+            $table->string('language_code', 5);
+            $table->unsignedBigInteger('category_id');
             $table->string('name', 255);
             $table->string('summary', 500)->nullable();
             $table->string('description', 500)->nullable();
@@ -29,16 +30,17 @@ return new class extends Migration
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
             $table->unsignedBigInteger('updated_by')->nullable();
 
-            $table->unique('uuid', 'uq_cat_product_translation_uuid');
-            $table->unique('code', 'uq_cat_product_translation_code');
-            $table->index('product_id', 'idx_cat_product_translation_product_id');
-            $table->index('created_by', 'idx_cat_product_translation_created_by');
-            $table->index('updated_by', 'idx_cat_product_translation_updated_by');
+            $table->unique('uuid', 'uq_def_category_translation_uuid');
+            $table->unique('code', 'uq_def_category_translation_code');
+            $table->index('category_id', 'idx_def_category_translation_category_id');
+            $table->index('language_code', 'idx_def_category_translation_language_code');
+            $table->index('created_by', 'idx_def_category_translation_created_by');
+            $table->index('updated_by', 'idx_def_category_translation_updated_by');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('cat_product_translation');
+        Schema::dropIfExists('def_category_translation');
     }
 };

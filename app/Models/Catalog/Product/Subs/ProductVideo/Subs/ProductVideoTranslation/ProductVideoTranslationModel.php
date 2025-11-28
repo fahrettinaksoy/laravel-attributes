@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Catalog\Product\Pivots\ProductTranslation;
+namespace App\Models\Catalog\Product\Subs\ProductVideo\Subs\ProductVideoTranslation;
 
 use App\Models\BaseModel;
 use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Catalog\Product\Pivots\ProductTranslation\ProductTranslationField;
-
-use App\Models\Catalog\Product\ProductModel;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Catalog\Product\Subs\ProductVideo\Subs\ProductVideoTranslation;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
@@ -20,21 +17,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
         ['code' => 'delete', 'plural' => true, 'singular' => false, 'route_name' => 'catalog.product.product.translation.delete', 'sort_order' => 3],
     ]
 )]
-class ProductTranslationModel extends BaseModel
+class ProductVideoTranslationModel extends BaseModel
 {
-    use ProductTranslationField;
+    use ProductVideoTranslationField;
 
-    public $table = 'cat_product_translation';
-    public $primaryKey = 'product_translation_id';
-    public string $defaultSorting = '-product_translation_id';
+    public $table = 'cat_product_image_translation';
+    public $primaryKey = 'product_image_translation_id';
+    public string $defaultSorting = '-product_image_translation_id';
 
     public array $allowedRelations = [
         'product',
     ];
-
-    public function product(): HasOne
-    {
-        return $this->hasOne(ProductModel::class, 'product_id', 'product_id');
-    }
-
 }

@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Catalog\Product\Pivots\ProductImage;
+namespace App\Models\Catalog\Product\Subs\ProductImage;
 
 use App\Models\BaseModel;
 use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Catalog\Product\Pivots\ProductImage\ProductImageField;
+use App\Models\Catalog\Product\Subs\ProductImage\ProductImageField;
 
 use App\Models\Catalog\Product\ProductModel;
+use App\Models\Catalog\Product\Subs\ProductImage\Subs\ProductImageTranslation\ProductImageTranslationModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
@@ -30,6 +32,7 @@ class ProductImageModel extends BaseModel
 
     public array $allowedRelations = [
         'product',
+        'translations',
     ];
 
     public function product(): HasOne
@@ -37,4 +40,8 @@ class ProductImageModel extends BaseModel
         return $this->hasOne(ProductModel::class, 'product_id', 'product_id');
     }
 
+    public function translations(): HasMany
+    {
+        return $this->hasMany(ProductImageTranslationModel::class, 'product_image_id', 'product_image_id');
+    }
 }

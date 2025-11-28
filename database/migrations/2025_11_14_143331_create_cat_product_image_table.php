@@ -4,24 +4,30 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('cat_product_image', function (Blueprint $table) {
-            $table->bigIncrements('product_image_id');
-            $table->integer('product_id')->nullable()->default('0');
-            $table->string('uuid')->unique();
-            $table->string('code')->unique();
-            $table->string('file_path')->nullable();
-            $table->timestamp('created_at')->nullable()->default('0');
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->timestamp('updated_at')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable()->default('0');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8mb4';
+            $table->collation = 'utf8mb4_unicode_ci';
 
-            $table->foreign('product_id')
-                ->references('product_id')
-                ->on('cat_product')
-                ->nullOnDelete();
+            $table->bigIncrements('product_image_id');
+            $table->unsignedBigInteger('product_id')->nullable()->default(0);
+            $table->uuid('uuid');
+            $table->string('code', 64);
+            $table->string('file_path', 255);
+            $table->timestamp('created_at')->useCurrent();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->unsignedBigInteger('updated_by')->nullable();
+
+            $table->unique('uuid', 'uq_cat_product_image_uuid');
+            $table->unique('code', 'uq_cat_product_image_code');
+            $table->index('product_id', 'idx_cat_product_image_product_id');
+            $table->index('created_by', 'idx_cat_product_image_created_by');
+            $table->index('updated_by', 'idx_cat_product_image_updated_by');
         });
     }
 

@@ -15,7 +15,7 @@ trait CategoryField
     #[ActionType(['index', 'show', 'destroy'])]
     protected int $category_id;
 
-    #[FormField(type: 'text', required: false, sort_order: 1)]
+    #[FormField(type: 'text', required: false, sort_order: 2)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected string $uuid;
@@ -25,58 +25,58 @@ trait CategoryField
     #[ActionType(['index', 'show'])]
     protected string $code;
 
-    #[FormField(type: 'text', required: true, sort_order: 2)]
+    #[FormField(type: 'text', required: true, sort_order: 4)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
-    protected ?string $name;
+    protected string $name;
 
-    #[FormField(type: 'textarea', required: false, sort_order: 4)]
+    #[FormField(type: 'textarea', required: false, sort_order: 5)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
-    protected string $description;
+    protected ?string $description;
 
-    #[FormField(type: 'image', required: true, sort_order: 5)]
-    #[TableColumn([])]
+    #[FormField(type: 'image', required: false, sort_order: 6)]
+    #[TableColumn(['showing'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
-    protected string $image_path;
+    protected ?string $image_path;
 
-    #[FormField(type: 'number', required: true, sort_order: 8)]
+    #[FormField(type: 'modal', required: false, relationship: ['type' => 'category', 'route' => 'definition/catalog/category', 'fields' => ['id' => 'category_id', 'label' => 'name']], sort_order: 7)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected int $parent_id;
 
-    #[FormField(type: 'number', required: true, sort_order: 8)]
+    #[FormField(type: 'modal', required: false, relationship: ['type' => 'layout', 'route' => 'system/layout', 'fields' => ['id' => 'layout_id', 'label' => 'name']], sort_order: 8)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected int $layout_id;
 
-    #[FormField(type: 'number', required: true, sort_order: 8)]
+    #[FormField(type: 'number', required: false, sort_order: 9)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected int $membership;
 
-    #[FormField(type: 'boolean', required: true, default: '1', options: [ 'true' => 'active', 'false' => 'passive', ], sort_order: 11)]
+    #[FormField(type: 'boolean', required: true, default: '1', options: ['true' => 'active', 'false' => 'passive'], sort_order: 10)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
-    protected ?bool $status;
+    protected bool $status;
 
-    #[FormField(type: 'datetime', required: false, sort_order: 12)]
+    #[FormField(type: 'datetime', required: false, sort_order: 11)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show'])]
     protected ?string $created_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'created_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 13)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'created_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 12)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
-    protected ?string $created_by;
+    protected ?int $created_by;
 
-    #[FormField(type: 'datetime', required: false, sort_order: 15)]
+    #[FormField(type: 'datetime', required: false, sort_order: 13)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show'])]
     protected ?string $updated_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'updated_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 14)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'updated_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 14)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
-    protected ?string $updated_by;
+    protected ?int $updated_by;
 }

@@ -4,25 +4,31 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('cat_product_video', function (Blueprint $table) {
-            $table->bigIncrements('product_video_id');
-            $table->integer('product_id')->nullable()->default('0');
-            $table->string('uuid')->unique();
-            $table->string('code')->unique();
-            $table->string('source')->nullable();
-            $table->string('content')->nullable();
-            $table->timestamp('created_at')->nullable()->default('0');
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->timestamp('updated_at')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable()->default('0');
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8mb4';
+            $table->collation = 'utf8mb4_unicode_ci';
 
-            $table->foreign('product_id')
-                ->references('product_id')
-                ->on('cat_product')
-                ->nullOnDelete();
+            $table->bigIncrements('product_video_id');
+            $table->unsignedBigInteger('product_id');
+            $table->uuid('uuid');
+            $table->string('code', 64);
+            $table->string('source', 255);
+            $table->string('content', 500);
+            $table->timestamp('created_at')->useCurrent();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->unsignedBigInteger('updated_by')->nullable();
+
+            $table->unique('uuid', 'uq_cat_product_video_uuid');
+            $table->unique('code', 'uq_cat_product_video_code');
+            $table->index('product_id', 'idx_cat_product_video_product_id');
+            $table->index('created_by', 'idx_cat_product_video_created_by');
+            $table->index('updated_by', 'idx_cat_product_video_updated_by');
         });
     }
 

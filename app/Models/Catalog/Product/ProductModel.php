@@ -12,10 +12,10 @@ use App\Models\Catalog\Product\ProductField;
 use App\Models\Definition\Localization\Currency\CurrencyModel;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Definition\Catalog\Category\CategoryModel;
-use App\Models\Catalog\Product\Pivots\ProductImage\ProductImageModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Catalog\Product\Pivots\ProductTranslation\ProductTranslationModel;
-use App\Models\Catalog\Product\Pivots\ProductVideo\ProductVideoModel;
+use App\Models\Catalog\Product\Subs\ProductTranslation\ProductTranslationModel;
+use App\Models\Catalog\Product\Subs\ProductImage\ProductImageModel;
+use App\Models\Catalog\Product\Subs\ProductVideo\ProductVideoModel;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
