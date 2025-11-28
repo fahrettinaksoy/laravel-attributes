@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class GeneratePostmanCollection extends Command
 {
     protected $signature = 'postman:generate
-                            {--name=TransferCabCore : Collection name}
+                            {--name= : Collection name}
                             {--collection-version=1.0.0 : Collection version}
                             {--auth-token= : Default auth token}';
 
@@ -41,14 +41,16 @@ class GeneratePostmanCollection extends Command
 
     public function handle(): int
     {
-        $this->info('🚀 Starting dynamic Postman collection generation...');
+        $projectName = basename(base_path());
+
+        if (!$this->option('name')) {
+            $this->input->setOption('name', $projectName);
+        }
 
         $this->initCollection();
         $this->buildEndpoints();
         $this->writeCollectionFile();
         $this->writeEnvironments();
-
-        $this->info('✅ Postman collection generated successfully!');
 
         return Command::SUCCESS;
     }
@@ -191,10 +193,12 @@ class GeneratePostmanCollection extends Command
 
     protected function writeCollectionFile(): void
     {
-        $fileName = $this->option('name') . '-collection.json';
-        $filePath = $this->postmanPath($fileName);
+        $projectName = $this->option('name');
+        $fileName = "{$projectName}-collection.json";
 
+        $filePath = $this->postmanPath($fileName);
         $json = json_encode($this->collection, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
         File::put($filePath, $json);
 
         $this->info('📊 Collection stats:');
@@ -205,16 +209,20 @@ class GeneratePostmanCollection extends Command
 
     protected function writeEnvironments(): void
     {
+        $projectName = $this->option('name');
+
         $envs = [
-            'local' => $this->option('name') . '-environment-local.json',
-            'stage' => $this->option('name') . '-environment-stage.json',
-            'master' => $this->option('name') . '-environment-master.json',
+            'local' => "{$projectName}-environment-local.json",
+            'stage' => "{$projectName}-environment-stage.json",
+            'master' => "{$projectName}-environment-master.json",
         ];
 
         foreach ($envs as $env => $fileName) {
-            $data = $this->buildEnvironment($env);
+            $data = $this->buildEnvironment($env, $projectName);
+
             $filePath = $this->postmanPath($fileName);
             File::put($filePath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
             $this->info("🌍 {$env} environment file created: postman/{$fileName}");
         }
     }
@@ -328,11 +336,11 @@ class GeneratePostmanCollection extends Command
                     continue;
                 }
 
-                if (strtolower($name) === 'pivot') {
-                    $sub = $this->scanModels($item, $rel . '/Pivot');
+                if (strtolower($name) === 'relation') {
+                    $sub = $this->scanModels($item, $rel . '/Relation');
                     if (! empty($sub)) {
-                        $structure['Pivot'] = [
-                            'type' => 'pivot',
+                        $structure['Relation'] = [
+                            'type' => 'relation',
                             'parent' => $this->parentModule($rel),
                             'children' => $sub,
                         ];
@@ -361,20 +369,20 @@ class GeneratePostmanCollection extends Command
             }
 
             $parentDir = basename(dirname($item));
-            $isPivotContext = str_contains($rel, '/Pivot');
+            $isRelationContext = str_contains($rel, '/Relation');
 
-            if ($isPivotContext) {
+            if ($isRelationContext) {
                 $parentModule = $this->parentModule($rel);
 
-                $pivotModelFqn = $this->fqnFromPath($item, 'Model');
+                $relationModelFqn = $this->fqnFromPath($item, 'Model');
                 $parentModelFqn = $this->parentModelFqn($rel);
-                $relationSlug = $this->guessRelationSlug($parentModelFqn, $pivotModelFqn)
+                $relationSlug = $this->guessRelationSlug($parentModelFqn, $relationModelFqn)
                     ?: $this->relationFromModelName($modelBase);
 
-                $route = $this->buildPivotRoute($rel, $relationSlug, $parentModule);
+                $route = $this->buildRelationRoute($rel, $relationSlug, $parentModule);
 
                 $structure['__CRUD__'] = [
-                    'type' => 'pivot_model',
+                    'type' => 'relation_model',
                     'parent' => $parentModule,
                     'route' => $route,
                     'file_path' => $item,
@@ -404,9 +412,9 @@ class GeneratePostmanCollection extends Command
     protected function parentModule(string $rel): string
     {
         $parts = array_values(array_filter(explode('/', trim($rel, '/'))));
-        $pivotIdx = array_search('Pivot', $parts, true);
-        if ($pivotIdx !== false && $pivotIdx > 0) {
-            return $parts[$pivotIdx - 1];
+        $relationIdx = array_search('Relation', $parts, true);
+        if ($relationIdx !== false && $relationIdx > 0) {
+            return $parts[$relationIdx - 1];
         }
 
         return end($parts) ?: '';
@@ -415,20 +423,20 @@ class GeneratePostmanCollection extends Command
     protected function parentModelFqn(string $rel): ?string
     {
         $parts = array_values(array_filter(explode('/', trim($rel, '/'))));
-        $pivotIdx = array_search('Pivot', $parts, true);
-        if ($pivotIdx === false || $pivotIdx === 0) {
+        $relationIdx = array_search('Relation', $parts, true);
+        if ($relationIdx === false || $relationIdx === 0) {
             return null;
         }
-        $parentParts = array_slice($parts, 0, $pivotIdx);
+        $parentParts = array_slice($parts, 0, $relationIdx);
         $parentBase = end($parentParts);
         $fqn = 'App\\Models\\' . implode('\\', $parentParts) . '\\' . $parentBase . 'Model';
 
         return class_exists($fqn) ? $fqn : null;
     }
 
-    protected function guessRelationSlug(?string $parentModelFqn, string $pivotModelFqn): ?string
+    protected function guessRelationSlug(?string $parentModelFqn, string $relationModelFqn): ?string
     {
-        if (! $parentModelFqn || ! class_exists($parentModelFqn) || ! class_exists($pivotModelFqn)) {
+        if (! $parentModelFqn || ! class_exists($parentModelFqn) || ! class_exists($relationModelFqn)) {
             return null;
         }
 
@@ -455,7 +463,7 @@ class GeneratePostmanCollection extends Command
                 }
 
                 if ($rel instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
-                    if (get_class($rel->getRelated()) === $pivotModelFqn) {
+                    if (get_class($rel->getRelated()) === $relationModelFqn) {
                         return $method->getName();
                     }
                 }
@@ -479,17 +487,17 @@ class GeneratePostmanCollection extends Command
         return Str::plural(Str::snake($modelBase));
     }
 
-    protected function buildPivotRoute(string $rel, string $relationSlug, string $parentModule): string
+    protected function buildRelationRoute(string $rel, string $relationSlug, string $parentModule): string
     {
         $parts = array_values(array_filter(explode('/', trim($rel, '/'))));
-        $pivotCount = array_count_values($parts)['Pivot'] ?? 0;
+        $relationCount = array_count_values($parts)['Relation'] ?? 0;
 
-        if ($pivotCount > 1) {
-            return $this->buildNestedPivotRoute($parts);
+        if ($relationCount > 1) {
+            return $this->buildNestedRelationRoute($parts);
         }
 
-        $pivotIdx = array_search('Pivot', $parts, true);
-        $baseParts = $pivotIdx !== false ? array_slice($parts, 0, $pivotIdx) : $parts;
+        $relationIdx = array_search('Relation', $parts, true);
+        $baseParts = $relationIdx !== false ? array_slice($parts, 0, $relationIdx) : $parts;
 
         $baseRoute = implode('/', array_map('strtolower', $baseParts));
         $parentVar = '{{' . strtolower($parentModule) . 'ID}}';
@@ -498,14 +506,14 @@ class GeneratePostmanCollection extends Command
         return trim($baseRoute . '/' . $parentVar . '/' . $slug, '/');
     }
 
-    protected function buildNestedPivotRoute(array $parts): string
+    protected function buildNestedRelationRoute(array $parts): string
     {
         $routeSegments = [];
         $baseModelStack = [];
-        $firstPivotIndex = array_search('Pivot', $parts, true);
+        $firstRelationIndex = array_search('Relation', $parts, true);
 
         for ($i = 0; $i < count($parts); $i++) {
-            if ($parts[$i] === 'Pivot') {
+            if ($parts[$i] === 'Relation') {
                 break;
             }
             $routeSegments[] = strtolower($parts[$i]);
@@ -514,34 +522,34 @@ class GeneratePostmanCollection extends Command
 
         $baseModel = end($baseModelStack);
         $currentParent = $baseModel;
-        $priorPivotChain = [];
+        $priorRelationChain = [];
 
         $currentParentFqn = $this->fqnFromSegments($baseModelStack, $currentParent, 'Model');
 
-        for ($i = $firstPivotIndex; $i !== false && $i < count($parts); $i++) {
-            if ($parts[$i] !== 'Pivot') {
+        for ($i = $firstRelationIndex; $i !== false && $i < count($parts); $i++) {
+            if ($parts[$i] !== 'Relation') {
                 continue;
             }
 
-            $pivotModelName = $parts[$i + 1] ?? null;
-            if (! $pivotModelName) {
+            $relationModelName = $parts[$i + 1] ?? null;
+            if (! $relationModelName) {
                 continue;
             }
 
-            $parentFqn = empty($priorPivotChain)
+            $parentFqn = empty($priorRelationChain)
                 ? $this->fqnFromSegments($baseModelStack, $currentParent, 'Model')
-                : $this->fqnPivotModel($baseModelStack, array_slice($priorPivotChain, 0, count($priorPivotChain) - 0), end($priorPivotChain));
+                : $this->fqnRelationModel($baseModelStack, array_slice($priorRelationChain, 0, count($priorRelationChain) - 0), end($priorRelationChain));
 
-            $pivotFqn = $this->fqnPivotModel($baseModelStack, $priorPivotChain, $pivotModelName);
-            $relation = $this->guessRelationSlug($parentFqn, $pivotFqn)
-                ?: $this->relationFromModelName($pivotModelName);
+            $relationFqn = $this->fqnRelationModel($baseModelStack, $priorRelationChain, $relationModelName);
+            $relation = $this->guessRelationSlug($parentFqn, $relationFqn)
+                ?: $this->relationFromModelName($relationModelName);
 
             $routeSegments[] = '{{' . strtolower($currentParent) . 'ID}}';
             $routeSegments[] = \Illuminate\Support\Str::snake($relation);
 
-            $priorPivotChain[] = $pivotModelName;
-            $currentParent = $pivotModelName;
-            $currentParentFqn = $pivotFqn;
+            $priorRelationChain[] = $relationModelName;
+            $currentParent = $relationModelName;
+            $currentParentFqn = $relationFqn;
 
             $i++;
         }
@@ -549,16 +557,16 @@ class GeneratePostmanCollection extends Command
         return implode('/', $routeSegments);
     }
 
-    protected function fqnPivotModel(array $baseSegments, array $priorPivotModels, string $targetModel): string
+    protected function fqnRelationModel(array $baseSegments, array $priorRelationModels, string $targetModel): string
     {
-        $parts = array_values(array_filter($baseSegments, fn ($s) => $s !== 'Pivot'));
+        $parts = array_values(array_filter($baseSegments, fn ($s) => $s !== 'Relation'));
 
-        foreach ($priorPivotModels as $m) {
-            $parts[] = 'Pivot';
+        foreach ($priorRelationModels as $m) {
+            $parts[] = 'Relation';
             $parts[] = $m;
         }
 
-        $parts[] = 'Pivot';
+        $parts[] = 'Relation';
         $parts[] = $targetModel;
 
         return 'App\\Models\\' . implode('\\', $parts) . '\\' . $targetModel . 'Model';
@@ -568,7 +576,7 @@ class GeneratePostmanCollection extends Command
     {
         $items = [];
 
-        if (isset($node['__CRUD__']) && in_array($node['__CRUD__']['type'], ['model', 'pivot_model'], true)) {
+        if (isset($node['__CRUD__']) && in_array($node['__CRUD__']['type'], ['model', 'relation_model'], true)) {
             $crud = $node['__CRUD__'];
             $modelName = basename($crud['file_path'], 'Model.php');
 
@@ -576,7 +584,7 @@ class GeneratePostmanCollection extends Command
                 $modelName,
                 $crud['route'],
                 $crud['file_path'],
-                ['is_pivot' => $crud['type'] === 'pivot_model'],
+                ['is_relation' => $crud['type'] === 'relation_model'],
             );
 
             $items = array_merge($items, $requests);
@@ -584,19 +592,19 @@ class GeneratePostmanCollection extends Command
         }
 
         foreach ($node as $name => $info) {
-            if ($info['type'] === 'directory' || $info['type'] === 'pivot') {
+            if ($info['type'] === 'directory' || $info['type'] === 'relation') {
                 $children = $this->toPostmanTree($info['children']);
                 if (! empty($children)) {
                     $items[] = [
                         'name' => $name,
                         'item' => $children,
-                        'description' => $info['type'] === 'pivot'
-                            ? "Pivot relations for {$info['parent']}"
+                        'description' => $info['type'] === 'relation'
+                            ? "Relation relations for {$info['parent']}"
                             : "Operations for {$name} module",
                     ];
                 }
             } elseif ($info['type'] === 'model') {
-                $requests = $this->makeCrudRequests($name, $info['route'], $info['file_path'], ['is_pivot' => false]);
+                $requests = $this->makeCrudRequests($name, $info['route'], $info['file_path'], ['is_relation' => false]);
                 if (! empty($requests)) {
                     $items[] = [
                         'name' => $name,
@@ -1138,23 +1146,43 @@ class GeneratePostmanCollection extends Command
             'Generated on: ' . now()->format('Y-m-d H:i:s');
     }
 
-    protected function buildEnvironment(string $env): array
+    protected function buildEnvironment(string $env, string $projectName): array
     {
+        $appUrl = config('app.url');
+        $parsed = parse_url($appUrl);
+
+        $host = $parsed['host'] ?? '';
+        $protocol = ($parsed['scheme'] ?? 'https') . '://';
+        $parts = explode('.', $host);
+        $subDomain = '';
+        $domain = $host;
+
+        if (count($parts) > 2) {
+            $subDomain = $parts[0] . '.'; // "api."
+            $domain = implode('.', array_slice($parts, 1));
+        }
+
+        if (count($parts) === 2) {
+            $subDomain = '';
+            $domain = $host;
+        }
+
         return [
             'id' => (string) Str::uuid(),
-            'name' => $this->option('name') . ' ' . ucfirst($env),
+            'name' => "{$projectName} " . ucfirst($env),
             'values' => [
-                ['key' => 'protocol',      'value' => 'https://',                     'enabled' => true],
-                ['key' => 'subDomain',     'value' => 'api_core.',                    'enabled' => true],
-                ['key' => 'domain',        'value' => 'transfercab.loc',          'enabled' => true],
-                ['key' => 'path',          'value' => '/api',                         'enabled' => true],
-                ['key' => 'version',       'value' => '/v1',                          'enabled' => true],
+                ['key' => 'protocol',      'value' => $protocol,                        'enabled' => true],
+                ['key' => 'subDomain',     'value' => $subDomain,                       'enabled' => true],
+                ['key' => 'domain',        'value' => $domain,                          'enabled' => true],
+                ['key' => 'path',          'value' => '/api',                           'enabled' => true],
+                ['key' => 'version',       'value' => '/v1',                            'enabled' => true],
                 ['key' => 'apiURL',        'value' => '{{protocol}}{{subDomain}}{{domain}}{{path}}', 'enabled' => true],
-                ['key' => 'authEmail',     'value' => 'aksoy@transfercab.com',    'enabled' => true],
-                ['key' => 'authPassword',  'value' => '19441944Aks%&',                'enabled' => true],
-                ['key' => 'authNameFirst', 'value' => 'Fahrettin',                    'enabled' => true],
-                ['key' => 'authNameLast',  'value' => 'Aksoy',                        'enabled' => true],
-                ['key' => 'authToken',     'value' => '',                             'enabled' => true],
+
+                ['key' => 'authEmail',     'value' => 'aksoy@' . $domain,               'enabled' => true],
+                ['key' => 'authPassword',  'value' => '19441944Aks%&',                  'enabled' => true],
+                ['key' => 'authNameFirst', 'value' => 'Fahrettin',                      'enabled' => true],
+                ['key' => 'authNameLast',  'value' => 'Aksoy',                          'enabled' => true],
+                ['key' => 'authToken',     'value' => '',                               'enabled' => true],
             ],
             '_postman_variable_scope' => 'environment',
             '_postman_exported_at' => now()->toIso8601String(),
@@ -1204,18 +1232,18 @@ class GeneratePostmanCollection extends Command
 
     protected function fqnFromSegments(array $segments, string $base, string $suffix): string
     {
-        $segments = array_values(array_filter($segments, fn ($s) => $s !== 'Pivot'));
+        $segments = array_values(array_filter($segments, fn ($s) => $s !== 'Relation'));
 
         return 'App\\Models\\' . implode('\\', $segments) . '\\' . $base . $suffix;
     }
 
-    protected function fqnFromPivotChain(array $baseSegments, string $pivotModel): string
+    protected function fqnFromRelationChain(array $baseSegments, string $relationModel): string
     {
-        $parts = array_values(array_filter($baseSegments, fn ($s) => $s !== 'Pivot'));
-        $parts[] = 'Pivot';
-        $parts[] = $pivotModel;
+        $parts = array_values(array_filter($baseSegments, fn ($s) => $s !== 'Relation'));
+        $parts[] = 'Relation';
+        $parts[] = $relationModel;
 
-        return 'App\\Models\\' . implode('\\', $parts) . '\\' . $pivotModel . 'Model';
+        return 'App\\Models\\' . implode('\\', $parts) . '\\' . $relationModel . 'Model';
     }
 
     protected function tableColumnComments(?string $table): array

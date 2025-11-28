@@ -570,9 +570,6 @@ trait ScansModulesTrait
 
             return [
                 'rules' => method_exists($requestInstance, 'rules') ? $requestInstance->rules() : [],
-                'messages' => method_exists($requestInstance, 'messages') ? $requestInstance->messages() : [],
-                'attributes' => method_exists($requestInstance, 'attributes') ? $requestInstance->attributes() : [],
-                'class' => $requestClassName,
             ];
         } catch (Throwable $exception) {
             Log::debug("Failed to instantiate request class: {$requestClassName}", [
