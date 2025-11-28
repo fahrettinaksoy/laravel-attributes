@@ -108,15 +108,15 @@ trait ScansModulesTrait
         }
 
         $discoveredModules = [];
-        $subDirectories = $this->getSubDirectories($directoryPath);
+        $relationDirectories = $this->getSubDirectories($directoryPath);
 
-        foreach ($subDirectories as $subDirectoryPath) {
-            $directoryName = basename($subDirectoryPath);
+        foreach ($relationDirectories as $relationDirectoryPath) {
+            $directoryName = basename($relationDirectoryPath);
             $directoryCode = $this->convertToSnakeCase($directoryName);
             $fullNamespaceKey = $this->buildNamespaceKey($parentNamespaceKey, $directoryCode);
 
             try {
-                $childModules = $this->processDirectoryContents($subDirectoryPath, $fullNamespaceKey);
+                $childModules = $this->processDirectoryContents($relationDirectoryPath, $fullNamespaceKey);
 
                 if (! empty($childModules)) {
                     $discoveredModules[$directoryCode] = [
@@ -126,7 +126,7 @@ trait ScansModulesTrait
                     ];
                 }
             } catch (Throwable $exception) {
-                Log::warning("Failed to process directory: {$subDirectoryPath}", [
+                Log::warning("Failed to process directory: {$relationDirectoryPath}", [
                     'exception' => $exception->getMessage(),
                     'trace' => $exception->getTraceAsString(),
                 ]);
@@ -207,26 +207,26 @@ trait ScansModulesTrait
 
     private function processSubDirectories(string $directoryPath, string $parentNamespaceKey, array $existingChildren): array
     {
-        $subDirectories = $this->getSubDirectories($directoryPath);
+        $relationDirectories = $this->getSubDirectories($directoryPath);
 
-        foreach ($subDirectories as $subDirectoryPath) {
-            $directoryName = basename($subDirectoryPath);
+        foreach ($relationDirectories as $relationDirectoryPath) {
+            $directoryName = basename($relationDirectoryPath);
             $directoryCode = $this->convertToSnakeCase($directoryName);
             $newNamespaceKey = $this->buildNamespaceKey($parentNamespaceKey, $directoryCode);
 
             try {
-                $modelFilesInSubDir = $this->collectValidModelFiles($subDirectoryPath);
+                $modelFilesInSubDir = $this->collectValidModelFiles($relationDirectoryPath);
 
                 if ($this->shouldTreatAsSingleModule($modelFilesInSubDir, $directoryName)) {
                     $modelFile = $modelFilesInSubDir[0];
                     $moduleCode = $this->extractCodeFromFileName($modelFile->getFilename());
-                    $moduleDefinition = $this->createModuleDefinition($modelFile, $subDirectoryPath, $parentNamespaceKey);
+                    $moduleDefinition = $this->createModuleDefinition($modelFile, $relationDirectoryPath, $parentNamespaceKey);
                     $existingChildren[$moduleCode] = $moduleDefinition;
 
                     continue;
                 }
 
-                $nestedModules = $this->processDirectoryContents($subDirectoryPath, $newNamespaceKey);
+                $nestedModules = $this->processDirectoryContents($relationDirectoryPath, $newNamespaceKey);
 
                 if (! empty($nestedModules)) {
                     $existingChildren[$directoryCode] = [
@@ -236,7 +236,7 @@ trait ScansModulesTrait
                     ];
                 }
             } catch (Throwable $exception) {
-                Log::warning("Failed to process subdirectory: {$subDirectoryPath}", [
+                Log::warning("Failed to process relationdirectory: {$relationDirectoryPath}", [
                     'exception' => $exception->getMessage(),
                 ]);
 
@@ -262,7 +262,7 @@ trait ScansModulesTrait
                 'actions' => $this->extractActionsFromModel($fullyQualifiedClassName),
                 'fields' => $this->extractFieldsFromModel($fullyQualifiedClassName),
             ],
-            'subs' => $this->extractPivotRelations($fullyQualifiedClassName),
+            'relations' => $this->extractPivotRelations($fullyQualifiedClassName),
         ];
     }
 
@@ -735,11 +735,11 @@ trait ScansModulesTrait
                 try {
                     $relationInstance = $modelInstance->{$method->getName()}();
                     $relatedClassName = get_class($relationInstance->getRelated());
-                    $subData = $this->buildPivotDefinition($fullyQualifiedClassName, $method->getName(), $relatedClassName);
-                    $subKey = $this->generatePivotKey($relatedClassName);
-                    $discoveredSubs[$subKey] = $subData;
+                    $relationData = $this->buildPivotDefinition($fullyQualifiedClassName, $method->getName(), $relatedClassName);
+                    $relationKey = $this->generatePivotKey($relatedClassName);
+                    $discoveredSubs[$relationKey] = $relationData;
                 } catch (Throwable $exception) {
-                    Log::debug("Failed to process sub relation: {$method->getName()}", [
+                    Log::debug("Failed to process relation relation: {$method->getName()}", [
                         'model' => $fullyQualifiedClassName,
                         'exception' => $exception->getMessage(),
                     ]);
@@ -752,7 +752,7 @@ trait ScansModulesTrait
 
             return $discoveredSubs;
         } catch (ReflectionException $exception) {
-            Log::error("Failed to extract sub relations from model: {$fullyQualifiedClassName}", [
+            Log::error("Failed to extract relation relations from model: {$fullyQualifiedClassName}", [
                 'exception' => $exception->getMessage(),
             ]);
 
@@ -865,9 +865,9 @@ trait ScansModulesTrait
     private function generatePivotKey(string $relatedClassName): string
     {
         $relatedBaseName = class_basename($relatedClassName);
-        $subName = str_ireplace(self::MODEL_SUFFIX, '', $relatedBaseName);
+        $relationName = str_ireplace(self::MODEL_SUFFIX, '', $relatedBaseName);
 
-        return $this->convertToSnakeCase($subName);
+        return $this->convertToSnakeCase($relationName);
     }
 
     public function getModuleStatistics(): array

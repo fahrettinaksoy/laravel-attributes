@@ -12,10 +12,12 @@ use App\Models\Catalog\Product\ProductField;
 use App\Models\Definition\Localization\Currency\CurrencyModel;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Definition\Catalog\Category\CategoryModel;
+use App\Models\Catalog\Product\Relations\ProductImage\ProductImageModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Catalog\Product\Subs\ProductTranslation\ProductTranslationModel;
-use App\Models\Catalog\Product\Subs\ProductImage\ProductImageModel;
-use App\Models\Catalog\Product\Subs\ProductVideo\ProductVideoModel;
+use App\Models\Catalog\Product\Relations\ProductImage\Relations\ProductImageTranslation\ProductImageTranslationModel;
+use App\Models\Catalog\Product\Relations\ProductTranslation\ProductTranslationModel;
+use App\Models\Catalog\Product\Relations\ProductVideo\ProductVideoModel;
+use App\Models\Catalog\Product\Relations\ProductVideo\Relations\ProductVideoTranslation\ProductVideoTranslationModel;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
@@ -39,8 +41,10 @@ class ProductModel extends BaseModel
         'currency',
         'category',
         'images',
+        'imageTranslations',
         'translations',
         'videos',
+        'videoTranslations',
     ];
 
     public function currency(): HasOne
@@ -58,6 +62,11 @@ class ProductModel extends BaseModel
         return $this->hasMany(ProductImageModel::class, 'product_id', 'product_id');
     }
 
+    public function imageTranslations(): HasMany
+    {
+        return $this->hasMany(ProductImageTranslationModel::class, 'product_id', 'product_id');
+    }
+
     public function translations(): HasMany
     {
         return $this->hasMany(ProductTranslationModel::class, 'product_id', 'product_id');
@@ -66,6 +75,11 @@ class ProductModel extends BaseModel
     public function videos(): HasMany
     {
         return $this->hasMany(ProductVideoModel::class, 'product_id', 'product_id');
+    }
+
+    public function videoTranslations(): HasMany
+    {
+        return $this->hasMany(ProductVideoTranslationModel::class, 'product_id', 'product_id');
     }
 
 }

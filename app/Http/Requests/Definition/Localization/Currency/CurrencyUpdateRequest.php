@@ -11,17 +11,19 @@ class CurrencyUpdateRequest extends BaseUpdateRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
+            'code' => ['required', 'max:10'],
             'name' => ['required', 'max:255'],
-            'description' => ['nullable', 'max:255'],
-            'image_path' => ['required', 'max:255'],
-            'symbol_left' => ['required', 'max:255'],
-            'symbol_right' => ['required', 'max:255'],
-            'decimal_place' => ['required', 'max:255'],
-            'decimal_point' => ['required', 'max:255'],
-            'thousand_point' => ['required', 'max:255'],
-            'value' => ['required', 'max:255'],
-            'last_synced_at' => ['nullable', 'max:255'],
-            'is_crypto' => ['required'],
+            'description' => ['nullable', 'max:500'],
+            'image_path' => ['nullable', 'max:255'],
+            'symbol_left' => ['nullable', 'max:50'],
+            'symbol_right' => ['nullable', 'max:50'],
+            'decimal_place' => ['required', 'max:10'],
+            'decimal_point' => ['required', 'max:5'],
+            'thousand_point' => ['required', 'max:5'],
+            'value' => ['required', 'max:50'],
+            'source' => ['nullable', 'max:100'],
+            'last_synced_at' => ['nullable', 'max:50'],
+            'is_crypto' => ['nullable'],
             'status' => ['required'],
         ]);
     }
@@ -29,15 +31,17 @@ class CurrencyUpdateRequest extends BaseUpdateRequest
     public function messages(): array
     {
         return array_merge(parent::messages(), [
+            'code.required' => 'Code alanı için required kuralı geçersizdir.',
+            'code.max' => 'Code alanı için max kuralı geçersizdir.',
             'name.required' => 'Name alanı için required kuralı geçersizdir.',
             'name.max' => 'Name alanı için max kuralı geçersizdir.',
             'description.nullable' => 'Description alanı için nullable kuralı geçersizdir.',
             'description.max' => 'Description alanı için max kuralı geçersizdir.',
-            'image_path.required' => 'Image Path alanı için required kuralı geçersizdir.',
+            'image_path.nullable' => 'Image Path alanı için nullable kuralı geçersizdir.',
             'image_path.max' => 'Image Path alanı için max kuralı geçersizdir.',
-            'symbol_left.required' => 'Symbol Left alanı için required kuralı geçersizdir.',
+            'symbol_left.nullable' => 'Symbol Left alanı için nullable kuralı geçersizdir.',
             'symbol_left.max' => 'Symbol Left alanı için max kuralı geçersizdir.',
-            'symbol_right.required' => 'Symbol Right alanı için required kuralı geçersizdir.',
+            'symbol_right.nullable' => 'Symbol Right alanı için nullable kuralı geçersizdir.',
             'symbol_right.max' => 'Symbol Right alanı için max kuralı geçersizdir.',
             'decimal_place.required' => 'Decimal Place alanı için required kuralı geçersizdir.',
             'decimal_place.max' => 'Decimal Place alanı için max kuralı geçersizdir.',
@@ -47,9 +51,11 @@ class CurrencyUpdateRequest extends BaseUpdateRequest
             'thousand_point.max' => 'Thousand Point alanı için max kuralı geçersizdir.',
             'value.required' => 'Value alanı için required kuralı geçersizdir.',
             'value.max' => 'Value alanı için max kuralı geçersizdir.',
+            'source.nullable' => 'Source alanı için nullable kuralı geçersizdir.',
+            'source.max' => 'Source alanı için max kuralı geçersizdir.',
             'last_synced_at.nullable' => 'Last Synced At alanı için nullable kuralı geçersizdir.',
             'last_synced_at.max' => 'Last Synced At alanı için max kuralı geçersizdir.',
-            'is_crypto.required' => 'Is Crypto alanı için required kuralı geçersizdir.',
+            'is_crypto.nullable' => 'Is Crypto alanı için nullable kuralı geçersizdir.',
             'status.required' => 'Status alanı için required kuralı geçersizdir.',
         ]);
     }

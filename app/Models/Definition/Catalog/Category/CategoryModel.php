@@ -9,7 +9,9 @@ use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
 use App\Models\Definition\Catalog\Category\CategoryField;
 
-use App\Models\Definition\Catalog\Category\Subs\CategoryTranslation\CategoryTranslationModel;
+use App\Models\Definition\Catalog\Category\CategoryModel;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Definition\Catalog\Category\Relations\CategoryTranslation\CategoryTranslationModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
@@ -29,8 +31,14 @@ class CategoryModel extends BaseModel
     public string $defaultSorting = '-category_id';
 
     public array $allowedRelations = [
+        'category',
         'translations',
     ];
+
+    public function category(): HasOne
+    {
+        return $this->hasOne(CategoryModel::class, 'category_id', 'parent_id');
+    }
 
     public function translations(): HasMany
     {

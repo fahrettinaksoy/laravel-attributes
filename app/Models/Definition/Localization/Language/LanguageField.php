@@ -31,57 +31,57 @@ trait LanguageField
     protected string $name;
 
     #[FormField(type: 'textarea', required: false, sort_order: 5)]
-    #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
+    #[TableColumn(['filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected ?string $description;
 
     #[FormField(type: 'image', required: true, sort_order: 6)]
-    #[TableColumn(['showing'])]
+    #[TableColumn([])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $flag_path;
 
-    #[FormField(type: 'text', required: true, sort_order: 7)]
-    #[TableColumn(['showing', 'filtering', 'sorting'])]
+    #[FormField(type: 'select', required: true, options: [ 'ltr' => 'Left-To-Right', 'rtl' => 'Right-To-Left', ], sort_order: 7)]
+    #[TableColumn(['filtering'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $direction;
 
     #[FormField(type: 'text', required: true, sort_order: 8)]
-    #[TableColumn(['showing', 'filtering', 'sorting'])]
+    #[TableColumn(['filtering'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $directory;
 
     #[FormField(type: 'text', required: true, sort_order: 9)]
-    #[TableColumn(['showing', 'filtering', 'sorting'])]
+    #[TableColumn(['filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $locale;
 
-    #[FormField(type: 'number', required: false, sort_order: 10)]
-    #[TableColumn(['showing', 'filtering', 'sorting'])]
+    #[FormField(type: 'number', required: true, sort_order: 10)]
+    #[TableColumn(['sorting', 'filtering'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected int $sort_order;
 
-    #[FormField(type: 'boolean', required: true, default: '1', options: ['true' => 'active', 'false' => 'passive'], sort_order: 11)]
-    #[TableColumn(['showing', 'filtering', 'sorting'])]
+    #[FormField(type: 'boolean', required: true, default: '1', options: [ 'true' => 'active', 'false' => 'passive', ], sort_order: 11)]
+    #[TableColumn(['sorting', 'filtering', 'showing'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
-    protected bool $status;
+    protected ?bool $status;
 
     #[FormField(type: 'datetime', required: false, sort_order: 12)]
-    #[TableColumn(['showing', 'filtering', 'sorting'])]
+    #[TableColumn(['sorting', 'filtering', 'showing'])]
     #[ActionType(['index', 'show'])]
     protected ?string $created_at;
 
-    #[FormField(type: 'modal', required: false, relationship: ['name' => 'created_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 13)]
-    #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
+    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'created_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 13)]
+    #[TableColumn(['sorting', 'filtering', 'hiding'])]
     #[ActionType(['index', 'show'])]
-    protected ?int $created_by;
+    protected ?string $created_by;
 
-    #[FormField(type: 'datetime', required: false, sort_order: 14)]
-    #[TableColumn(['showing', 'filtering', 'sorting'])]
+    #[FormField(type: 'datetime', required: false, sort_order: 15)]
+    #[TableColumn(['sorting', 'filtering', 'showing'])]
     #[ActionType(['index', 'show'])]
     protected ?string $updated_at;
 
-    #[FormField(type: 'modal', required: false, relationship: ['name' => 'updated_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 15)]
-    #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
+    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'updated_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 14)]
+    #[TableColumn(['sorting', 'filtering', 'hiding'])]
     #[ActionType(['index', 'show'])]
-    protected ?int $updated_by;
+    protected ?string $updated_by;
 }

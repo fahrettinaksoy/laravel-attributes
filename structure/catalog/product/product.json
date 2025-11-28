@@ -39,14 +39,14 @@
             "form": {"type": "text", "required": true, "sort_order": 2}
         },
         "description": {
-            "database": {"variable": "string", "nullable": false},
+            "database": {"variable": "string", "nullable": true},
             "validations": ["max:255"],
             "actions": ["index", "show", "store", "update"],
             "table": ["showing", "filtering", "sorting", "hiding"],
             "form": {"type": "textarea", "sort_order": 4}
         },
         "image_path": {
-            "database": {"variable": "string", "nullable": false},
+            "database": {"variable": "string", "nullable": true},
             "validations": ["max:255"],
             "actions": ["index", "show", "store", "update"],
             "table": [],

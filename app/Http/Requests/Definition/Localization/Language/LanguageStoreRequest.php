@@ -11,12 +11,14 @@ class LanguageStoreRequest extends BaseStoreRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
+            'code' => ['required', 'max:10'],
             'name' => ['required', 'max:255'],
-            'description' => ['nullable', 'max:255'],
+            'description' => ['nullable', 'max:500'],
             'flag_path' => ['required', 'max:255'],
-            'direction' => ['required', 'max:255'],
-            'directory' => ['required', 'max:255'],
-            'locale' => ['required', 'max:255'],
+            'direction' => ['required', 'max:10'],
+            'directory' => ['required', 'max:100'],
+            'locale' => ['required', 'max:50'],
+            'sort_order' => ['required'],
             'status' => ['required'],
         ]);
     }
@@ -24,6 +26,8 @@ class LanguageStoreRequest extends BaseStoreRequest
     public function messages(): array
     {
         return array_merge(parent::messages(), [
+            'code.required' => 'Code alanı için required kuralı geçersizdir.',
+            'code.max' => 'Code alanı için max kuralı geçersizdir.',
             'name.required' => 'Name alanı için required kuralı geçersizdir.',
             'name.max' => 'Name alanı için max kuralı geçersizdir.',
             'description.nullable' => 'Description alanı için nullable kuralı geçersizdir.',
@@ -36,6 +40,7 @@ class LanguageStoreRequest extends BaseStoreRequest
             'directory.max' => 'Directory alanı için max kuralı geçersizdir.',
             'locale.required' => 'Locale alanı için required kuralı geçersizdir.',
             'locale.max' => 'Locale alanı için max kuralı geçersizdir.',
+            'sort_order.required' => 'Sort Order alanı için required kuralı geçersizdir.',
             'status.required' => 'Status alanı için required kuralı geçersizdir.',
         ]);
     }

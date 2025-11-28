@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class StructureModel extends Command
 {
     protected $signature = 'structure:model {--Requests} {--Migration}';
-    protected $description = 'Generate Models, Field traits, Pivot Models and optionally FormRequests from /structure JSON files.';
+    protected $description = 'Generate Models, Field traits, Relation Models and optionally FormRequests from /structure JSON files.';
 
     public function handle(): void
     {
@@ -44,7 +44,7 @@ class StructureModel extends Command
     }
 
     /**
-     * @return array{namespaceParts: array<int,string>, modelName: string, isPivot: bool, segments: array<int,string>, filename: string}
+     * @return array{namespaceParts: array<int,string>, modelName: string, isRelation: bool, segments: array<int,string>, filename: string}
      */
     private function resolveModelInfo($file): array
     {
@@ -53,35 +53,75 @@ class StructureModel extends Command
         $segmentsStudly = array_map(fn($s) => Str::studly($s), $segments);
 
         $filename = pathinfo($file->getFilename(), PATHINFO_FILENAME);
-        $isPivot = Str::contains($filename, '_');
+        $underscoreCount = substr_count($filename, '_');
 
-        if ($isPivot) {
-            [$parent, $child] = explode('_', $filename, 2);
-            $parentStudly = Str::studly($parent);
-            $childStudly = Str::studly($child);
-
-            if (empty($segmentsStudly) || end($segmentsStudly) !== $parentStudly) {
-                $segmentsStudly[] = $parentStudly;
-            }
-
-            $segmentsStudly[] = 'Pivots';
-            $segmentsStudly[] = $parentStudly . $childStudly;
-            $modelName = $parentStudly . $childStudly;
-        } else {
+        if ($underscoreCount === 0) {
+            // Normal model: product.json -> Product/ProductModel.php
             $modelName = Str::studly($filename);
-            $last = $segmentsStudly ? end($segmentsStudly) : null;
 
-            if ($last !== $modelName) {
+            // Eğer son segment model adıyla aynı değilse ekle
+            if (empty($segmentsStudly) || end($segmentsStudly) !== $modelName) {
                 $segmentsStudly[] = $modelName;
             }
+
+            return [
+                'namespaceParts' => $segmentsStudly,
+                'modelName'      => $modelName,
+                'isRelation'     => false,
+                'segments'       => $segments,
+                'filename'       => $filename,
+                'depth'          => 0,
+            ];
         }
+
+        // Relation modeller
+        $parts = explode('_', $filename);
+        $depth = count($parts) - 1;
+
+        // İlk part'ı al (product)
+        $firstPart = Str::studly($parts[0]);
+
+        // RELATION'LAR İÇİN DE MODEL DİZİNİNE GİRMELİYİZ
+        // Yani catalog/product/product_image.json için:
+        // segments = ['catalog', 'product']
+        // segmentsStudly = ['Catalog', 'Product']
+        // firstPart = 'Product'
+
+        // Eğer son segment firstPart değilse ekle (Product dizinine gir)
+        if (empty($segmentsStudly) || end($segmentsStudly) !== $firstPart) {
+            $segmentsStudly[] = $firstPart;
+        }
+
+        // ŞİMDİ Relations dizinine gir
+        $segmentsStudly[] = 'Relations';
+
+        // İlk relation seviyesi (product_image -> ProductImage)
+        if ($depth === 1) {
+            // Tek seviye: product_image
+            $segmentsStudly[] = Str::studly($filename);
+        } else {
+            // Çok seviye: product_image_translation
+            // Her seviye için path oluştur
+            for ($i = 1; $i < count($parts); $i++) {
+                $accumulated = implode('_', array_slice($parts, 0, $i + 1));
+                $segmentsStudly[] = Str::studly($accumulated);
+
+                // Son seviye değilse Relations ekle
+                if ($i < count($parts) - 1) {
+                    $segmentsStudly[] = 'Relations';
+                }
+            }
+        }
+
+        $modelName = Str::studly($filename);
 
         return [
             'namespaceParts' => $segmentsStudly,
             'modelName'      => $modelName,
-            'isPivot'        => $isPivot,
+            'isRelation'     => true,
             'segments'       => $segments,
             'filename'       => $filename,
+            'depth'          => $depth,
         ];
     }
 
@@ -227,7 +267,7 @@ PHP;
         }
 
         /* ---------------------------------------------------------
-         * Pivot HasMany (product_image, product_translation, ...)
+         * Relation HasMany (product_image, product_translation, ...)
          * --------------------------------------------------------- */
         foreach ($allFiles as $pivotFile) {
             $pivotFilename = pathinfo($pivotFile->getFilename(), PATHINFO_FILENAME);

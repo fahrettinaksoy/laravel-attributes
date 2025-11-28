@@ -1,0 +1,86 @@
+{
+    "model": {
+        "table": "cat_product_image_translation",
+        "primaryKey": "product_image_translation_id",
+        "enabled": true,
+        "sort_order": 1
+    },
+    "operations": {
+        "active": {"sort_order": 1, "plural": true, "singular": false},
+        "passive": {"sort_order": 2, "plural": true, "singular": false},
+        "delete": {"sort_order": 3, "plural": true, "singular": false}
+    },
+    "fields": {
+        "product_image_translation_id": {
+            "database": {"variable": "bigIncrements", "nullable": false},
+            "actions": ["index", "show", "destroy"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "number", "sort_order": 1}
+        },
+        "product_image_id": {
+            "database": {"variable": "unsignedBigInteger", "nullable": false},
+            "validations": ["exists:cat_product_image,product_image_id"],
+            "actions": ["index", "show", "store", "update"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "select", "required": true, "relationship": {"type": "product_image", "route": "catalog/product-image", "fields": {"id": "product_image_id", "label": "code"}}, "sort_order": 2}
+        },
+        "uuid": {
+            "database": {"variable": "string", "nullable": false, "unique": true},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting", "hiding"],
+            "form": {"type": "text", "sort_order": 3}
+        },
+        "code": {
+            "database": {"variable": "string", "nullable": false, "unique": true},
+            "validations": ["max:64"],
+            "actions": ["index", "show", "store", "update"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "text", "required": true, "sort_order": 4}
+        },
+        "name": {
+            "database": {"variable": "string", "nullable": false},
+            "validations": ["max:255"],
+            "actions": ["index", "show", "store", "update"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "text", "required": true, "sort_order": 5}
+        },
+        "summary": {
+            "database": {"variable": "string", "nullable": true},
+            "validations": ["max:500"],
+            "actions": ["index", "show", "store", "update"],
+            "table": ["filtering", "sorting"],
+            "form": {"type": "textarea", "sort_order": 6}
+        },
+        "description": {
+            "database": {"variable": "string", "nullable": true},
+            "validations": ["max:500"],
+            "actions": ["index", "show", "store", "update"],
+            "table": ["filtering", "sorting"],
+            "form": {"type": "textarea", "sort_order": 7}
+        },
+        "created_at": {
+            "database": {"variable": "timestamp", "nullable": true, "default": 0},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "datetime", "sort_order": 8}
+        },
+        "created_by": {
+            "database": {"variable": "unsignedBigInteger", "nullable": true},
+            "actions": ["index", "show"],
+            "table": ["filtering", "sorting", "hiding"],
+            "form": {"type": "modal", "relationship": {"name": "created_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 9}
+        },
+        "updated_at": {
+            "database": {"variable": "timestamp", "nullable": true},
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting"],
+            "form": {"type": "datetime", "sort_order": 11}
+        },
+        "updated_by": {
+            "database": {"variable": "unsignedBigInteger", "nullable": true},
+            "actions": ["index", "show"],
+            "table": ["filtering", "sorting", "hiding"],
+            "form": {"type": "modal", "relationship": {"name": "updated_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 10}
+        }
+    }
+}
