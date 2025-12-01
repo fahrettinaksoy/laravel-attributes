@@ -15,85 +15,85 @@
             "database": {"variable": "bigIncrements", "nullable": false},
             "actions": ["index", "show", "destroy"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "number", "sort_order": 1}
+            "form": {"type":"number","sort_order":1}
         },
         "uuid": {
             "database": {"variable": "string", "nullable": false, "unique": true},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "text", "sort_order": 2}
+            "form": {"type":"text","sort_order":2}
         },
         "code": {
             "database": {"variable": "string", "nullable": false, "unique": true},
-            "validations": ["max:64"],
-            "actions": ["index", "show", "store", "update"],
+            "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "text", "required": true, "sort_order": 3}
+            "form": {"type":"text","sort_order":3}
         },
         "product_id": {
             "database": {"variable": "unsignedBigInteger", "nullable": false},
-            "validations": ["exists:cat_product,product_id"],
+            "validations": {"store": ["required","integer","exists:cat_product,product_id"],"update": ["required","integer","exists:cat_product,product_id"]},
             "actions": ["index", "show", "store", "update"],
             "table": ["filtering", "sorting", "showing"],
-            "form": {"type": "select", "required": true, "relationship": {"type": "product", "route": "catalog/product", "fields": {"id": "product_id", "label": "name"}}, "sort_order": 4}
+            "form": {"type":"select","relationship":{"type":"product","route":"catalog/product","fields":{"id":"product_id","label":"name"}},"sort_order":4}
         },
         "account_id": {
             "database": {"variable": "unsignedBigInteger", "nullable": true, "default": 0},
-            "validations": ["exists:acc_account,account_id"],
+            "validations": {"store": ["nullable","integer","exists:acc_account,account_id"],"update": ["nullable","integer","exists:acc_account,account_id"]},
             "actions": ["index", "show", "store", "update"],
             "table": ["filtering", "sorting"],
-            "form": {"type": "select", "relationship": {"type": "account", "route": "accounting/account", "fields": {"id": "account_id", "label": "name"}}, "sort_order": 5}
+            "form": {"type":"select","relationship":{"type":"account","route":"accounting/account","fields":{"id":"account_id","label":"name"}},"sort_order":5}
         },
         "author": {
             "database": {"variable": "string", "nullable": false},
-            "validations": ["max:150"],
+            "validations": {"store": ["required","string","max:150"],"update": ["required","string","max:150"]},
             "actions": ["index", "show", "store", "update"],
             "table": ["showing", "filtering"],
-            "form": {"type": "text", "required": true, "sort_order": 6}
+            "form": {"type":"text","sort_order":6}
         },
         "content": {
             "database": {"variable": "string", "nullable": false},
-            "validations": ["max:800"],
+            "validations": {"store": ["required","string","max:800"],"update": ["required","string","max:800"]},
             "actions": ["index", "show", "store", "update"],
             "table": [],
-            "form": {"type": "textarea", "required": true, "sort_order": 7}
+            "form": {"type":"textarea","sort_order":7}
         },
         "rating": {
             "database": {"variable": "unsignedTinyInteger", "nullable": false, "default": 0},
-            "validations": ["numeric", "min:0", "max:10"],
+            "validations": {"store": ["required","numeric","min:0","max:10"],"update": ["required","numeric","min:0","max:10"]},
             "actions": ["index", "show", "store", "update"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "number", "required": true, "sort_order": 8}
+            "form": {"type":"number","sort_order":8}
         },
         "status": {
-            "database": {"variable": "boolean", "nullable": true, "default": true},
+            "database": {"variable": "boolean", "nullable": false, "default": true},
+            "validations": {"store": ["required","boolean"],"update": ["required","boolean"]},
             "actions": ["index", "show", "store", "update"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "boolean", "required": true, "default": true, "options": {"true": "active", "false": "passive"}, "sort_order": 9}
+            "form": {"type":"boolean","options":{"true":"active","false":"passive"},"sort_order":9}
         },
         "created_at": {
             "database": {"variable": "timestamp", "nullable": true, "default": 0},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "datetime", "sort_order": 10}
+            "form": {"type":"datetime","sort_order":10}
         },
         "created_by": {
             "database": {"variable": "unsignedBigInteger", "nullable": true},
             "actions": ["index", "show"],
             "table": ["filtering", "sorting", "hiding"],
-            "form": {"type": "modal", "relationship": {"name": "created_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 11}
+            "form": {"type":"modal","relationship":{"name":"created_by","route":"system/user","fields":{"id":"user_id","label":"first_name"}},"sort_order":11}
         },
         "updated_at": {
             "database": {"variable": "timestamp", "nullable": true},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "datetime", "sort_order": 13}
+            "form": {"type":"datetime","sort_order":13}
         },
         "updated_by": {
             "database": {"variable": "unsignedBigInteger", "nullable": true},
             "actions": ["index", "show"],
             "table": ["filtering", "sorting", "hiding"],
-            "form": {"type": "modal", "relationship": {"name": "updated_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 12}
+            "form": {"type":"modal","relationship":{"name":"updated_by","route":"system/user","fields":{"id":"user_id","label":"first_name"}},"sort_order":12}
         }
     }
 }

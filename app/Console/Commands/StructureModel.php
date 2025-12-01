@@ -632,7 +632,6 @@ PHP;
         $path      = database_path("migrations/{$timestamp}_create_{$table}_table.php");
 
         $columnsCode = $this->buildMigrationColumns($fields, $primaryKey);
-        $foreignKeys = $this->buildMigrationForeignKeys($fields);
 
         $content = <<<PHP
 <?php
@@ -646,8 +645,6 @@ return new class extends Migration {
     {
         Schema::create('{$table}', function (Blueprint \$table) {
 {$columnsCode}
-
-{$foreignKeys}
         });
     }
 
@@ -667,13 +664,26 @@ PHP;
         $lines = [];
 
         foreach ($fields as $name => $meta) {
-            $db = $meta['database'] ?? [];
-            $type = $db['variable'] ?? 'string';
+
+            // CREATED_AT + UPDATED_AT özel çözüm
+            if ($name === 'created_at') {
+                $lines[] = "            \$table->timestamp('created_at')->useCurrent();";
+                continue;
+            }
+
+            if ($name === 'updated_at') {
+                $lines[] = "            \$table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();";
+                continue;
+            }
+
+            // Normal alanlar
+            $db      = $meta['database'] ?? [];
+            $type    = $db['variable'] ?? 'string';
             $nullable = $db['nullable'] ?? false;
-            $unique = $db['unique'] ?? false;
+            $unique  = $db['unique'] ?? false;
             $default = $db['default'] ?? null;
 
-            // Primary key
+            // PRIMARY KEY
             if ($name === $primaryKey && $type === 'bigIncrements') {
                 $lines[] = "            \$table->bigIncrements('{$name}');";
                 continue;
@@ -722,7 +732,15 @@ PHP;
 
             // DEFAULT
             if ($default !== null) {
-                $defaultValue = is_bool($default) ? ($default ? 'true' : 'false') : "'{$default}'";
+                if (is_bool($default)) {
+                    $defaultValue = $default ? 'true' : 'false';
+                } elseif ($default === 'CURRENT_TIMESTAMP') {
+                    // RAW CURRENT_TIMESTAMP
+                    $defaultValue = "DB::raw('CURRENT_TIMESTAMP')";
+                } else {
+                    $defaultValue = "'{$default}'";
+                }
+
                 $col .= "->default({$defaultValue})";
             }
 
@@ -731,30 +749,5 @@ PHP;
         }
 
         return implode("\n", $lines);
-    }
-
-    private function buildMigrationForeignKeys(array $fields): string
-    {
-        $lines = [];
-
-        foreach ($fields as $name => $meta) {
-            $valid = $meta['validations'] ?? [];
-
-            foreach ($valid as $rule) {
-                if (!str_starts_with($rule, 'exists:')) {
-                    continue;
-                }
-
-                [$table, $col] = explode(',', str_replace('exists:', '', $rule));
-
-                $lines[] =
-                    "            \$table->foreign('{$name}')
-                ->references('{$col}')
-                ->on('{$table}')
-                ->nullOnDelete();";
-            }
-        }
-
-        return implode("\n\n", $lines);
     }
 }

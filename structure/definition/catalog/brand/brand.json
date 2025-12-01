@@ -1,7 +1,7 @@
 {
     "model": {
-        "table": "def_cat_category",
-        "primaryKey": "category_id",
+        "table": "def_cat_brand",
+        "primaryKey": "brand_id",
         "enabled": true,
         "sort_order": 1
     },
@@ -11,69 +11,69 @@
         "delete": {"sort_order": 3, "plural": true, "singular": false}
     },
     "fields": {
-        "category_id": {
+        "brand_id": {
             "database": {"variable": "bigIncrements", "nullable": false},
-            "actions": ["index","show","destroy"],
-            "table": ["showing","filtering","sorting"],
+            "actions": ["index", "show", "destroy"],
+            "table": ["showing", "filtering", "sorting"],
             "form": {"type":"number","sort_order":1}
         },
         "uuid": {
             "database": {"variable": "string", "nullable": false, "unique": true},
-            "actions": ["index","show"],
-            "table": ["showing","filtering","sorting","hiding"],
+            "actions": ["index", "show"],
+            "table": ["showing", "filtering", "sorting","hiding"],
             "form": {"type":"text","sort_order":2}
         },
         "code": {
             "database": {"variable": "string", "nullable": false, "unique": true},
-            "actions": ["index","show","store","update"],
+            "actions": ["index","show"],
             "table": ["showing","filtering","sorting"],
-            "form": {"type":"text","sort_order":3}
+            "form": {"type":"text","required":true,"sort_order":3}
         },
         "name": {
             "database": {"variable": "string", "nullable": false},
             "validations": {"store": ["required","string","max:255"],"update": ["required","string","max:255"]},
             "actions": ["index","show","store","update"],
             "table": ["showing","filtering","sorting"],
-            "form": {"type":"text","sort_order":4}
+            "form": {"type":"text","required":true,"sort_order":4}
         },
         "description": {
             "database": {"variable": "string", "nullable": true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:500"]},
+            "validations": {"store": ["nullable","string","max:500"],"update": ["nullable","string","max:500"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting","hiding"],
             "form": {"type":"textarea","sort_order":5}
         },
         "image_path": {
             "database": {"variable": "string", "nullable": true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:255"]},
+            "validations": {"store": ["nullable","string","max:255"],"update": ["nullable","string","max:255"]},
             "actions": ["index","show","store","update"],
             "table": [],
             "form": {"type":"image","sort_order":6}
         },
         "parent_id": {
             "database": {"variable": "unsignedBigInteger", "nullable": false, "default": 0},
-            "validations": {"actions":["store","update"],"rules":["required","integer","exists:def_cat_category,category_id"]},
+            "validations": {"store": ["required","integer","exists:def_cat_brand,brand_id"],"update": ["required","integer","exists:def_cat_brand,brand_id"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
-            "form": {"type":"modal","relationship":{"type":"category","route":"definition/catalog/category","fields":{"id":"category_id","label":"name"}},"sort_order":7}
+            "form": {"type":"modal","relationship":{"type":"brand","route":"definition/catalog/brand","fields":{"id":"brand_id","label":"name"}},"sort_order":7}
         },
         "layout_id": {
             "database": {"variable": "unsignedBigInteger", "nullable": false, "default": 0},
-            "validations": {"actions":["store","update"],"rules":["required","integer","exists:def_cat_layout,layout_id"]},
+            "validations": {"store": ["required","integer","exists:def_cat_layout,layout_id"],"update": ["required","integer","exists:def_cat_layout,layout_id"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
             "form": {"type":"number","sort_order":8}
         },
         "membership": {
             "database": {"variable": "unsignedBigInteger", "nullable": false, "default": 0},
-            "validations": {"actions":["store","update"],"rules":["required","integer"]},
+            "validations": {"store": ["required","integer"],"update": ["required","integer"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
             "form": {"type":"number","sort_order":9}
         },
         "status": {
             "database": {"variable": "boolean", "nullable": false, "default": true},
-            "validations": {"actions":["store","update"],"rules":["required","boolean"]},
+            "validations": {"store": ["required","boolean"],"update": ["required","boolean"]},
             "actions": ["index","show","store","update"],
             "table": ["showing","filtering","sorting"],
             "form": {"type":"boolean","options":{"true":"active","false":"passive"},"sort_order":10}

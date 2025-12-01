@@ -15,58 +15,56 @@
             "database": {"variable": "bigIncrements", "nullable": false},
             "actions": ["index", "show", "destroy"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "number", "sort_order": 1}
+            "form": {"type":"number","sort_order":1}
         },
         "product_id": {
             "database": {"variable": "unsignedBigInteger", "nullable": true, "default": 0},
-            "validations": ["exists:cat_product,product_id"],
-            "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "select", "relationship": {"type": "product", "route": "catalog/product", "fields": {"id": "product_id", "label": "name"}}, "sort_order": 2}
+            "actions": [],
+            "table": [],
+            "form": {"type":"select","relationship":{"type":"product","route":"catalog/product","fields":{"id":"product_id","label":"name"}},"sort_order":2}
         },
         "uuid": {
-            "database": {"variable": "string", "nullable": false, "unique": true},
+            "database": {"variable": "uuid", "nullable": false, "unique": true},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "text", "sort_order": 3}
+            "form": {"type":"text","sort_order":3}
         },
         "code": {
             "database": {"variable": "string", "nullable": false, "unique": true},
-            "validations": ["max:64"],
-            "actions": ["index", "show", "store", "update"],
+            "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "text", "required": true, "sort_order": 4}
+            "form": {"type":"text","sort_order":4}
         },
         "file_path": {
             "database": {"variable": "string", "nullable": false},
-            "validations": ["max:255"],
+            "validations": {"store": ["required","string","max:255"],"update": ["required","string","max:255"]},
             "actions": ["index", "show", "store", "update"],
             "table": [],
-            "form": {"type": "image", "required": true, "sort_order": 5}
+            "form": {"type":"image","sort_order":5}
         },
         "created_at": {
             "database": {"variable": "timestamp", "nullable": true, "default": 0},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "datetime", "sort_order": 6}
+            "form": {"type":"datetime","sort_order":6}
         },
         "created_by": {
             "database": {"variable": "unsignedBigInteger", "nullable": true},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "modal", "relationship": {"name": "created_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 7}
+            "form": {"type":"modal","relationship":{"name":"created_by","route":"system/user","fields":{"id":"user_id","label":"first_name"}},"sort_order":7}
         },
         "updated_at": {
             "database": {"variable": "timestamp", "nullable": true},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "datetime", "sort_order": 9}
+            "form": {"type":"datetime","sort_order":9}
         },
         "updated_by": {
             "database": {"variable": "unsignedBigInteger", "nullable": true},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "modal", "relationship": {"name": "updated_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 8}
+            "form": {"type":"modal","relationship":{"name":"updated_by","route":"system/user","fields":{"id":"user_id","label":"first_name"}},"sort_order":8}
         }
     }
 }

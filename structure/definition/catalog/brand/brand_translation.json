@@ -1,7 +1,7 @@
 {
     "model": {
-        "table": "def_category_translation",
-        "primaryKey": "category_translation_id",
+        "table": "def_brand_translation",
+        "primaryKey": "brand_translation_id",
         "enabled": true,
         "sort_order": 1
     },
@@ -11,7 +11,7 @@
         "delete": {"sort_order": 3, "plural": true, "singular": false}
     },
     "fields": {
-        "category_translation_id": {
+        "brand_translation_id": {
             "database": {"variable": "bigIncrements", "nullable": false},
             "actions": ["index","show","destroy"],
             "table": ["showing","filtering","sorting"],
@@ -25,70 +25,68 @@
         },
         "code": {
             "database": {"variable": "string", "nullable": false, "unique": true},
-            "validations": {"actions":["store","update"],"rules":["required","string","max:255"]},
-            "actions": ["index","show","store","update"],
+            "actions": ["index","show"],
             "table": ["showing","filtering","sorting"],
             "form": {"type":"text","sort_order":3}
         },
-        "category_id": {
+        "brand_id": {
             "database": {"variable": "unsignedBigInteger", "nullable": false},
-            "validations": {"actions":["store","update"],"rules":["required","integer","exists:def_cat_category,category_id"]},
-            "actions": ["index","show","store","update"],
+            "actions": ["index","show"],
             "table": ["filtering","sorting","showing"],
-            "form": {"type":"modal","relationship":{"type":"category","route":"definition/catalog/category","fields":{"id":"category_id","label":"name"}},"sort_order":4}
+            "form": {"type":"modal","relationship":{"type":"brand","route":"definition/catalog/brand","fields":{"id":"brand_id","label":"name"}},"sort_order":4}
         },
         "language_code": {
             "database": {"variable": "string", "nullable": false},
-            "validations": {"actions":["store","update"],"rules":["required","string","max:5","exists:def_loc_language,code"]},
+            "validations": {"store": ["required","string","max:5","exists:def_loc_language,code"],"update": ["required","string","max:5","exists:def_loc_language,code"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting","showing"],
             "form": {"type":"modal","relationship":{"type":"language","route":"definition/localization/language","fields":{"id":"code","label":"name"}},"sort_order":5}
         },
         "name": {
             "database": {"variable": "string", "nullable": false},
-            "validations": {"actions":["store","update"],"rules":["required","string","max:255"]},
+            "validations": {"store": ["required","string","max:255"],"update": ["required","string","max:255"]},
             "actions": ["index","show","store","update"],
             "table": ["showing","filtering","sorting"],
             "form": {"type":"text","sort_order":6}
         },
         "summary": {
             "database": {"variable": "string", "nullable": true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:500"]},
+            "validations": {"store": ["nullable","string","max:500"],"update": ["nullable","string","max:500"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
             "form": {"type":"textarea","sort_order":7}
         },
         "description": {
             "database": {"variable": "string", "nullable": true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:500"]},
+            "validations": {"store": ["nullable","string","max:500"],"update": ["nullable","string","max:500"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
             "form": {"type":"textarea","sort_order":8}
         },
         "slug": {
             "database": {"variable": "string", "nullable": false},
-            "validations": {"actions":["store","update"],"rules":["required","string","max:255"]},
+            "validations": {"store": ["nullable","string","max:500"],"update": ["nullable","string","max:500"]},
             "actions": ["index","show","store","update"],
             "table": ["showing","filtering","sorting"],
             "form": {"type":"text","sort_order":9}
         },
         "meta_title": {
             "database": {"variable": "string", "nullable": true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:255"]},
+            "validations": {"store": ["nullable","string","max:255"],"update": ["nullable","string","max:255"]},
             "actions": ["index","show","store","update"],
             "table": ["hiding"],
             "form": {"type":"text","sort_order":10}
         },
         "meta_description": {
             "database": {"variable": "string", "nullable": true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:500"]},
+            "validations": {"store": ["nullable","string","max:500"],"update": ["nullable","string","max:500"]},
             "actions": ["index","show","store","update"],
             "table": ["hiding"],
             "form": {"type":"textarea","sort_order":11}
         },
         "meta_keyword": {
             "database": {"variable": "string", "nullable": true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:500"]},
+            "validations": {"store": ["nullable","string","max:500"],"update": ["nullable","string","max:500"]},
             "actions": ["index","show","store","update"],
             "table": ["hiding"],
             "form": {"type":"textarea","sort_order":12}

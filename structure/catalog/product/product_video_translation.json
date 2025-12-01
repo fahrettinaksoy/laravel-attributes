@@ -15,72 +15,70 @@
             "database": {"variable": "bigIncrements", "nullable": false},
             "actions": ["index", "show", "destroy"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "number", "sort_order": 1}
+            "form": {"type":"number","sort_order":1}
         },
         "product_video_id": {
             "database": {"variable": "unsignedBigInteger", "nullable": false},
-            "validations": ["exists:cat_product_video,product_video_id"],
-            "actions": ["index", "show", "store", "update"],
-            "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "select", "required": true, "relationship": {"type": "product_video", "route": "catalog/product-video", "fields": {"id": "product_video_id", "label": "code"}}, "sort_order": 2}
+            "actions": ["index", "show"],
+            "table": [],
+            "form": {"type":"select","relationship":{"type":"product_video","route":"catalog/product-video","fields":{"id":"product_video_id","label":"code"}},"sort_order":2}
         },
         "uuid": {
             "database": {"variable": "string", "nullable": false, "unique": true},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting", "hiding"],
-            "form": {"type": "text", "sort_order": 3}
+            "form": {"type":"text","sort_order":3}
         },
         "code": {
             "database": {"variable": "string", "nullable": false, "unique": true},
-            "validations": ["max:64"],
-            "actions": ["index", "show", "store", "update"],
+            "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "text", "required": true, "sort_order": 4}
+            "form": {"type":"text","sort_order":4}
         },
         "name": {
-            "database": {"variable": "string", "nullable": true},
-            "validations": ["max:255"],
+            "database": {"variable": "string", "nullable": false},
+            "validations": {"store": ["required","string","max:255"],"update": ["required","string","max:255"]},
             "actions": ["index", "show", "store", "update"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "text", "sort_order": 5}
+            "form": {"type":"text","sort_order":5}
         },
         "summary": {
             "database": {"variable": "string", "nullable": true},
-            "validations": ["max:500"],
+            "validations": {"store": ["nullable","string","max:500"],"update": ["nullable","string","max:500"]},
             "actions": ["index", "show", "store", "update"],
-            "table": ["filtering", "sorting"],
-            "form": {"type": "textarea", "sort_order": 6}
+            "table": [],
+            "form": {"type":"textarea","sort_order":6}
         },
         "description": {
             "database": {"variable": "string", "nullable": true},
-            "validations": ["max:500"],
+            "validations": {"store": ["nullable","string","max:500"],"update": ["nullable","string","max:500"]},
             "actions": ["index", "show", "store", "update"],
-            "table": ["filtering", "sorting"],
-            "form": {"type": "textarea", "sort_order": 7}
+            "table": [],
+            "form": {"type":"textarea","sort_order":7}
         },
         "created_at": {
             "database": {"variable": "timestamp", "nullable": true, "default": 0},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "datetime", "sort_order": 8}
+            "form": {"type":"datetime","sort_order":8}
         },
         "created_by": {
             "database": {"variable": "unsignedBigInteger", "nullable": true},
             "actions": ["index", "show"],
-            "table": ["filtering", "sorting", "hiding"],
-            "form": {"type": "modal", "relationship": {"name": "created_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 9}
+            "table": ["showing", "filtering", "sorting", "hiding"],
+            "form": {"type":"modal","relationship":{"name":"created_by","route":"system/user","fields":{"id":"user_id","label":"first_name"}},"sort_order":9}
         },
         "updated_at": {
             "database": {"variable": "timestamp", "nullable": true},
             "actions": ["index", "show"],
             "table": ["showing", "filtering", "sorting"],
-            "form": {"type": "datetime", "sort_order": 11}
+            "form": {"type":"datetime","sort_order":11}
         },
         "updated_by": {
             "database": {"variable": "unsignedBigInteger", "nullable": true},
             "actions": ["index", "show"],
-            "table": ["filtering", "sorting", "hiding"],
-            "form": {"type": "modal", "relationship": {"name": "updated_by", "route": "system/user", "fields": {"id": "user_id", "label": "first_name"}}, "sort_order": 10}
+            "table": ["showing", "filtering", "sorting", "hiding"],
+            "form": {"type":"modal","relationship":{"name":"updated_by","route":"system/user","fields":{"id":"user_id","label":"first_name"}},"sort_order":10}
         }
     }
 }
