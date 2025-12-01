@@ -18,7 +18,6 @@ Route::prefix('v1')->middleware(['api', ValidateModule::class])->group(function 
         Route::get('{path}/{id}', [CommonController::class, 'show'])->name('show')->where('path', '.*')->where('id', '[0-9]+');
         Route::put('{path}/{id}', [CommonController::class, 'update'])->name('update')->where('path', '.*')->where('id', '[0-9]+');
 
-
         Route::delete('{path}/{id}', [CommonController::class, 'destroy'])->name('destroy.single')->where('path', '.*')->where('id', '[0-9]+');
         Route::delete('{path}', [CommonController::class, 'destroy'])->name('destroy')->where('path', '.*');
 

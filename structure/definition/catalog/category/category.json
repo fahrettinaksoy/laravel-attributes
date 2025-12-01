@@ -52,28 +52,28 @@
         },
         "parent_id": {
             "database": {"variable": "unsignedBigInteger", "nullable": false, "default": 0},
-            "validations": {"actions":["store","update"],"rules":["required","integer","exists:def_cat_category,category_id"]},
+            "validations": {"store": ["required","integer","exists:def_cat_category,category_id"],"update": ["required","integer","exists:def_cat_category,category_id"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
             "form": {"type":"modal","relationship":{"type":"category","route":"definition/catalog/category","fields":{"id":"category_id","label":"name"}},"sort_order":7}
         },
         "layout_id": {
             "database": {"variable": "unsignedBigInteger", "nullable": false, "default": 0},
-            "validations": {"actions":["store","update"],"rules":["required","integer","exists:def_cat_layout,layout_id"]},
+            "validations": {"store": ["required","integer","exists:def_cat_layout,layout_id"],"update": ["required","integer","exists:def_cat_layout,layout_id"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
             "form": {"type":"number","sort_order":8}
         },
         "membership": {
             "database": {"variable": "unsignedBigInteger", "nullable": false, "default": 0},
-            "validations": {"actions":["store","update"],"rules":["required","integer"]},
+            "validations": {"store": ["required","integer"],"update": ["required","integer"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
             "form": {"type":"number","sort_order":9}
         },
         "status": {
             "database": {"variable": "boolean", "nullable": false, "default": true},
-            "validations": {"actions":["store","update"],"rules":["required","boolean"]},
+            "validations": {"store": ["required","boolean"],"update": ["required","boolean"]},
             "actions": ["index","show","store","update"],
             "table": ["showing","filtering","sorting"],
             "form": {"type":"boolean","options":{"true":"active","false":"passive"},"sort_order":10}

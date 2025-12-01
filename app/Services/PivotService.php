@@ -40,9 +40,8 @@ class PivotService
     {
         $this->setupPivotContext($parentId, $relationName);
 
-        return $this->actions['filter']->execute($filter);
-
         try {
+            return $this->actions['filter']->execute($filter);
         } catch (ModelNotFoundException $e) {
             throw new NotFoundException(__('exceptions/filter.not_found'));
         } catch (\Exception $e) {
@@ -170,6 +169,6 @@ class PivotService
         $request = request();
         $tableName = $request->attributes->get('tableName');
 
-        return $tableName . '_id';
+        return $tableName.'_id';
     }
 }

@@ -17,10 +17,15 @@ use Throwable;
 trait ResolvesFormRequests
 {
     private const REQUEST_NAMESPACE_BASE = 'App\\Http\\Requests\\';
+
     private const PIVOT_NAMESPACE_SUFFIX = '\\Pivot\\';
+
     private const REQUEST_CLASS_SUFFIX = 'Request';
+
     private const PIVOT_ROUTE_PREFIX = 'pivot.';
+
     private const UNKNOWN_ACTION = 'unknown';
+
     private const ROUTE_PATH_PARAMETER = 'path';
 
     private Container $container;
@@ -58,7 +63,7 @@ trait ResolvesFormRequests
             $this->handleResolutionError($exception, $currentAction ?? self::UNKNOWN_ACTION);
 
             throw new InvalidArgumentException(
-                'Failed to resolve form request: ' . $exception->getMessage(),
+                'Failed to resolve form request: '.$exception->getMessage(),
                 previous: $exception,
             );
         }
@@ -92,9 +97,7 @@ trait ResolvesFormRequests
 
     private function determineRequestClassName(Request $request, string $action): ?string
     {
-        return $this->isPivotRoute($request)
-            ? $this->buildPivotRequestClassName($action, $request)
-            : $this->buildModuleRequestClassName($action, $request);
+        return $this->isPivotRoute($request) ? $this->buildPivotRequestClassName($action, $request) : $this->buildModuleRequestClassName($action, $request);
     }
 
     private function buildPivotRequestClassName(string $action, Request $request): ?string
@@ -156,17 +159,17 @@ trait ResolvesFormRequests
         $namespace = $this->buildPivotNamespace($namespaceSegments, $pivotContext);
         $className = $this->buildPivotClassName($pivotContext, $action);
 
-        return $namespace . '\\' . $className;
+        return $namespace.'\\'.$className;
     }
 
     private function constructModuleClassName(string $modelPath, string $action): string
     {
         $pathSegments = $this->splitPath($modelPath);
         $namespaceSegments = $this->buildNamespaceSegments($modelPath);
-        $namespace = self::REQUEST_NAMESPACE_BASE . implode('\\', $namespaceSegments);
-        $className = Str::studly(end($pathSegments)) . Str::studly($action) . self::REQUEST_CLASS_SUFFIX;
+        $namespace = self::REQUEST_NAMESPACE_BASE.implode('\\', $namespaceSegments);
+        $className = Str::studly(end($pathSegments)).Str::studly($action).self::REQUEST_CLASS_SUFFIX;
 
-        return $namespace . '\\' . $className;
+        return $namespace.'\\'.$className;
     }
 
     private function buildNamespaceSegments(string $modelPath): array
@@ -183,19 +186,12 @@ trait ResolvesFormRequests
 
     private function buildPivotNamespace(array $namespaceSegments, array $pivotContext): string
     {
-        return self::REQUEST_NAMESPACE_BASE
-            . implode('\\', $namespaceSegments)
-            . self::PIVOT_NAMESPACE_SUFFIX
-            . Str::studly($pivotContext['tableName'])
-            . Str::studly($pivotContext['relationName']);
+        return self::REQUEST_NAMESPACE_BASE.implode('\\', $namespaceSegments).self::PIVOT_NAMESPACE_SUFFIX.Str::studly($pivotContext['tableName']).Str::studly($pivotContext['relationName']);
     }
 
     private function buildPivotClassName(array $pivotContext, string $action): string
     {
-        return Str::studly($pivotContext['tableName'])
-            . Str::studly($pivotContext['relationName'])
-            . Str::studly($action)
-            . self::REQUEST_CLASS_SUFFIX;
+        return Str::studly($pivotContext['tableName']).Str::studly($pivotContext['relationName']).Str::studly($action).self::REQUEST_CLASS_SUFFIX;
     }
 
     private function resolveModelPath(Request $request): ?string
@@ -261,9 +257,7 @@ trait ResolvesFormRequests
 
     private function isValidRequestClass(?string $className): bool
     {
-        return is_string($className)
-            && ! empty($className)
-            && class_exists($className);
+        return is_string($className) && ! empty($className) && class_exists($className);
     }
 
     private function instantiateRequestClass(string $className): object

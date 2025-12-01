@@ -2,11 +2,11 @@
 
 namespace Database\Seeders\Catalog;
 
-use App\Models\Catalog\Product\ProductModel;
+use App\Models\Catalog\Language\LanguageModel;
 use App\Models\Catalog\Product\Pivot\ProductImage\ProductImageModel;
 use App\Models\Catalog\Product\Pivot\ProductTranslation\ProductTranslationModel;
 use App\Models\Catalog\Product\Pivot\ProductVideo\ProductVideoModel;
-use App\Models\Catalog\Language\LanguageModel;
+use App\Models\Catalog\Product\ProductModel;
 use Illuminate\Database\Seeder;
 
 class ProductTableSeeder extends Seeder

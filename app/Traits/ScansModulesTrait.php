@@ -26,12 +26,19 @@ use Throwable;
 trait ScansModulesTrait
 {
     private const MODEL_SUFFIX = 'Model';
+
     private const MODEL_FILE_EXTENSION = '.php';
+
     private const MODEL_FILE_PATTERN = '/Model\.php$/i';
+
     private const CACHE_KEY_MODULE_TREE = 'app:modules:tree';
+
     private const CACHE_TTL_MODULES = 3600; // 1 hour
+
     private const API_VERSION_PREFIX = '/api/v1';
+
     private const BASE_NAMESPACE = 'App\\Models\\';
+
     private const REQUEST_NAMESPACE = 'App\\Http\\Requests\\';
 
     private const STANDARD_REST_ACTIONS = [
@@ -98,7 +105,7 @@ trait ScansModulesTrait
     {
         $pathHash = md5($this->modelsBasePath);
 
-        return self::CACHE_KEY_MODULE_TREE . ':' . $pathHash;
+        return self::CACHE_KEY_MODULE_TREE.':'.$pathHash;
     }
 
     protected function scanModulesRecursively(string $directoryPath, string $parentNamespaceKey): array
@@ -524,16 +531,16 @@ trait ScansModulesTrait
 
     private function buildRoutePattern(string $routeBase, string $actionName, bool $hasParam): string
     {
-        $pattern = '/' . $routeBase;
+        $pattern = '/'.$routeBase;
 
         if ($hasParam) {
             $modelName = basename($routeBase);
-            $idParam = $modelName . '_id';
-            $pattern .= '/{' . $idParam . '}';
+            $idParam = $modelName.'_id';
+            $pattern .= '/{'.$idParam.'}';
         }
 
         if (! in_array($actionName, ['index', 'store', 'show', 'update', 'destroy'])) {
-            $pattern .= '/' . $actionName;
+            $pattern .= '/'.$actionName;
         }
 
         return $pattern;
@@ -554,7 +561,7 @@ trait ScansModulesTrait
 
     private function buildRequestClassName(string $namespace, string $modelName, string $actionName, string $relationName = ''): string
     {
-        $suffix = self::ACTION_REQUEST_SUFFIXES[$actionName] ?? Str::ucfirst($actionName) . 'Request';
+        $suffix = self::ACTION_REQUEST_SUFFIXES[$actionName] ?? Str::ucfirst($actionName).'Request';
 
         return sprintf('%s%s\\%s%s%s', self::REQUEST_NAMESPACE, $namespace, $modelName, $relationName, $suffix);
     }
@@ -595,7 +602,7 @@ trait ScansModulesTrait
     {
         $relativePath = str_replace(['App\\', '\\'], ['', '/'], $requestClassName);
 
-        return app_path($relativePath . self::MODEL_FILE_EXTENSION);
+        return app_path($relativePath.self::MODEL_FILE_EXTENSION);
     }
 
     protected function extractModelShortName(string $fullyQualifiedClassName): string
@@ -679,10 +686,10 @@ trait ScansModulesTrait
         $className = pathinfo($fileName, PATHINFO_FILENAME);
         $namespace = self::BASE_NAMESPACE;
         if (! empty($namespacePart)) {
-            $namespace .= trim($namespacePart, '\\') . '\\';
+            $namespace .= trim($namespacePart, '\\').'\\';
         }
 
-        return $namespace . $className;
+        return $namespace.$className;
     }
 
     private function buildNamespaceKey(string $parentKey, string $currentKey): string
@@ -701,7 +708,7 @@ trait ScansModulesTrait
         }
 
         $modelFile = $modelFiles[0];
-        $baseFileName = str_replace(self::MODEL_SUFFIX . self::MODEL_FILE_EXTENSION, '', $modelFile->getFilename());
+        $baseFileName = str_replace(self::MODEL_SUFFIX.self::MODEL_FILE_EXTENSION, '', $modelFile->getFilename());
 
         return strcasecmp($baseFileName, $directoryName) === 0;
     }
@@ -710,7 +717,7 @@ trait ScansModulesTrait
     {
         $baseUrl = rtrim(config('app.url', 'http://localhost'), '/');
 
-        return $baseUrl . self::API_VERSION_PREFIX . $routePattern;
+        return $baseUrl.self::API_VERSION_PREFIX.$routePattern;
     }
 
     protected function extractPivotRelations(string $fullyQualifiedClassName): array
@@ -799,9 +806,9 @@ trait ScansModulesTrait
         $baseRoute = $this->generateRouteBase($parentClassName);
         $relationName = $this->convertToSnakeCase($methodName);
         $parentModelName = $this->extractModelShortName($parentClassName);
-        $parentIdParam = $this->convertToSnakeCase($parentModelName) . '_id';
+        $parentIdParam = $this->convertToSnakeCase($parentModelName).'_id';
 
-        return $baseRoute . '/{' . $parentIdParam . '}/' . $relationName;
+        return $baseRoute.'/{'.$parentIdParam.'}/'.$relationName;
     }
 
     protected function generatePivotActions(string $parentClassName, string $methodName): array
@@ -809,36 +816,36 @@ trait ScansModulesTrait
         $baseRoute = $this->generateRouteBase($parentClassName);
         $relationName = $this->convertToSnakeCase($methodName);
         $parentModelName = $this->extractModelShortName($parentClassName);
-        $parentIdParam = $this->convertToSnakeCase($parentModelName) . '_id';
-        $relationIdParam = $relationName . '_id';
+        $parentIdParam = $this->convertToSnakeCase($parentModelName).'_id';
+        $relationIdParam = $relationName.'_id';
 
-        $routeBase = $baseRoute . '/{' . $parentIdParam . '}/' . $relationName;
+        $routeBase = $baseRoute.'/{'.$parentIdParam.'}/'.$relationName;
 
         $actions = [
             'filter' => [
                 'name' => 'filter',
                 'method' => 'GET',
-                'route' => $this->buildFullApiRoute('/' . $routeBase),
+                'route' => $this->buildFullApiRoute('/'.$routeBase),
             ],
             'store' => [
                 'name' => 'store',
                 'method' => 'POST',
-                'route' => $this->buildFullApiRoute('/' . $routeBase),
+                'route' => $this->buildFullApiRoute('/'.$routeBase),
             ],
             'show' => [
                 'name' => 'show',
                 'method' => 'GET',
-                'route' => $this->buildFullApiRoute('/' . $routeBase . '/{' . $relationIdParam . '}'),
+                'route' => $this->buildFullApiRoute('/'.$routeBase.'/{'.$relationIdParam.'}'),
             ],
             'update' => [
                 'name' => 'update',
                 'method' => 'PUT',
-                'route' => $this->buildFullApiRoute('/' . $routeBase . '/{' . $relationIdParam . '}'),
+                'route' => $this->buildFullApiRoute('/'.$routeBase.'/{'.$relationIdParam.'}'),
             ],
             'destroy' => [
                 'name' => 'destroy',
                 'method' => 'DELETE',
-                'route' => $this->buildFullApiRoute('/' . $routeBase . '/{' . $relationIdParam . '}'),
+                'route' => $this->buildFullApiRoute('/'.$routeBase.'/{'.$relationIdParam.'}'),
             ],
         ];
 

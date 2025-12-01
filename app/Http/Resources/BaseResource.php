@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class BaseResource extends JsonResource
 {
@@ -47,7 +47,7 @@ class BaseResource extends JsonResource
      */
     protected function resolveResourceType(): string
     {
-        if (property_exists($this->resource, 'resourceType') && !empty($this->resource->resourceType)) {
+        if (property_exists($this->resource, 'resourceType') && ! empty($this->resource->resourceType)) {
             return (string) $this->resource->resourceType;
         }
 
@@ -87,7 +87,7 @@ class BaseResource extends JsonResource
         foreach ($resource->allowedShowing as $key => $value) {
             $fieldKey = is_int($key) ? $value : $key;
 
-            if (!in_array($fieldKey, $fieldsToShow, true)) {
+            if (! in_array($fieldKey, $fieldsToShow, true)) {
                 continue;
             }
 
@@ -112,8 +112,8 @@ class BaseResource extends JsonResource
         }
 
         return collect($fieldsParam)
-            ->flatMap(fn($item) => explode(',', (string) $item))
-            ->map(fn($field) => trim($field))
+            ->flatMap(fn ($item) => explode(',', (string) $item))
+            ->map(fn ($field) => trim($field))
             ->filter()
             ->unique()
             ->toArray();
@@ -125,7 +125,7 @@ class BaseResource extends JsonResource
     protected function getAllowedFields($resource): array
     {
         return array_map(
-            fn($k, $v) => is_int($k) ? $v : $k,
+            fn ($k, $v) => is_int($k) ? $v : $k,
             array_keys($resource->allowedShowing),
             $resource->allowedShowing
         );
@@ -223,7 +223,7 @@ class BaseResource extends JsonResource
     {
         $includeParam = $request->query('include');
 
-        if (!$includeParam) {
+        if (! $includeParam) {
             return [];
         }
 
@@ -264,12 +264,12 @@ class BaseResource extends JsonResource
         $missingRelations = [];
 
         foreach ($relations as $relation) {
-            if (!$this->resource->relationLoaded($relation)) {
+            if (! $this->resource->relationLoaded($relation)) {
                 $missingRelations[] = $relation;
             }
         }
 
-        if (!empty($missingRelations)) {
+        if (! empty($missingRelations)) {
             // Use load() instead of individual queries
             $this->resource->load($missingRelations);
         }
@@ -305,6 +305,7 @@ class BaseResource extends JsonResource
         if ($resourceClass && class_exists($resourceClass)) {
             $resource = new $resourceClass($model);
             $transformed = $resource->toArray($request);
+
             return $transformed['attributes'] ?? [];
         }
 
@@ -378,7 +379,7 @@ class BaseResource extends JsonResource
             'updated_at' => $this->resource->updated_at?->timestamp,
         ];
 
-        return 'resource_attributes_' . md5(serialize($keyData));
+        return 'resource_attributes_'.md5(serialize($keyData));
     }
 
     /**
@@ -410,6 +411,7 @@ class BaseResource extends JsonResource
     protected function getTypeLink(): string
     {
         $type = Str::plural(Str::snake($this->resolveResourceType()));
+
         return url("/api/v1/{$type}");
     }
 
@@ -470,6 +472,7 @@ class BaseResource extends JsonResource
             }
 
             $path = implode('/', $pathSegments);
+
             return url("/api/v1/{$path}");
         }
 
@@ -505,6 +508,7 @@ class BaseResource extends JsonResource
             }
 
             $path = implode('/', $pathSegments);
+
             return url("/api/v1/{$path}/{$this->resource->getKey()}");
         }
 
@@ -528,6 +532,7 @@ class BaseResource extends JsonResource
             }
 
             $path = implode('/', array_map([Str::class, 'snake'], $pathParts));
+
             return url("/api/v1/{$path}/{$this->resource->getKey()}");
         }
 

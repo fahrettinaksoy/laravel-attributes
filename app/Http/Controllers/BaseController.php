@@ -8,8 +8,6 @@ use App\Http\Resources\BaseCollection;
 use App\Http\Resources\BaseResource;
 use App\Services\BaseService;
 use App\Traits\FormRequestResolver;
-use App\Traits\NestedValidationTrait;
-use App\Traits\ResolvesFormRequests;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

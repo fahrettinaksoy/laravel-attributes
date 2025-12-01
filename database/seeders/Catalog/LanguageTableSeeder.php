@@ -55,7 +55,7 @@ class LanguageTableSeeder extends Seeder
         foreach ($languages as $language) {
             $existingLanguage = LanguageModel::where('code', $language['code'])->first();
 
-            if (!$existingLanguage) {
+            if (! $existingLanguage) {
                 LanguageModel::create($language);
             }
         }

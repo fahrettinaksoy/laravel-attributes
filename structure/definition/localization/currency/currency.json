@@ -31,91 +31,91 @@
         },
         "name": {
             "database": {"variable": "string","nullable":false},
-            "validations": {"actions":["store","update"],"rules":["required","string","max:255"]},
+            "validations": {"store": ["required","string","max:255"],"update": ["required","string","max:255"]},
             "actions": ["index","show","store","update"],
             "table": ["showing","filtering","sorting"],
             "form": {"type":"text","sort_order":4}
         },
         "description": {
             "database": {"variable": "string","nullable":true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:500"]},
+            "validations": {"store": ["nullable","string","max:500"],"update": ["nullable","string","max:500"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting","hiding"],
             "form": {"type":"textarea","sort_order":5}
         },
         "image_path": {
             "database": {"variable": "string","nullable":true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:255"]},
+            "validations": {"store": ["nullable","string","max:255"],"update": ["nullable","string","max:255"]},
             "actions": ["index","show","store","update"],
             "table": [],
             "form": {"type":"image","sort_order":6}
         },
         "symbol_left": {
             "database": {"variable": "string","nullable":true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:50"]},
+            "validations": {"store": ["nullable","string","max:50"],"update": ["nullable","string","max:50"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering"],
             "form": {"type":"text","sort_order":7}
         },
         "symbol_right": {
             "database": {"variable": "string","nullable":true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:50"]},
+            "validations": {"store": ["nullable","string","max:50"],"update": ["nullable","string","max:50"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering"],
             "form": {"type":"text","sort_order":8}
         },
         "decimal_place": {
             "database": {"variable": "string","nullable":false},
-            "validations": {"actions":["store","update"],"rules":["required","string","max:10"]},
+            "validations": {"store": ["required","string","max:10"],"update": ["required","string","max:10"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
             "form": {"type":"text","sort_order":9}
         },
         "decimal_point": {
             "database": {"variable": "string","nullable":false},
-            "validations": {"actions":["store","update"],"rules":["required","string","max:5"]},
+            "validations": {"store": ["required","string","max:5"],"update": ["required","string","max:5"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering"],
             "form": {"type":"text","sort_order":10}
         },
         "thousand_point": {
             "database": {"variable": "string","nullable":false},
-            "validations": {"actions":["store","update"],"rules":["required","string","max:5"]},
+            "validations": {"store": ["required","string","max:5"],"update": ["required","string","max:5"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering"],
             "form": {"type":"text","sort_order":11}
         },
         "value": {
             "database": {"variable": "string","nullable":false},
-            "validations": {"actions":["store","update"],"rules":["required","string","max:50"]},
+            "validations": {"store": ["required","string","max:50"],"update": ["required","string","max:50"]},
             "actions": ["index","show","store","update"],
             "table": ["sorting","filtering"],
             "form": {"type":"text","sort_order":12}
         },
         "source": {
             "database": {"variable": "string","nullable":true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:100"]},
+            "validations": {"store": ["nullable","string","max:100"],"update": ["nullable","string","max:100"]},
             "actions": ["index","show","store","update"],
             "table": ["hiding"],
             "form": {"type":"text","sort_order":13}
         },
         "last_synced_at": {
             "database": {"variable": "string","nullable":true},
-            "validations": {"actions":["store","update"],"rules":["nullable","string","max:50"]},
+            "validations": {"store": ["nullable","string","max:50"],"update": ["nullable","string","max:50"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering"],
             "form": {"type":"text","sort_order":14}
         },
         "is_crypto": {
             "database": {"variable": "boolean","nullable":true,"default":true},
-            "validations": {"actions":["store","update"],"rules":["boolean"]},
+            "validations": {"store": ["required","boolean"],"update": ["required","boolean"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting"],
             "form": {"type":"boolean","options":{"true":"crypto","false":"fiat"},"sort_order":15}
         },
         "status": {
             "database": {"variable": "boolean","nullable":true,"default":true},
-            "validations": {"actions":["store","update"],"rules":["boolean"]},
+            "validations": {"store": ["required","boolean"],"update": ["required","boolean"]},
             "actions": ["index","show","store","update"],
             "table": ["filtering","sorting","showing"],
             "form": {"type":"boolean","options":{"true":"active","false":"passive"},"sort_order":16}

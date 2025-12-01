@@ -1,7 +1,7 @@
 {
     "info": {
         "name": "tutorial-laravel-attributes",
-        "description": "TransferCab API Collection\n\nThis collection contains all API endpoints for the TransferCab platform.\n\nFeatures:\n- Dynamic model-based endpoints\n- Automatic CRUD operations\n- Filtering, sorting, field selection, includes\n- Raw JSON body generation (typed) for Create\/Update\n- Bearer token authentication with pre-request script\n\nGenerated on: 2025-11-28 20:05:07",
+        "description": "TransferCab API Collection\n\nThis collection contains all API endpoints for the TransferCab platform.\n\nFeatures:\n- Dynamic model-based endpoints\n- Automatic CRUD operations\n- Filtering, sorting, field selection, includes\n- Raw JSON body generation (typed) for Create\/Update\n- Bearer token authentication with pre-request script\n\nGenerated on: 2025-12-01 12:23:44",
         "version": "1.0.0",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -56,85 +56,79 @@
                                                 {
                                                     "key": "filter[product_id]",
                                                     "value": "1",
-                                                    "description": "Filter by product_id",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[uuid]",
                                                     "value": "example_value",
-                                                    "description": "Filter by uuid",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[code]",
                                                     "value": "example_value",
-                                                    "description": "Filter by code",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[name]",
                                                     "value": "example_value",
-                                                    "description": "Filter by name",
-                                                    "disabled": true
-                                                },
-                                                {
-                                                    "key": "filter[description]",
-                                                    "value": "example_value",
-                                                    "description": "Filter by description",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[price]",
                                                     "value": "example_value",
-                                                    "description": "Filter by price",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[currency_code]",
                                                     "value": "example_value",
-                                                    "description": "Filter by currency_code",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[sku]",
                                                     "value": "example_value",
-                                                    "description": "Filter by sku",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[category_id]",
                                                     "value": "1",
-                                                    "description": "Filter by category_id",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[status]",
                                                     "value": "example_value",
-                                                    "description": "Filter by status",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[created_at]",
                                                     "value": "2024-01-01,2024-12-31",
-                                                    "description": "Filter by created_at",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[created_by]",
                                                     "value": "example_value",
-                                                    "description": "Filter by created_by",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[updated_at]",
                                                     "value": "2024-01-01,2024-12-31",
-                                                    "description": "Filter by updated_at",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[updated_by]",
                                                     "value": "example_value",
-                                                    "description": "Filter by updated_by",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
@@ -357,49 +351,43 @@
                                                                 {
                                                                     "key": "filter[product_image_id]",
                                                                     "value": "1",
-                                                                    "description": "Filter by product_image_id",
-                                                                    "disabled": true
-                                                                },
-                                                                {
-                                                                    "key": "filter[product_id]",
-                                                                    "value": "1",
-                                                                    "description": "Filter by product_id",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[uuid]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by uuid",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[code]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by code",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[created_at]",
                                                                     "value": "2024-01-01,2024-12-31",
-                                                                    "description": "Filter by created_at",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[created_by]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by created_by",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[updated_at]",
                                                                     "value": "2024-01-01,2024-12-31",
-                                                                    "description": "Filter by updated_at",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[updated_by]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by updated_by",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
@@ -451,7 +439,7 @@
                                                         "description": "Create endpoint for ProductImage",
                                                         "body": {
                                                             "mode": "raw",
-                                                            "raw": "{\n    \"product_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"file_path\": \"example_value\"\n}"
+                                                            "raw": "{\n    \"file_path\": \"example_value\"\n}"
                                                         }
                                                     }
                                                 },
@@ -542,7 +530,7 @@
                                                         "description": "Update endpoint for ProductImage",
                                                         "body": {
                                                             "mode": "raw",
-                                                            "raw": "{\n    \"product_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"file_path\": \"example_value\"\n}"
+                                                            "raw": "{\n    \"file_path\": \"example_value\"\n}"
                                                         }
                                                     }
                                                 },
@@ -640,67 +628,49 @@
                                                                                 {
                                                                                     "key": "filter[product_image_translation_id]",
                                                                                     "value": "1",
-                                                                                    "description": "Filter by product_image_translation_id",
-                                                                                    "disabled": true
-                                                                                },
-                                                                                {
-                                                                                    "key": "filter[product_image_id]",
-                                                                                    "value": "1",
-                                                                                    "description": "Filter by product_image_id",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[uuid]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by uuid",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[code]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by code",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[name]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by name",
-                                                                                    "disabled": true
-                                                                                },
-                                                                                {
-                                                                                    "key": "filter[summary]",
-                                                                                    "value": "example_value",
-                                                                                    "description": "Filter by summary",
-                                                                                    "disabled": true
-                                                                                },
-                                                                                {
-                                                                                    "key": "filter[description]",
-                                                                                    "value": "example_value",
-                                                                                    "description": "Filter by description",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[created_at]",
                                                                                     "value": "2024-01-01,2024-12-31",
-                                                                                    "description": "Filter by created_at",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[created_by]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by created_by",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[updated_at]",
                                                                                     "value": "2024-01-01,2024-12-31",
-                                                                                    "description": "Filter by updated_at",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[updated_by]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by updated_by",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
@@ -754,7 +724,7 @@
                                                                         "description": "Create endpoint for ProductImageTranslation",
                                                                         "body": {
                                                                             "mode": "raw",
-                                                                            "raw": "{\n    \"product_image_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\"\n}"
+                                                                            "raw": "{\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\"\n}"
                                                                         }
                                                                     }
                                                                 },
@@ -849,7 +819,7 @@
                                                                         "description": "Update endpoint for ProductImageTranslation",
                                                                         "body": {
                                                                             "mode": "raw",
-                                                                            "raw": "{\n    \"product_image_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\"\n}"
+                                                                            "raw": "{\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\"\n}"
                                                                         }
                                                                     }
                                                                 },
@@ -953,73 +923,55 @@
                                                                 {
                                                                     "key": "filter[product_translation_id]",
                                                                     "value": "1",
-                                                                    "description": "Filter by product_translation_id",
-                                                                    "disabled": true
-                                                                },
-                                                                {
-                                                                    "key": "filter[product_id]",
-                                                                    "value": "1",
-                                                                    "description": "Filter by product_id",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[uuid]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by uuid",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[code]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by code",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[name]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by name",
-                                                                    "disabled": true
-                                                                },
-                                                                {
-                                                                    "key": "filter[summary]",
-                                                                    "value": "example_value",
-                                                                    "description": "Filter by summary",
-                                                                    "disabled": true
-                                                                },
-                                                                {
-                                                                    "key": "filter[description]",
-                                                                    "value": "example_value",
-                                                                    "description": "Filter by description",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[slug]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by slug",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[created_at]",
                                                                     "value": "2024-01-01,2024-12-31",
-                                                                    "description": "Filter by created_at",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[created_by]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by created_by",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[updated_at]",
                                                                     "value": "2024-01-01,2024-12-31",
-                                                                    "description": "Filter by updated_at",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[updated_by]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by updated_by",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
@@ -1071,7 +1023,7 @@
                                                         "description": "Create endpoint for ProductTranslation",
                                                         "body": {
                                                             "mode": "raw",
-                                                            "raw": "{\n    \"product_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
+                                                            "raw": "{\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
                                                         }
                                                     }
                                                 },
@@ -1162,7 +1114,7 @@
                                                         "description": "Update endpoint for ProductTranslation",
                                                         "body": {
                                                             "mode": "raw",
-                                                            "raw": "{\n    \"product_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
+                                                            "raw": "{\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
                                                         }
                                                     }
                                                 },
@@ -1258,55 +1210,43 @@
                                                                 {
                                                                     "key": "filter[product_video_id]",
                                                                     "value": "1",
-                                                                    "description": "Filter by product_video_id",
-                                                                    "disabled": true
-                                                                },
-                                                                {
-                                                                    "key": "filter[product_id]",
-                                                                    "value": "1",
-                                                                    "description": "Filter by product_id",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[uuid]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by uuid",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[code]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by code",
-                                                                    "disabled": true
-                                                                },
-                                                                {
-                                                                    "key": "filter[source]",
-                                                                    "value": "example_value",
-                                                                    "description": "Filter by source",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[created_at]",
                                                                     "value": "2024-01-01,2024-12-31",
-                                                                    "description": "Filter by created_at",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[created_by]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by created_by",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[updated_at]",
                                                                     "value": "2024-01-01,2024-12-31",
-                                                                    "description": "Filter by updated_at",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
                                                                     "key": "filter[updated_by]",
                                                                     "value": "example_value",
-                                                                    "description": "Filter by updated_by",
+                                                                    "description": "",
                                                                     "disabled": true
                                                                 },
                                                                 {
@@ -1358,7 +1298,7 @@
                                                         "description": "Create endpoint for ProductVideo",
                                                         "body": {
                                                             "mode": "raw",
-                                                            "raw": "{\n    \"product_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"source\": \"example_value\",\n    \"content\": \"example_value\"\n}"
+                                                            "raw": "{\n    \"source\": \"example_value\",\n    \"content\": \"example_value\"\n}"
                                                         }
                                                     }
                                                 },
@@ -1449,7 +1389,7 @@
                                                         "description": "Update endpoint for ProductVideo",
                                                         "body": {
                                                             "mode": "raw",
-                                                            "raw": "{\n    \"product_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"source\": \"example_value\",\n    \"content\": \"example_value\"\n}"
+                                                            "raw": "{\n    \"source\": \"example_value\",\n    \"content\": \"example_value\"\n}"
                                                         }
                                                     }
                                                 },
@@ -1547,67 +1487,49 @@
                                                                                 {
                                                                                     "key": "filter[product_video_translation_id]",
                                                                                     "value": "1",
-                                                                                    "description": "Filter by product_video_translation_id",
-                                                                                    "disabled": true
-                                                                                },
-                                                                                {
-                                                                                    "key": "filter[product_video_id]",
-                                                                                    "value": "1",
-                                                                                    "description": "Filter by product_video_id",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[uuid]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by uuid",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[code]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by code",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[name]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by name",
-                                                                                    "disabled": true
-                                                                                },
-                                                                                {
-                                                                                    "key": "filter[summary]",
-                                                                                    "value": "example_value",
-                                                                                    "description": "Filter by summary",
-                                                                                    "disabled": true
-                                                                                },
-                                                                                {
-                                                                                    "key": "filter[description]",
-                                                                                    "value": "example_value",
-                                                                                    "description": "Filter by description",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[created_at]",
                                                                                     "value": "2024-01-01,2024-12-31",
-                                                                                    "description": "Filter by created_at",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[created_by]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by created_by",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[updated_at]",
                                                                                     "value": "2024-01-01,2024-12-31",
-                                                                                    "description": "Filter by updated_at",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
                                                                                     "key": "filter[updated_by]",
                                                                                     "value": "example_value",
-                                                                                    "description": "Filter by updated_by",
+                                                                                    "description": "",
                                                                                     "disabled": true
                                                                                 },
                                                                                 {
@@ -1661,7 +1583,7 @@
                                                                         "description": "Create endpoint for ProductVideoTranslation",
                                                                         "body": {
                                                                             "mode": "raw",
-                                                                            "raw": "{\n    \"product_video_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\"\n}"
+                                                                            "raw": "{\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\"\n}"
                                                                         }
                                                                     }
                                                                 },
@@ -1756,7 +1678,7 @@
                                                                         "description": "Update endpoint for ProductVideoTranslation",
                                                                         "body": {
                                                                             "mode": "raw",
-                                                                            "raw": "{\n    \"product_video_id\": \"example_value\",\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\"\n}"
+                                                                            "raw": "{\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\"\n}"
                                                                         }
                                                                     }
                                                                 },
@@ -1862,73 +1784,73 @@
                                                 {
                                                     "key": "filter[review_id]",
                                                     "value": "1",
-                                                    "description": "Filter by review_id",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[uuid]",
                                                     "value": "example_value",
-                                                    "description": "Filter by uuid",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[code]",
                                                     "value": "example_value",
-                                                    "description": "Filter by code",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[product_id]",
                                                     "value": "1",
-                                                    "description": "Filter by product_id",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[account_id]",
                                                     "value": "1",
-                                                    "description": "Filter by account_id",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[author]",
                                                     "value": "example_value",
-                                                    "description": "Filter by author",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[rating]",
                                                     "value": "example_value",
-                                                    "description": "Filter by rating",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[status]",
                                                     "value": "example_value",
-                                                    "description": "Filter by status",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[created_at]",
                                                     "value": "2024-01-01,2024-12-31",
-                                                    "description": "Filter by created_at",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[created_by]",
                                                     "value": "example_value",
-                                                    "description": "Filter by created_by",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[updated_at]",
                                                     "value": "2024-01-01,2024-12-31",
-                                                    "description": "Filter by updated_at",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
                                                     "key": "filter[updated_by]",
                                                     "value": "example_value",
-                                                    "description": "Filter by updated_by",
+                                                    "description": "",
                                                     "disabled": true
                                                 },
                                                 {
@@ -1976,7 +1898,7 @@
                                         "description": "Create endpoint for Review",
                                         "body": {
                                             "mode": "raw",
-                                            "raw": "{\n    \"code\": \"ABC123\",\n    \"product_id\": \"example_value\",\n    \"account_id\": \"example_value\",\n    \"author\": \"example_value\",\n    \"content\": \"example_value\",\n    \"rating\": 1,\n    \"status\": true\n}"
+                                            "raw": "{\n    \"product_id\": \"example_value\",\n    \"account_id\": \"example_value\",\n    \"author\": \"example_value\",\n    \"content\": \"example_value\",\n    \"rating\": 1,\n    \"status\": true\n}"
                                         }
                                     }
                                 },
@@ -2059,7 +1981,7 @@
                                         "description": "Update endpoint for Review",
                                         "body": {
                                             "mode": "raw",
-                                            "raw": "{\n    \"code\": \"ABC123\",\n    \"product_id\": \"example_value\",\n    \"account_id\": \"example_value\",\n    \"author\": \"example_value\",\n    \"content\": \"example_value\",\n    \"rating\": 1,\n    \"status\": true\n}"
+                                            "raw": "{\n    \"product_id\": \"example_value\",\n    \"account_id\": \"example_value\",\n    \"author\": \"example_value\",\n    \"content\": \"example_value\",\n    \"rating\": 1,\n    \"status\": true\n}"
                                         }
                                     }
                                 },
@@ -2113,6 +2035,624 @@
                             "name": "Catalog",
                             "item": [
                                 {
+                                    "name": "Brand",
+                                    "item": [
+                                        {
+                                            "name": "List endpoint",
+                                            "request": {
+                                                "method": "GET",
+                                                "header": [
+                                                    {
+                                                        "key": "Accept",
+                                                        "value": "application\/json",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "key": "Authorization",
+                                                        "value": "Bearer {{authToken}}",
+                                                        "type": "text"
+                                                    }
+                                                ],
+                                                "url": {
+                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand",
+                                                    "host": [
+                                                        "{{apiURL}}{{version}}"
+                                                    ],
+                                                    "path": [
+                                                        "definition",
+                                                        "catalog",
+                                                        "brand"
+                                                    ],
+                                                    "query": [
+                                                        {
+                                                            "key": "page",
+                                                            "value": "1",
+                                                            "description": "Page number",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "limit",
+                                                            "value": "15",
+                                                            "description": "Items per page",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[brand_id]",
+                                                            "value": "1",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[uuid]",
+                                                            "value": "example_value",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[code]",
+                                                            "value": "example_value",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[name]",
+                                                            "value": "example_value",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[description]",
+                                                            "value": "example_value",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[parent_id]",
+                                                            "value": "1",
+                                                            "description": "Filter by parent_id",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[layout_id]",
+                                                            "value": "1",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[membership]",
+                                                            "value": "example_value",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[status]",
+                                                            "value": "example_value",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[created_at]",
+                                                            "value": "2024-01-01,2024-12-31",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[created_by]",
+                                                            "value": "example_value",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[updated_at]",
+                                                            "value": "2024-01-01,2024-12-31",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "filter[updated_by]",
+                                                            "value": "example_value",
+                                                            "description": "",
+                                                            "disabled": true
+                                                        },
+                                                        {
+                                                            "key": "include",
+                                                            "value": "brand,translations",
+                                                            "description": "Allowed includes: brand, translations",
+                                                            "disabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                "description": "List endpoint for Brand"
+                                            }
+                                        },
+                                        {
+                                            "name": "Create endpoint",
+                                            "request": {
+                                                "method": "POST",
+                                                "header": [
+                                                    {
+                                                        "key": "Accept",
+                                                        "value": "application\/json",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "key": "Content-Type",
+                                                        "value": "application\/json",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "key": "Authorization",
+                                                        "value": "Bearer {{authToken}}",
+                                                        "type": "text"
+                                                    }
+                                                ],
+                                                "url": {
+                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand",
+                                                    "host": [
+                                                        "{{apiURL}}{{version}}"
+                                                    ],
+                                                    "path": [
+                                                        "definition",
+                                                        "catalog",
+                                                        "brand"
+                                                    ]
+                                                },
+                                                "description": "Create endpoint for Brand",
+                                                "body": {
+                                                    "mode": "raw",
+                                                    "raw": "{\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"image_path\": \"example_value\",\n    \"parent_id\": \"example_value\",\n    \"layout_id\": 1,\n    \"membership\": 1,\n    \"status\": true\n}"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "name": "Get endpoint",
+                                            "request": {
+                                                "method": "GET",
+                                                "header": [
+                                                    {
+                                                        "key": "Accept",
+                                                        "value": "application\/json",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "key": "Authorization",
+                                                        "value": "Bearer {{authToken}}",
+                                                        "type": "text"
+                                                    }
+                                                ],
+                                                "url": {
+                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand\/{{id}}",
+                                                    "host": [
+                                                        "{{apiURL}}{{version}}"
+                                                    ],
+                                                    "path": [
+                                                        "definition",
+                                                        "catalog",
+                                                        "brand",
+                                                        "{{id}}"
+                                                    ],
+                                                    "variable": [
+                                                        {
+                                                            "key": "id",
+                                                            "value": "1",
+                                                            "description": "Brand ID"
+                                                        }
+                                                    ]
+                                                },
+                                                "description": "Get endpoint for Brand"
+                                            }
+                                        },
+                                        {
+                                            "name": "Update endpoint",
+                                            "request": {
+                                                "method": "PUT",
+                                                "header": [
+                                                    {
+                                                        "key": "Accept",
+                                                        "value": "application\/json",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "key": "Content-Type",
+                                                        "value": "application\/json",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "key": "Authorization",
+                                                        "value": "Bearer {{authToken}}",
+                                                        "type": "text"
+                                                    }
+                                                ],
+                                                "url": {
+                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand\/{{id}}",
+                                                    "host": [
+                                                        "{{apiURL}}{{version}}"
+                                                    ],
+                                                    "path": [
+                                                        "definition",
+                                                        "catalog",
+                                                        "brand",
+                                                        "{{id}}"
+                                                    ],
+                                                    "variable": [
+                                                        {
+                                                            "key": "id",
+                                                            "value": "1",
+                                                            "description": "Brand ID"
+                                                        }
+                                                    ]
+                                                },
+                                                "description": "Update endpoint for Brand",
+                                                "body": {
+                                                    "mode": "raw",
+                                                    "raw": "{\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"image_path\": \"example_value\",\n    \"parent_id\": \"example_value\",\n    \"layout_id\": 1,\n    \"membership\": 1,\n    \"status\": true\n}"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "name": "Delete endpoint",
+                                            "request": {
+                                                "method": "DELETE",
+                                                "header": [
+                                                    {
+                                                        "key": "Accept",
+                                                        "value": "application\/json",
+                                                        "type": "text"
+                                                    },
+                                                    {
+                                                        "key": "Authorization",
+                                                        "value": "Bearer {{authToken}}",
+                                                        "type": "text"
+                                                    }
+                                                ],
+                                                "url": {
+                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand\/{{id}}",
+                                                    "host": [
+                                                        "{{apiURL}}{{version}}"
+                                                    ],
+                                                    "path": [
+                                                        "definition",
+                                                        "catalog",
+                                                        "brand",
+                                                        "{{id}}"
+                                                    ],
+                                                    "variable": [
+                                                        {
+                                                            "key": "id",
+                                                            "value": "1",
+                                                            "description": "Brand ID"
+                                                        }
+                                                    ]
+                                                },
+                                                "description": "Delete endpoint for Brand"
+                                            }
+                                        },
+                                        {
+                                            "name": "Relations",
+                                            "item": [
+                                                {
+                                                    "name": "BrandTranslation",
+                                                    "item": [
+                                                        {
+                                                            "name": "List endpoint",
+                                                            "request": {
+                                                                "method": "GET",
+                                                                "header": [
+                                                                    {
+                                                                        "key": "Accept",
+                                                                        "value": "application\/json",
+                                                                        "type": "text"
+                                                                    },
+                                                                    {
+                                                                        "key": "Authorization",
+                                                                        "value": "Bearer {{authToken}}",
+                                                                        "type": "text"
+                                                                    }
+                                                                ],
+                                                                "url": {
+                                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand\/relations\/brandtranslation\/{{brandtranslationID}}\/translations",
+                                                                    "host": [
+                                                                        "{{apiURL}}{{version}}"
+                                                                    ],
+                                                                    "path": [
+                                                                        "definition",
+                                                                        "catalog",
+                                                                        "brand",
+                                                                        "relations",
+                                                                        "brandtranslation",
+                                                                        "{{brandtranslationID}}",
+                                                                        "translations"
+                                                                    ],
+                                                                    "query": [
+                                                                        {
+                                                                            "key": "page",
+                                                                            "value": "1",
+                                                                            "description": "Page number",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "limit",
+                                                                            "value": "15",
+                                                                            "description": "Items per page",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[brand_translation_id]",
+                                                                            "value": "1",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[uuid]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[code]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[brand_id]",
+                                                                            "value": "1",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[language_code]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[name]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[summary]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[description]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[slug]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[created_at]",
+                                                                            "value": "2024-01-01,2024-12-31",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[created_by]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[updated_at]",
+                                                                            "value": "2024-01-01,2024-12-31",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[updated_by]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "include",
+                                                                            "value": "brand,language",
+                                                                            "description": "Allowed includes: brand, language",
+                                                                            "disabled": true
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "description": "List endpoint for BrandTranslation"
+                                                            }
+                                                        },
+                                                        {
+                                                            "name": "Create endpoint",
+                                                            "request": {
+                                                                "method": "POST",
+                                                                "header": [
+                                                                    {
+                                                                        "key": "Accept",
+                                                                        "value": "application\/json",
+                                                                        "type": "text"
+                                                                    },
+                                                                    {
+                                                                        "key": "Content-Type",
+                                                                        "value": "application\/json",
+                                                                        "type": "text"
+                                                                    },
+                                                                    {
+                                                                        "key": "Authorization",
+                                                                        "value": "Bearer {{authToken}}",
+                                                                        "type": "text"
+                                                                    }
+                                                                ],
+                                                                "url": {
+                                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand\/relations\/brandtranslation\/{{brandtranslationID}}\/translations",
+                                                                    "host": [
+                                                                        "{{apiURL}}{{version}}"
+                                                                    ],
+                                                                    "path": [
+                                                                        "definition",
+                                                                        "catalog",
+                                                                        "brand",
+                                                                        "relations",
+                                                                        "brandtranslation",
+                                                                        "{{brandtranslationID}}",
+                                                                        "translations"
+                                                                    ]
+                                                                },
+                                                                "description": "Create endpoint for BrandTranslation",
+                                                                "body": {
+                                                                    "mode": "raw",
+                                                                    "raw": "{\n    \"language_code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "name": "Get endpoint",
+                                                            "request": {
+                                                                "method": "GET",
+                                                                "header": [
+                                                                    {
+                                                                        "key": "Accept",
+                                                                        "value": "application\/json",
+                                                                        "type": "text"
+                                                                    },
+                                                                    {
+                                                                        "key": "Authorization",
+                                                                        "value": "Bearer {{authToken}}",
+                                                                        "type": "text"
+                                                                    }
+                                                                ],
+                                                                "url": {
+                                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand\/relations\/brandtranslation\/{{brandtranslationID}}\/translations\/{{id}}",
+                                                                    "host": [
+                                                                        "{{apiURL}}{{version}}"
+                                                                    ],
+                                                                    "path": [
+                                                                        "definition",
+                                                                        "catalog",
+                                                                        "brand",
+                                                                        "relations",
+                                                                        "brandtranslation",
+                                                                        "{{brandtranslationID}}",
+                                                                        "translations",
+                                                                        "{{id}}"
+                                                                    ],
+                                                                    "variable": [
+                                                                        {
+                                                                            "key": "id",
+                                                                            "value": "1",
+                                                                            "description": "BrandTranslation ID"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "description": "Get endpoint for BrandTranslation"
+                                                            }
+                                                        },
+                                                        {
+                                                            "name": "Update endpoint",
+                                                            "request": {
+                                                                "method": "PUT",
+                                                                "header": [
+                                                                    {
+                                                                        "key": "Accept",
+                                                                        "value": "application\/json",
+                                                                        "type": "text"
+                                                                    },
+                                                                    {
+                                                                        "key": "Content-Type",
+                                                                        "value": "application\/json",
+                                                                        "type": "text"
+                                                                    },
+                                                                    {
+                                                                        "key": "Authorization",
+                                                                        "value": "Bearer {{authToken}}",
+                                                                        "type": "text"
+                                                                    }
+                                                                ],
+                                                                "url": {
+                                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand\/relations\/brandtranslation\/{{brandtranslationID}}\/translations\/{{id}}",
+                                                                    "host": [
+                                                                        "{{apiURL}}{{version}}"
+                                                                    ],
+                                                                    "path": [
+                                                                        "definition",
+                                                                        "catalog",
+                                                                        "brand",
+                                                                        "relations",
+                                                                        "brandtranslation",
+                                                                        "{{brandtranslationID}}",
+                                                                        "translations",
+                                                                        "{{id}}"
+                                                                    ],
+                                                                    "variable": [
+                                                                        {
+                                                                            "key": "id",
+                                                                            "value": "1",
+                                                                            "description": "BrandTranslation ID"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "description": "Update endpoint for BrandTranslation",
+                                                                "body": {
+                                                                    "mode": "raw",
+                                                                    "raw": "{\n    \"language_code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "name": "Delete endpoint",
+                                                            "request": {
+                                                                "method": "DELETE",
+                                                                "header": [
+                                                                    {
+                                                                        "key": "Accept",
+                                                                        "value": "application\/json",
+                                                                        "type": "text"
+                                                                    },
+                                                                    {
+                                                                        "key": "Authorization",
+                                                                        "value": "Bearer {{authToken}}",
+                                                                        "type": "text"
+                                                                    }
+                                                                ],
+                                                                "url": {
+                                                                    "raw": "{{apiURL}}{{version}}\/definition\/catalog\/brand\/relations\/brandtranslation\/{{brandtranslationID}}\/translations\/{{id}}",
+                                                                    "host": [
+                                                                        "{{apiURL}}{{version}}"
+                                                                    ],
+                                                                    "path": [
+                                                                        "definition",
+                                                                        "catalog",
+                                                                        "brand",
+                                                                        "relations",
+                                                                        "brandtranslation",
+                                                                        "{{brandtranslationID}}",
+                                                                        "translations",
+                                                                        "{{id}}"
+                                                                    ],
+                                                                    "variable": [
+                                                                        {
+                                                                            "key": "id",
+                                                                            "value": "1",
+                                                                            "description": "BrandTranslation ID"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "description": "Delete endpoint for BrandTranslation"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "description": "Operations for BrandTranslation module"
+                                                }
+                                            ],
+                                            "description": "Operations for Relations module"
+                                        }
+                                    ],
+                                    "description": "Operations for Brand module"
+                                },
+                                {
                                     "name": "Category",
                                     "item": [
                                         {
@@ -2157,79 +2697,79 @@
                                                         {
                                                             "key": "filter[category_id]",
                                                             "value": "1",
-                                                            "description": "Filter by category_id",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[uuid]",
                                                             "value": "example_value",
-                                                            "description": "Filter by uuid",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[code]",
                                                             "value": "example_value",
-                                                            "description": "Filter by code",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[name]",
                                                             "value": "example_value",
-                                                            "description": "Filter by name",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[description]",
                                                             "value": "example_value",
-                                                            "description": "Filter by description",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[parent_id]",
                                                             "value": "1",
-                                                            "description": "Filter by parent_id",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[layout_id]",
                                                             "value": "1",
-                                                            "description": "Filter by layout_id",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[membership]",
                                                             "value": "example_value",
-                                                            "description": "Filter by membership",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[status]",
                                                             "value": "example_value",
-                                                            "description": "Filter by status",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[created_at]",
                                                             "value": "2024-01-01,2024-12-31",
-                                                            "description": "Filter by created_at",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[created_by]",
                                                             "value": "example_value",
-                                                            "description": "Filter by created_by",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[updated_at]",
                                                             "value": "2024-01-01,2024-12-31",
-                                                            "description": "Filter by updated_at",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[updated_by]",
                                                             "value": "example_value",
-                                                            "description": "Filter by updated_by",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
@@ -2457,85 +2997,85 @@
                                                                         {
                                                                             "key": "filter[category_translation_id]",
                                                                             "value": "1",
-                                                                            "description": "Filter by category_translation_id",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[uuid]",
                                                                             "value": "example_value",
-                                                                            "description": "Filter by uuid",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[code]",
                                                                             "value": "example_value",
-                                                                            "description": "Filter by code",
-                                                                            "disabled": true
-                                                                        },
-                                                                        {
-                                                                            "key": "filter[language_code]",
-                                                                            "value": "example_value",
-                                                                            "description": "Filter by language_code",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[category_id]",
                                                                             "value": "1",
-                                                                            "description": "Filter by category_id",
+                                                                            "description": "",
+                                                                            "disabled": true
+                                                                        },
+                                                                        {
+                                                                            "key": "filter[language_code]",
+                                                                            "value": "example_value",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[name]",
                                                                             "value": "example_value",
-                                                                            "description": "Filter by name",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[summary]",
                                                                             "value": "example_value",
-                                                                            "description": "Filter by summary",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[description]",
                                                                             "value": "example_value",
-                                                                            "description": "Filter by description",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[slug]",
                                                                             "value": "example_value",
-                                                                            "description": "Filter by slug",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[created_at]",
                                                                             "value": "2024-01-01,2024-12-31",
-                                                                            "description": "Filter by created_at",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[created_by]",
                                                                             "value": "example_value",
-                                                                            "description": "Filter by created_by",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[updated_at]",
                                                                             "value": "2024-01-01,2024-12-31",
-                                                                            "description": "Filter by updated_at",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "filter[updated_by]",
                                                                             "value": "example_value",
-                                                                            "description": "Filter by updated_by",
+                                                                            "description": "",
                                                                             "disabled": true
                                                                         },
                                                                         {
                                                                             "key": "include",
-                                                                            "value": "language,category",
-                                                                            "description": "Allowed includes: language, category",
+                                                                            "value": "category,language",
+                                                                            "description": "Allowed includes: category, language",
                                                                             "disabled": true
                                                                         }
                                                                     ]
@@ -2582,7 +3122,7 @@
                                                                 "description": "Create endpoint for CategoryTranslation",
                                                                 "body": {
                                                                     "mode": "raw",
-                                                                    "raw": "{\n    \"code\": \"ABC123\",\n    \"language_code\": \"ABC123\",\n    \"category_id\": \"example_value\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
+                                                                    "raw": "{\n    \"code\": \"ABC123\",\n    \"category_id\": \"example_value\",\n    \"language_code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
                                                                 }
                                                             }
                                                         },
@@ -2675,7 +3215,7 @@
                                                                 "description": "Update endpoint for CategoryTranslation",
                                                                 "body": {
                                                                     "mode": "raw",
-                                                                    "raw": "{\n    \"code\": \"ABC123\",\n    \"language_code\": \"ABC123\",\n    \"category_id\": \"example_value\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
+                                                                    "raw": "{\n    \"code\": \"ABC123\",\n    \"category_id\": \"example_value\",\n    \"language_code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"summary\": \"example_value\",\n    \"description\": \"example_value\",\n    \"slug\": \"example_value\",\n    \"meta_title\": \"Example Title\",\n    \"meta_description\": \"example_value\",\n    \"meta_keyword\": \"example_value\"\n}"
                                                                 }
                                                             }
                                                         },
@@ -2781,109 +3321,109 @@
                                                         {
                                                             "key": "filter[currency_id]",
                                                             "value": "1",
-                                                            "description": "Filter by currency_id",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[uuid]",
                                                             "value": "example_value",
-                                                            "description": "Filter by uuid",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[code]",
                                                             "value": "example_value",
-                                                            "description": "Filter by code",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[name]",
                                                             "value": "example_value",
-                                                            "description": "Filter by name",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[description]",
                                                             "value": "example_value",
-                                                            "description": "Filter by description",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[symbol_left]",
                                                             "value": "example_value",
-                                                            "description": "Filter by symbol_left",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[symbol_right]",
                                                             "value": "example_value",
-                                                            "description": "Filter by symbol_right",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[decimal_place]",
                                                             "value": "example_value",
-                                                            "description": "Filter by decimal_place",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[decimal_point]",
                                                             "value": "example_value",
-                                                            "description": "Filter by decimal_point",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[thousand_point]",
                                                             "value": "example_value",
-                                                            "description": "Filter by thousand_point",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[value]",
                                                             "value": "example_value",
-                                                            "description": "Filter by value",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[last_synced_at]",
                                                             "value": "2024-01-01,2024-12-31",
-                                                            "description": "Filter by last_synced_at",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[is_crypto]",
                                                             "value": "true",
-                                                            "description": "Filter by is_crypto",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[status]",
                                                             "value": "example_value",
-                                                            "description": "Filter by status",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[created_at]",
                                                             "value": "2024-01-01,2024-12-31",
-                                                            "description": "Filter by created_at",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[created_by]",
                                                             "value": "example_value",
-                                                            "description": "Filter by created_by",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[updated_at]",
                                                             "value": "2024-01-01,2024-12-31",
-                                                            "description": "Filter by updated_at",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[updated_by]",
                                                             "value": "example_value",
-                                                            "description": "Filter by updated_by",
+                                                            "description": "",
                                                             "disabled": true
                                                         }
                                                     ]
@@ -2926,7 +3466,7 @@
                                                 "description": "Create endpoint for Currency",
                                                 "body": {
                                                     "mode": "raw",
-                                                    "raw": "{\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"image_path\": \"example_value\",\n    \"symbol_left\": \"example_value\",\n    \"symbol_right\": \"example_value\",\n    \"decimal_place\": \"example_value\",\n    \"decimal_point\": \"example_value\",\n    \"thousand_point\": \"example_value\",\n    \"value\": \"example_value\",\n    \"source\": \"example_value\",\n    \"last_synced_at\": \"example_value\",\n    \"is_crypto\": true,\n    \"status\": true\n}"
+                                                    "raw": "{\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"image_path\": \"example_value\",\n    \"symbol_left\": \"example_value\",\n    \"symbol_right\": \"example_value\",\n    \"decimal_place\": \"example_value\",\n    \"decimal_point\": \"example_value\",\n    \"thousand_point\": \"example_value\",\n    \"value\": \"example_value\",\n    \"source\": \"example_value\",\n    \"last_synced_at\": \"example_value\",\n    \"is_crypto\": true,\n    \"status\": true\n}"
                                                 }
                                             }
                                         },
@@ -3011,7 +3551,7 @@
                                                 "description": "Update endpoint for Currency",
                                                 "body": {
                                                     "mode": "raw",
-                                                    "raw": "{\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"image_path\": \"example_value\",\n    \"symbol_left\": \"example_value\",\n    \"symbol_right\": \"example_value\",\n    \"decimal_place\": \"example_value\",\n    \"decimal_point\": \"example_value\",\n    \"thousand_point\": \"example_value\",\n    \"value\": \"example_value\",\n    \"source\": \"example_value\",\n    \"last_synced_at\": \"example_value\",\n    \"is_crypto\": true,\n    \"status\": true\n}"
+                                                    "raw": "{\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"image_path\": \"example_value\",\n    \"symbol_left\": \"example_value\",\n    \"symbol_right\": \"example_value\",\n    \"decimal_place\": \"example_value\",\n    \"decimal_point\": \"example_value\",\n    \"thousand_point\": \"example_value\",\n    \"value\": \"example_value\",\n    \"source\": \"example_value\",\n    \"last_synced_at\": \"example_value\",\n    \"is_crypto\": true,\n    \"status\": true\n}"
                                                 }
                                             }
                                         },
@@ -3101,85 +3641,85 @@
                                                         {
                                                             "key": "filter[language_id]",
                                                             "value": "1",
-                                                            "description": "Filter by language_id",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[uuid]",
                                                             "value": "example_value",
-                                                            "description": "Filter by uuid",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[code]",
                                                             "value": "example_value",
-                                                            "description": "Filter by code",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[name]",
                                                             "value": "example_value",
-                                                            "description": "Filter by name",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[description]",
                                                             "value": "example_value",
-                                                            "description": "Filter by description",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[direction]",
                                                             "value": "example_value",
-                                                            "description": "Filter by direction",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[directory]",
                                                             "value": "example_value",
-                                                            "description": "Filter by directory",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[locale]",
                                                             "value": "example_value",
-                                                            "description": "Filter by locale",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[sort_order]",
                                                             "value": "example_value",
-                                                            "description": "Filter by sort_order",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[status]",
                                                             "value": "example_value",
-                                                            "description": "Filter by status",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[created_at]",
                                                             "value": "2024-01-01,2024-12-31",
-                                                            "description": "Filter by created_at",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[created_by]",
                                                             "value": "example_value",
-                                                            "description": "Filter by created_by",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[updated_at]",
                                                             "value": "2024-01-01,2024-12-31",
-                                                            "description": "Filter by updated_at",
+                                                            "description": "",
                                                             "disabled": true
                                                         },
                                                         {
                                                             "key": "filter[updated_by]",
                                                             "value": "example_value",
-                                                            "description": "Filter by updated_by",
+                                                            "description": "",
                                                             "disabled": true
                                                         }
                                                     ]
@@ -3222,7 +3762,7 @@
                                                 "description": "Create endpoint for Language",
                                                 "body": {
                                                     "mode": "raw",
-                                                    "raw": "{\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"flag_path\": \"example_value\",\n    \"direction\": \"example_value\",\n    \"directory\": \"example_value\",\n    \"locale\": \"example_value\",\n    \"sort_order\": 1,\n    \"status\": true\n}"
+                                                    "raw": "{\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"flag_path\": \"example_value\",\n    \"direction\": \"example_value\",\n    \"directory\": \"example_value\",\n    \"locale\": \"example_value\",\n    \"sort_order\": 1,\n    \"status\": true\n}"
                                                 }
                                             }
                                         },
@@ -3307,7 +3847,7 @@
                                                 "description": "Update endpoint for Language",
                                                 "body": {
                                                     "mode": "raw",
-                                                    "raw": "{\n    \"code\": \"ABC123\",\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"flag_path\": \"example_value\",\n    \"direction\": \"example_value\",\n    \"directory\": \"example_value\",\n    \"locale\": \"example_value\",\n    \"sort_order\": 1,\n    \"status\": true\n}"
+                                                    "raw": "{\n    \"name\": \"Example Name\",\n    \"description\": \"example_value\",\n    \"flag_path\": \"example_value\",\n    \"direction\": \"example_value\",\n    \"directory\": \"example_value\",\n    \"locale\": \"example_value\",\n    \"sort_order\": 1,\n    \"status\": true\n}"
                                                 }
                                             }
                                         },

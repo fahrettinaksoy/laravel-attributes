@@ -77,7 +77,6 @@ abstract class BaseModel extends Model
         return $this->hasOne(UserModel::class, 'updated_by', 'user_id');
     }
 
-
     protected function serializeDate(\DateTimeInterface $date): string
     {
         return $date->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');

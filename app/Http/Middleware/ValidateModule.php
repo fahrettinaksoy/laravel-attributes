@@ -13,13 +13,12 @@ use InvalidArgumentException;
 class ValidateModule
 {
     private array $modelClassCache = [];
-    private const CACHE_TTL = 3600; // 1 saat cache
 
-    // Bu URL'ler için model resolution yapılmayacak
+    private const CACHE_TTL = 3600;
+
     private const EXCEPTION_ROUTES = [
         'definition/location/search',
         'catalog/availability/check',
-        // Diğer özel endpoint'ler buraya eklenebilir
     ];
 
     public function handle(Request $request, Closure $next): mixed
@@ -30,13 +29,12 @@ class ValidateModule
             return $next($request);
         }
 
-        // İstisna route'ları kontrol et
         $pathAfterApi = implode('/', array_slice($segments, 2));
         if ($this->isExceptionRoute($pathAfterApi)) {
             return $next($request);
         }
 
-        $cacheKey = 'model_resolution_' . md5(implode('/', $segments));
+        $cacheKey = 'model_resolution_'.md5(implode('/', $segments));
         if (isset($this->modelClassCache[$cacheKey])) {
             $this->setRequestAttributes($request, $this->modelClassCache[$cacheKey]);
 
@@ -176,10 +174,10 @@ class ValidateModule
     private function buildModelClass(array $pathSegments, ?string $customName = null): string
     {
         $nsParts = array_map([Str::class, 'studly'], $pathSegments);
-        $namespace = 'App\\Models\\' . implode('\\', $nsParts);
-        $className = $customName ?: (Str::studly(end($pathSegments)) . 'Model');
+        $namespace = 'App\\Models\\'.implode('\\', $nsParts);
+        $className = $customName ?: (Str::studly(end($pathSegments)).'Model');
 
-        return $namespace . '\\' . $className;
+        return $namespace.'\\'.$className;
     }
 
     private function setRequestAttributes(Request $request, array $attributes): void

@@ -99,11 +99,9 @@ trait NestedValidationTrait
         }
 
         $namespaceSegments = $this->buildNestedNamespaceSegments($modelPath);
-        $namespace = 'App\\Http\\Requests\\' . implode('\\', $namespaceSegments) . '\\Pivot\\' . Str::studly($this->getPivotTableName($relationName)) . Str::studly($relationName);
-        $className = Str::studly($this->getPivotTableName($relationName)) . Str::studly($relationName) . Str::studly($currentAction) . 'Request';
-        $fullClassName = $namespace . '\\' . $className;
-
-        return $fullClassName;
+        $namespace = 'App\\Http\\Requests\\'.implode('\\', $namespaceSegments).'\\Pivot\\'.Str::studly($this->getPivotTableName($relationName)).Str::studly($relationName);
+        $className = Str::studly($this->getPivotTableName($relationName)).Str::studly($relationName).Str::studly($currentAction).'Request';
+        return $namespace.'\\'.$className;
     }
 
     protected function getNestedModelPath($model): string
@@ -119,7 +117,7 @@ trait NestedValidationTrait
 
         $path = strtolower(implode('/', $namespaceParts));
         if (! empty($path)) {
-            $path .= '/' . strtolower($cleanName);
+            $path .= '/'.strtolower($cleanName);
         } else {
             $path = strtolower($cleanName);
         }
@@ -133,7 +131,7 @@ trait NestedValidationTrait
         $modelName = class_basename(get_class($model));
         $cleanModelName = str_replace('Model', '', $modelName);
 
-        return $cleanModelName . Str::studly($relationName);
+        return $cleanModelName.Str::studly($relationName);
     }
 
     protected function buildNestedNamespaceSegments(string $modelPath): array

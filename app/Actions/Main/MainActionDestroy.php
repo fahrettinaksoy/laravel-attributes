@@ -13,7 +13,7 @@ class MainActionDestroy extends BaseAction
     {
         $deleted = $this->repository->delete($filter);
 
-        if (!$deleted) {
+        if (! $deleted) {
             throw new ModelNotFoundException(__('actions/base.error.delete'));
         }
 
