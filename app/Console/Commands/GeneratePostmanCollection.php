@@ -11,10 +11,11 @@ use Illuminate\Support\Str;
 
 class GeneratePostmanCollection extends Command
 {
-    protected $signature = 'postman:generate {--name=} {--collection-version=1.0.0} {--auth-token=}';
+    protected $signature = 'postman:generate {--name=} {--collection-version=1.0.0} {--auth-token=} {--auth=true}';
     protected $description = 'Generate Postman collection from dynamic Model structure and Laravel routes';
     protected array $collection = [];
     protected ?string $authToken = null;
+    protected bool $authEnabled = true;
     protected array $excludedDirectories = ['Base', 'Shared', 'Common', 'Traits', 'Concerns', 'Contracts', 'Abstracts', 'DTO', 'ValueObjects'];
     protected array $excludedModelNames = ['BaseModel', 'AbstractModel', 'Base'];
     protected array $excludedModelNamePatterns = ['/^Base[A-Za-z0-9]*Model$/', '/^Abstract.+Model$/', '/^Base$/'];
@@ -23,6 +24,11 @@ class GeneratePostmanCollection extends Command
     public function handle(): int
     {
         if (!$this->option('name')) $this->input->setOption('name', basename(base_path()));
+
+        // Parse auth option (handles both boolean and string values)
+        $authOption = $this->option('auth');
+        $this->authEnabled = filter_var($authOption, FILTER_VALIDATE_BOOLEAN);
+
         $this->initCollection();
         $this->buildEndpoints();
         $this->writeCollectionFile();
@@ -41,8 +47,13 @@ class GeneratePostmanCollection extends Command
                 'schema' => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
             ],
             'item' => [],
-            'variable' => [['key' => 'authToken', 'value' => $this->authToken ?: 'your_bearer_token_here', 'type' => 'string']],
         ];
+
+        if ($this->authEnabled) {
+            $this->collection['variable'] = [
+                ['key' => 'authToken', 'value' => $this->authToken ?: 'your_bearer_token_here', 'type' => 'string']
+            ];
+        }
     }
 
     protected function buildEndpoints(): void
@@ -56,9 +67,57 @@ class GeneratePostmanCollection extends Command
             'name' => 'Core',
             'item' => $merged,
             'description' => 'All API endpoints (Models + Routes)',
-            'auth' => ['type' => 'bearer', 'bearer' => [['key' => 'token', 'value' => '{{authToken}}', 'type' => 'string']]],
-            'event' => [['listen' => 'prerequest', 'script' => ['exec' => ['const protocol = pm.environment.get("protocol");', 'const subdomain = pm.environment.get("subDomain");', 'const domain = pm.environment.get("domain");', 'const path = pm.environment.get("path");', 'const version = pm.environment.get("version");', '', 'const baseUrl = `${protocol}${subdomain}${domain}${path}${version}`;', '', 'if (!pm.environment.get("authToken")) {', '  pm.sendRequest({', '    url: `${baseUrl}/auth/login`,', '    method: "POST",', '    header: { "Content-Type": "application/json" },', '    body: {', '      mode: "raw",', '      raw: JSON.stringify({', '        email: pm.environment.get("authEmail"),', '        password: pm.environment.get("authPassword"),', '        device_name: "postman"', '      })', '    }', '  }, (err, res) => {', '    if (err) { console.error("Token isteğinde hata:", err); return; }', '    let json;', '    try { json = res.json(); } catch (e) { console.error("Geçersiz JSON:", res.text()); return; }', '    if (json.token) {', '      pm.environment.set("authToken", json.token);', '      postman.setNextRequest(pm.info.requestName);', '    } else { console.error("Token alınamadı:", json); }', '  });', '}'], 'type' => 'text/javascript']]],
         ];
+
+        if ($this->authEnabled) {
+            $coreFolder['auth'] = [
+                'type' => 'bearer',
+                'bearer' => [
+                    ['key' => 'token', 'value' => '{{authToken}}', 'type' => 'string']
+                ]
+            ];
+            $coreFolder['event'] = [
+                [
+                    'listen' => 'prerequest',
+                    'script' => [
+                        'exec' => [
+                            'const protocol = pm.environment.get("protocol");',
+                            'const subdomain = pm.environment.get("subDomain");',
+                            'const domain = pm.environment.get("domain");',
+                            'const path = pm.environment.get("path");',
+                            'const version = pm.environment.get("version");',
+                            '',
+                            'const baseUrl = `${protocol}${subdomain}${domain}${path}${version}`;',
+                            '',
+                            'if (!pm.environment.get("authToken")) {',
+                            '  pm.sendRequest({',
+                            '    url: `${baseUrl}/auth/login`,',
+                            '    method: "POST",',
+                            '    header: { "Content-Type": "application/json" },',
+                            '    body: {',
+                            '      mode: "raw",',
+                            '      raw: JSON.stringify({',
+                            '        email: pm.environment.get("authEmail"),',
+                            '        password: pm.environment.get("authPassword"),',
+                            '        device_name: "postman"',
+                            '      })',
+                            '    }',
+                            '  }, (err, res) => {',
+                            '    if (err) { console.error("Token isteğinde hata:", err); return; }',
+                            '    let json;',
+                            '    try { json = res.json(); } catch (e) { console.error("Geçersiz JSON:", res.text()); return; }',
+                            '    if (json.token) {',
+                            '      pm.environment.set("authToken", json.token);',
+                            '      postman.setNextRequest(pm.info.requestName);',
+                            '    } else { console.error("Token alınamadı:", json); }',
+                            '  });',
+                            '}'
+                        ],
+                        'type' => 'text/javascript'
+                    ]
+                ]
+            ];
+        }
 
         $authFolder = [
             'name' => 'Auth',
@@ -69,7 +128,7 @@ class GeneratePostmanCollection extends Command
             ],
         ];
 
-        $this->collection['item'] = [$coreFolder, $authFolder];
+        $this->collection['item'] = $this->authEnabled ? [$coreFolder, $authFolder] : [$coreFolder];
     }
 
     protected function writeCollectionFile(): void
@@ -82,6 +141,7 @@ class GeneratePostmanCollection extends Command
         $this->info("   • File: postman/{$fileName}");
         $this->info('   • Total requests: ' . $this->countRequests($this->collection['item']));
         $this->info('   • File size: ' . $this->formatBytes(strlen($json)));
+        $this->info('   • Auth enabled: ' . ($this->authEnabled ? 'Yes' : 'No'));
     }
 
     protected function writeEnvironments(): void
@@ -166,7 +226,7 @@ class GeneratePostmanCollection extends Command
             if (File::isDirectory($item)) {
                 if ($this->isExcludedDir($name) || $this->isExcludedDir($normalized)) continue;
 
-                if (strtolower($name) === 'relation') {
+                if (strtolower($name) === 'relation' || strtolower($name) === 'relations') {
                     $sub = $this->scanModels($item, $rel . '/Relation');
                     if (!empty($sub)) $structure['Relation'] = ['type' => 'relation', 'parent' => $this->parentModule($rel), 'children' => $sub];
                 } else {
@@ -186,7 +246,13 @@ class GeneratePostmanCollection extends Command
                 $relationModelFqn = $this->fqnFromPath($item, 'Model');
                 $parentModelFqn = $this->parentModelFqn($rel);
                 $relationSlug = $this->guessRelationSlug($parentModelFqn, $relationModelFqn) ?: $this->relationFromModelName($modelBase);
-                $structure['__CRUD__'] = ['type' => 'relation_model', 'parent' => $parentModule, 'route' => $this->buildRelationRoute($rel, $relationSlug, $parentModule), 'file_path' => $item];
+                $structure['__CRUD__'] = [
+                    'type' => 'relation_model',
+                    'parent' => $parentModule,
+                    'route' => $this->buildRelationRoute($rel, $relationSlug, $parentModule),
+                    'file_path' => $item,
+                    'relation_model_name' => $modelBase
+                ];
             } else {
                 if (strtolower($modelBase) === strtolower(basename(dirname($item)))) {
                     $structure['__CRUD__'] = ['type' => 'model', 'route' => $this->routeFromRel($rel, $modelBase, false), 'file_path' => $item];
@@ -201,7 +267,15 @@ class GeneratePostmanCollection extends Command
     protected function parentModule(string $rel): string
     {
         $parts = array_values(array_filter(explode('/', trim($rel, '/'))));
-        $relationIdx = array_search('Relation', $parts, true);
+
+        $relationIdx = false;
+        foreach ($parts as $idx => $part) {
+            if (strtolower($part) === 'relation' || strtolower($part) === 'relations') {
+                $relationIdx = $idx;
+                break;
+            }
+        }
+
         return ($relationIdx !== false && $relationIdx > 0) ? $parts[$relationIdx - 1] : (end($parts) ?: '');
     }
 
@@ -241,10 +315,29 @@ class GeneratePostmanCollection extends Command
     protected function buildRelationRoute(string $rel, string $relationSlug, string $parentModule): string
     {
         $parts = array_values(array_filter(explode('/', trim($rel, '/'))));
-        if ((array_count_values($parts)['Relation'] ?? 0) > 1) return $this->buildNestedRelationRoute($parts);
-        $relationIdx = array_search('Relation', $parts, true);
+
+        $relationCount = 0;
+        foreach ($parts as $part) {
+            if (strtolower($part) === 'relation' || strtolower($part) === 'relations') {
+                $relationCount++;
+            }
+        }
+
+        if ($relationCount > 1) return $this->buildNestedRelationRoute($parts);
+
+        $relationIdx = false;
+        foreach ($parts as $idx => $part) {
+            if (strtolower($part) === 'relation' || strtolower($part) === 'relations') {
+                $relationIdx = $idx;
+                break;
+            }
+        }
+
         $baseParts = $relationIdx !== false ? array_slice($parts, 0, $relationIdx) : $parts;
-        return trim(implode('/', array_map('strtolower', $baseParts)) . '/{{' . strtolower($parentModule) . 'ID}}/' . Str::snake($relationSlug), '/');
+
+        $route = trim(implode('/', array_map('strtolower', $baseParts)) . '/{{' . strtolower($parentModule) . 'ID}}/' . $relationSlug, '/');
+
+        return $route;
     }
 
     protected function buildNestedRelationRoute(array $parts): string
@@ -320,7 +413,11 @@ class GeneratePostmanCollection extends Command
             if ($cfg['param']) $req['request']['url']['variable'] = [['key' => 'id', 'value' => '1', 'description' => "{$modelName} ID"]];
             if (in_array($cfg['method'], ['POST', 'PUT'], true)) $req['request']['body'] = ['mode' => 'raw', 'raw' => json_encode($this->jsonBodyParams($filePath, $action), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)];
             if ($cfg['method'] === 'GET' && $action === 'index') $req['request']['url']['query'] = array_merge($this->paginationParams(), $this->filterParams($filePath), $this->includeParams($filePath), $this->fieldParams($filePath), $this->sortParams($filePath));
-            if ($this->needsAuth($route)) $req['request']['header'][] = ['key' => 'Authorization', 'value' => 'Bearer {{authToken}}', 'type' => 'text'];
+
+            if ($this->authEnabled && $this->needsAuth($route)) {
+                $req['request']['header'][] = ['key' => 'Authorization', 'value' => 'Bearer {{authToken}}', 'type' => 'text'];
+            }
+
             $requests[] = $req;
         }
         return $requests;
@@ -492,6 +589,10 @@ class GeneratePostmanCollection extends Command
 
     protected function needsAuth(string $route): bool
     {
+        if (!$this->authEnabled) {
+            return false;
+        }
+
         foreach (['definition/location/search', 'catalog/availability', 'parameter', 'configuration'] as $p) {
             if (Str::startsWith($route, $p)) return false;
         }
@@ -541,7 +642,8 @@ class GeneratePostmanCollection extends Command
 
     protected function collectionDoc(): string
     {
-        return "TransferCab API Collection\n\nThis collection contains all API endpoints for the TransferCab platform.\n\nFeatures:\n- Dynamic model-based endpoints\n- Automatic CRUD operations\n- Filtering, sorting, field selection, includes\n- Raw JSON body generation (typed) for Create/Update\n- Bearer token authentication with pre-request script\n\nGenerated on: " . now()->format('Y-m-d H:i:s');
+        $authStatus = $this->authEnabled ? 'enabled' : 'disabled';
+        return "TransferCab API Collection\n\nThis collection contains all API endpoints for the TransferCab platform.\n\nFeatures:\n- Dynamic model-based endpoints\n- Automatic CRUD operations\n- Filtering, sorting, field selection, includes\n- Raw JSON body generation (typed) for Create/Update\n- Bearer token authentication: {$authStatus}\n\nGenerated on: " . now()->format('Y-m-d H:i:s');
     }
 
     protected function buildEnvironment(string $env, string $projectName): array
@@ -553,22 +655,29 @@ class GeneratePostmanCollection extends Command
         $subDomain = count($parts) > 2 ? $parts[0] . '.' : '';
         $domain = count($parts) > 2 ? implode('.', array_slice($parts, 1)) : $host;
 
-        return [
-            'id' => (string)Str::uuid(),
-            'name' => "{$projectName} " . ucfirst($env),
-            'values' => [
-                ['key' => 'protocol', 'value' => $protocol, 'enabled' => true],
-                ['key' => 'subDomain', 'value' => $subDomain, 'enabled' => true],
-                ['key' => 'domain', 'value' => $domain, 'enabled' => true],
-                ['key' => 'path', 'value' => '/api', 'enabled' => true],
-                ['key' => 'version', 'value' => '/v1', 'enabled' => true],
-                ['key' => 'apiURL', 'value' => '{{protocol}}{{subDomain}}{{domain}}{{path}}', 'enabled' => true],
+        $values = [
+            ['key' => 'protocol', 'value' => $protocol, 'enabled' => true],
+            ['key' => 'subDomain', 'value' => $subDomain, 'enabled' => true],
+            ['key' => 'domain', 'value' => $domain, 'enabled' => true],
+            ['key' => 'path', 'value' => '/api', 'enabled' => true],
+            ['key' => 'version', 'value' => '/v1', 'enabled' => true],
+            ['key' => 'apiURL', 'value' => '{{protocol}}{{subDomain}}{{domain}}{{path}}', 'enabled' => true],
+        ];
+
+        if ($this->authEnabled) {
+            $values = array_merge($values, [
                 ['key' => 'authEmail', 'value' => 'aksoy@' . $domain, 'enabled' => true],
                 ['key' => 'authPassword', 'value' => '19441944Aks%&', 'enabled' => true],
                 ['key' => 'authNameFirst', 'value' => 'Fahrettin', 'enabled' => true],
                 ['key' => 'authNameLast', 'value' => 'Aksoy', 'enabled' => true],
                 ['key' => 'authToken', 'value' => '', 'enabled' => true],
-            ],
+            ]);
+        }
+
+        return [
+            'id' => (string)Str::uuid(),
+            'name' => "{$projectName} " . ucfirst($env),
+            'values' => $values,
             '_postman_variable_scope' => 'environment',
             '_postman_exported_at' => now()->toIso8601String(),
             '_postman_exported_using' => 'Postman/10.0.0',

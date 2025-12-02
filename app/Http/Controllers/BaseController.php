@@ -7,7 +7,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BaseCollection;
 use App\Http\Resources\BaseResource;
 use App\Services\BaseService;
-use App\Traits\FormRequestResolver;
+use App\Services\Request\FormRequestService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,19 +15,23 @@ use Illuminate\Routing\Controller;
 
 abstract class BaseController extends Controller
 {
-    use FormRequestResolver;
-
     public function __construct(
         protected readonly Model $model,
         protected readonly BaseService $service,
         protected readonly BaseResource $resource,
         protected readonly BaseCollection $collection,
+        protected readonly FormRequestService $formRequestService,
         protected readonly array $requests,
     ) {}
 
     public function index(): JsonResponse
     {
-        $validatedData = $this->resolveFormRequest($this->requests['index'])->validated();
+        $formRequest = $this->formRequestService->resolve(
+            request(),
+            $this->requests['index']
+        );
+
+        $validatedData = $formRequest->validated();
         $filterData = $this->service->filter($validatedData);
 
         return $this->collection::make($filterData)
@@ -37,7 +41,12 @@ abstract class BaseController extends Controller
 
     public function show(): JsonResponse
     {
-        $validatedData = $this->resolveFormRequest($this->requests['show'])->validated();
+        $formRequest = $this->formRequestService->resolve(
+            request(),
+            $this->requests['show']
+        );
+
+        $validatedData = $formRequest->validated();
         $showData = $this->service->show($validatedData);
 
         return $this->resource::make($showData)
@@ -47,8 +56,19 @@ abstract class BaseController extends Controller
 
     public function store(): JsonResponse
     {
-        $validatedData = $this->resolveFormRequest($this->requests['store'])->validated();
-        $validatedData = $this->validateNestedData($validatedData, 'store');
+        $formRequest = $this->formRequestService->resolve(
+            request(),
+            $this->requests['store']
+        );
+
+        $validatedData = $formRequest->validated();
+
+        $validatedData = $this->formRequestService->validateNestedData(
+            $validatedData,
+            'store',
+            $this->model
+        );
+
         $storeData = $this->service->store($validatedData);
 
         return $this->resource::make($storeData)
@@ -58,8 +78,19 @@ abstract class BaseController extends Controller
 
     public function update(): JsonResponse
     {
-        $validatedData = $this->resolveFormRequest($this->requests['update'])->validated();
-        $validatedData = $this->validateNestedData($validatedData, 'update');
+        $formRequest = $this->formRequestService->resolve(
+            request(),
+            $this->requests['update']
+        );
+
+        $validatedData = $formRequest->validated();
+
+        $validatedData = $this->formRequestService->validateNestedData(
+            $validatedData,
+            'update',
+            $this->model
+        );
+
         $updatedData = $this->service->update($validatedData);
 
         return $this->resource::make($updatedData)
@@ -69,7 +100,12 @@ abstract class BaseController extends Controller
 
     public function destroy(Request $request): JsonResponse
     {
-        $validatedData = $this->resolveFormRequest($this->requests['destroy'])->validated();
+        $formRequest = $this->formRequestService->resolve(
+            $request,
+            $this->requests['destroy']
+        );
+
+        $validatedData = $formRequest->validated();
 
         $routeId = $request->route('id');
         $primaryKey = $this->model->getKeyName();
@@ -77,7 +113,9 @@ abstract class BaseController extends Controller
         if ($routeId !== null) {
             $deleteFilter = [$primaryKey => (int) $routeId];
         } else {
-            $ids = is_array($validatedData['ids']) ? array_map('intval', $validatedData['ids']) : [(int) $validatedData['ids']];
+            $ids = is_array($validatedData['ids'])
+                ? array_map('intval', $validatedData['ids'])
+                : [(int) $validatedData['ids']];
             $deleteFilter = [$primaryKey => $ids];
         }
 

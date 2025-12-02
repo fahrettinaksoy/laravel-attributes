@@ -21,7 +21,7 @@
             "database": {"variable": "unsignedBigInteger", "nullable": false},
             "actions": ["index", "show"],
             "table": [],
-            "form": {"type":"select","relationship":{"type":"product_video","route":"catalog/product-video","fields":{"id":"product_video_id","label":"code"}},"sort_order":2}
+            "form": {"type":"modal","sort_order":2}
         },
         "uuid": {
             "database": {"variable": "string", "nullable": false, "unique": true},

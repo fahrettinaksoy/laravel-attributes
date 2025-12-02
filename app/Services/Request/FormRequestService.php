@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Traits;
+namespace App\Services\Request;
 
+use App\Services\Module\ModuleRelationDetectorService;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -14,10 +15,8 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-trait FormRequestResolver
+final class FormRequestService
 {
-    use HasManyRelationDetector;
-
     private const REQUEST_NAMESPACE_BASE = 'App\\Http\\Requests\\';
 
     private const PIVOT_NAMESPACE_SUFFIX = '\\Pivot\\';
@@ -30,65 +29,65 @@ trait FormRequestResolver
 
     private const ROUTE_PATH_PARAMETER = 'path';
 
-    private ?Container $container = null;
+    public function __construct(
+        private readonly Container $container,
+        private readonly LoggerInterface $logger,
+        private readonly ModuleRelationDetectorService $moduleRelationDetectorService,
+    ) {}
 
-    private ?LoggerInterface $logger = null;
-
-    private ?Route $cachedRoute = null;
-
-    private ?string $modelPath = null;
-
-    public function resolveFormRequest(mixed $fallbackRequest = null): object
+    public function resolve(Request $request, mixed $fallbackRequest = null): object
     {
         try {
-            $this->initializeDependencies();
-            $currentRequest = $this->getCurrentRequest();
-            $currentAction = $this->getCurrentAction();
+            $currentAction = $this->getCurrentAction($request);
 
             $this->logRequestResolution($currentAction);
 
-            $requestClassName = $this->determineRequestClassName($currentRequest, $currentAction);
+            $requestClassName = $this->determineRequestClassName($request, $currentAction);
 
             if ($this->isValidRequestClass($requestClassName)) {
-                return $this->createAndValidateFormRequest($requestClassName, $currentRequest);
+                return $this->createAndValidateFormRequest($requestClassName, $request);
             }
 
             return $this->resolveFallbackRequest($fallbackRequest, $currentAction);
 
         } catch (Throwable $exception) {
-            return $this->handleRequestResolutionException($exception, $currentAction ?? self::UNKNOWN_ACTION);
+            return $this->handleRequestResolutionException(
+                $exception,
+                $this->getCurrentAction($request)
+            );
         }
     }
 
-    protected function validateNestedData(array $validatedData, string $currentAction): array
-    {
-        if (! $this->hasModel()) {
-            return $validatedData;
-        }
+    public function validateNestedData(
+        array $validatedData,
+        string $currentAction,
+        object $model,
+        ?string $modelPath = null
+    ): array {
+        $modelPath = $modelPath ?? $this->determineModelPathFromRequest() ?? $this->getModelPathFromModel($model);
 
-        $model = $this->getModelInstance();
-        $this->setModelPath($model);
-
-        $relations = $this->getHasManyRelationMethods($model);
+        $relations = $this->moduleRelationDetectorService->getHasManyRelations($model);
 
         foreach ($relations as $relationName) {
             if ($this->hasRelationData($validatedData, $relationName)) {
-                $validatedData[$relationName] = $this->validateRelationData($relationName, $validatedData[$relationName], $currentAction);
+                $validatedData[$relationName] = $this->validateRelationData(
+                    $relationName,
+                    $validatedData[$relationName],
+                    $currentAction,
+                    $model,
+                    $modelPath
+                );
             }
         }
 
         return $validatedData;
     }
 
-    private function initializeDependencies(): void
-    {
-        $this->container ??= app(Container::class);
-        $this->logger ??= app(LoggerInterface::class);
-    }
-
     private function determineRequestClassName(Request $request, string $action): ?string
     {
-        return $this->isPivotRoute($request) ? $this->buildPivotRequestClassName($action, $request) : $this->buildModuleRequestClassName($action, $request);
+        return $this->isPivotRoute($request)
+            ? $this->buildPivotRequestClassName($action, $request)
+            : $this->buildModuleRequestClassName($action, $request);
     }
 
     private function buildPivotRequestClassName(string $action, Request $request): ?string
@@ -159,7 +158,9 @@ trait FormRequestResolver
 
     private function buildNamespaceSegments(string $modelPath): array
     {
-        return collect($this->splitPath($modelPath))->map(fn ($segment) => Str::studly($segment))->toArray();
+        return collect($this->splitPath($modelPath))
+            ->map(fn ($segment) => Str::studly($segment))
+            ->toArray();
     }
 
     private function splitPath(string $path): array
@@ -169,12 +170,19 @@ trait FormRequestResolver
 
     private function buildPivotNamespace(array $namespaceSegments, array $pivotContext): string
     {
-        return self::REQUEST_NAMESPACE_BASE.implode('\\', $namespaceSegments).self::PIVOT_NAMESPACE_SUFFIX.Str::studly($pivotContext['tableName']).Str::studly($pivotContext['relationName']);
+        return self::REQUEST_NAMESPACE_BASE
+            .implode('\\', $namespaceSegments)
+            .self::PIVOT_NAMESPACE_SUFFIX
+            .Str::studly($pivotContext['tableName'])
+            .Str::studly($pivotContext['relationName']);
     }
 
     private function buildPivotClassName(array $pivotContext, string $action): string
     {
-        return Str::studly($pivotContext['tableName']).Str::studly($pivotContext['relationName']).Str::studly($action).self::REQUEST_CLASS_SUFFIX;
+        return Str::studly($pivotContext['tableName'])
+            .Str::studly($pivotContext['relationName'])
+            .Str::studly($action)
+            .self::REQUEST_CLASS_SUFFIX;
     }
 
     private function resolveModelPath(Request $request): ?string
@@ -189,7 +197,7 @@ trait FormRequestResolver
         return is_string($routeParameter) ? $routeParameter : null;
     }
 
-    private function getCurrentAction(): string
+    private function getCurrentAction(Request $request): string
     {
         $currentRoute = $this->getCurrentRoute();
 
@@ -294,12 +302,22 @@ trait FormRequestResolver
         );
     }
 
-    private function validateRelationData(string $relationName, array $relationData, string $currentAction): array
-    {
+    private function validateRelationData(
+        string $relationName,
+        array $relationData,
+        string $currentAction,
+        object $model,
+        string $modelPath
+    ): array {
         $validatedItems = [];
 
         foreach ($relationData as $index => $item) {
-            $requestClass = $this->determineRelationRequestClass($relationName, $currentAction);
+            $requestClass = $this->determineRelationRequestClass(
+                $relationName,
+                $currentAction,
+                $model,
+                $modelPath
+            );
 
             if ($requestClass && class_exists($requestClass)) {
                 try {
@@ -339,67 +357,69 @@ trait FormRequestResolver
         return $formRequest->validated();
     }
 
-    private function determineRelationRequestClass(string $relationName, string $currentAction): ?string
-    {
-        $model = $this->getModelInstance();
-        $modelPath = $this->modelPath ?? $this->getModelPathFromModel($model);
-
+    private function determineRelationRequestClass(
+        string $relationName,
+        string $currentAction,
+        object $model,
+        string $modelPath
+    ): ?string {
         if (empty($modelPath)) {
             return null;
         }
 
         $namespaceSegments = $this->buildNamespaceSegments($modelPath);
-        $namespace = self::REQUEST_NAMESPACE_BASE.implode('\\', $namespaceSegments).self::PIVOT_NAMESPACE_SUFFIX.Str::studly($this->getPivotTableName($relationName)).Str::studly($relationName);
-        $className = Str::studly($this->getPivotTableName($relationName)).Str::studly($relationName).Str::studly($currentAction).self::REQUEST_CLASS_SUFFIX;
+        $pivotTableName = $this->getPivotTableName($relationName, $model);
+
+        $namespace = self::REQUEST_NAMESPACE_BASE
+            .implode('\\', $namespaceSegments)
+            .self::PIVOT_NAMESPACE_SUFFIX
+            .Str::studly($pivotTableName)
+            .Str::studly($relationName);
+
+        $className = Str::studly($pivotTableName)
+            .Str::studly($relationName)
+            .Str::studly($currentAction)
+            .self::REQUEST_CLASS_SUFFIX;
 
         return $namespace.'\\'.$className;
     }
 
-    private function getModelPathFromModel($model): string
+    private function getModelPathFromModel(object $model): string
     {
         $modelClass = get_class($model);
         $modelName = class_basename($modelClass);
         $cleanName = str_replace('Model', '', $modelName);
 
         $namespaceParts = explode('\\', $modelClass);
-        array_shift($namespaceParts);
-        array_shift($namespaceParts);
-        array_pop($namespaceParts);
+        array_shift($namespaceParts); // Remove 'App'
+        array_shift($namespaceParts); // Remove 'Models'
+        array_pop($namespaceParts);   // Remove model name
 
         $path = strtolower(implode('/', $namespaceParts));
 
         return ! empty($path) ? $path.'/'.strtolower($cleanName) : strtolower($cleanName);
     }
 
-    private function getPivotTableName(string $relationName): string
+    private function getPivotTableName(string $relationName, object $model): string
     {
-        $model = $this->getModelInstance();
         $modelName = class_basename(get_class($model));
         $cleanModelName = str_replace('Model', '', $modelName);
 
         return $cleanModelName.Str::studly($relationName);
     }
 
-    private function addIndexToValidationErrors(ValidationException $exception, string $relationName, int $index): ValidationException
-    {
-        $errors = collect($exception->errors())->mapWithKeys(fn ($messages, $field) => ["{$relationName}.{$index}.{$field}" => $messages])->toArray();
+    private function addIndexToValidationErrors(
+        ValidationException $exception,
+        string $relationName,
+        int $index
+    ): ValidationException {
+        $errors = collect($exception->errors())
+            ->mapWithKeys(fn ($messages, $field) => [
+                "{$relationName}.{$index}.{$field}" => $messages
+            ])
+            ->toArray();
 
         return ValidationException::withMessages($errors);
-    }
-
-    private function hasModel(): bool
-    {
-        return method_exists($this, 'model') || isset($this->model);
-    }
-
-    private function getModelInstance()
-    {
-        return $this->model ?? $this->getModel();
-    }
-
-    private function setModelPath($model): void
-    {
-        $this->modelPath = $this->modelPath ?? $this->determineModelPathFromRequest() ?? $this->getModelPathFromModel($model);
     }
 
     private function hasRelationData(array $data, string $relationName): bool
@@ -414,14 +434,9 @@ trait FormRequestResolver
         return $request->attributes->get('mainModelPath') ?? $request->route('path');
     }
 
-    private function getCurrentRequest(): Request
-    {
-        return app(Request::class);
-    }
-
     private function getCurrentRoute(): ?Route
     {
-        return $this->cachedRoute ??= RouteFacade::current();
+        return RouteFacade::current();
     }
 
     private function logRequestResolution(string $action): void
@@ -440,11 +455,5 @@ trait FormRequestResolver
     private function logError(string $message, array $context = []): void
     {
         $this->logger->error($message, $context);
-    }
-
-    protected function resetFormRequestCache(): void
-    {
-        $this->cachedRoute = null;
-        $this->modelPath = null;
     }
 }

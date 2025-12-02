@@ -14,6 +14,7 @@ use App\Http\Resources\BaseCollection;
 use App\Http\Resources\BaseResource;
 use App\Services\BaseService;
 use App\Services\PivotService;
+use App\Services\Request\FormRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -26,6 +27,7 @@ class CommonController extends BaseController
         BaseResource $resource,
         BaseCollection $collection,
         PivotService $pivotService,
+        FormRequestService $formRequestService,
     ) {
         $this->pivotService = $pivotService;
 
@@ -34,6 +36,7 @@ class CommonController extends BaseController
             service: $service,
             resource: $resource,
             collection: $collection,
+            formRequestService: $formRequestService,
             requests: [
                 'index' => BaseIndexRequest::class,
                 'show' => BaseShowRequest::class,
@@ -46,9 +49,12 @@ class CommonController extends BaseController
 
     public function pivotIndex(Request $request): JsonResponse
     {
-        $validatedData = $this
-            ->resolveFormRequest($this->requests['index'])
-            ->validated();
+        $formRequest = $this->formRequestService->resolve(
+            $request,
+            $this->requests['index']
+        );
+
+        $validatedData = $formRequest->validated();
 
         $parentId = (int) $request->route('parent_id');
         $relationName = $request->route('relation');
@@ -62,9 +68,12 @@ class CommonController extends BaseController
 
     public function pivotShow(Request $request): JsonResponse
     {
-        $validatedData = $this
-            ->resolveFormRequest($this->requests['show'])
-            ->validated();
+        $formRequest = $this->formRequestService->resolve(
+            $request,
+            $this->requests['show']
+        );
+
+        $validatedData = $formRequest->validated();
 
         $parentId = (int) $request->route('parent_id');
         $relationName = $request->route('relation');
@@ -79,9 +88,12 @@ class CommonController extends BaseController
 
     public function pivotStore(Request $request): JsonResponse
     {
-        $validatedData = $this
-            ->resolveFormRequest($this->requests['store'])
-            ->validated();
+        $formRequest = $this->formRequestService->resolve(
+            $request,
+            $this->requests['store']
+        );
+
+        $validatedData = $formRequest->validated();
 
         $parentId = (int) $request->route('parent_id');
         $relationName = $request->route('relation');
@@ -95,9 +107,12 @@ class CommonController extends BaseController
 
     public function pivotUpdate(Request $request): JsonResponse
     {
-        $validatedData = $this
-            ->resolveFormRequest($this->requests['update'])
-            ->validated();
+        $formRequest = $this->formRequestService->resolve(
+            $request,
+            $this->requests['update']
+        );
+
+        $validatedData = $formRequest->validated();
 
         $parentId = (int) $request->route('parent_id');
         $relationName = $request->route('relation');
@@ -112,9 +127,12 @@ class CommonController extends BaseController
 
     public function pivotDestroy(Request $request): JsonResponse
     {
-        $validatedData = $this
-            ->resolveFormRequest($this->requests['destroy'])
-            ->validated();
+        $formRequest = $this->formRequestService->resolve(
+            $request,
+            $this->requests['destroy']
+        );
+
+        $validatedData = $formRequest->validated();
 
         $parentId = (int) $request->route('parent_id');
         $relationName = $request->route('relation');

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Traits\HasManyRelationDetector;
+use App\Services\Module\ModuleRelationDetectorService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -13,11 +13,12 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class BaseRepository implements BaseRepositoryInterface
 {
-    use HasManyRelationDetector;
-
     protected Model $model;
 
-    public function __construct(Model $model)
+    public function __construct(
+        Model $model,
+        protected readonly ModuleRelationDetectorService $moduleRelationDetectorService,
+    )
     {
         $this->model = $model;
     }
@@ -64,7 +65,7 @@ class BaseRepository implements BaseRepositoryInterface
 
     public function create(array $createdData = []): Model
     {
-        $relations = $this->getHasManyRelationMethods($this->model);
+        $relations = $this->relationDetector->getHasManyRelations($this->model);
         $nested = [];
 
         foreach ($relations as $relationName) {
@@ -88,7 +89,7 @@ class BaseRepository implements BaseRepositoryInterface
 
     public function update(array $updatedField = [], array $updatedData = []): Model
     {
-        $relations = $this->getHasManyRelationMethods($this->model);
+        $relations = $this->relationDetector->getHasManyRelations($this->model);
         $nested = [];
 
         foreach ($relations as $relationName) {

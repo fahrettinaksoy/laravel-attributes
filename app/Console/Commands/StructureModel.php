@@ -10,9 +10,11 @@ use Illuminate\Support\Str;
 
 class StructureModel extends Command
 {
-    protected $signature = 'structure:model {--Requests} {--Migration} {--Factory}';
+    protected $signature = 'structure:model {--Requests} {--Migration} {--Factory} {--Seeder}';
 
-    protected $description = 'Generate Models, Field traits, Relation Models and optionally FormRequests, Migrations and Factory from /structure JSON files.';
+    protected $description = 'Generate Models, Field traits, Relation Models and optionally FormRequests, Migrations, Factory and Seeders from /structure JSON files.';
+
+    private array $generatedSeeders = [];
 
     public function handle(): void
     {
@@ -37,12 +39,25 @@ class StructureModel extends Command
                 $this->generateMigration($file, $json, $this->resolveModelInfo($file), $timestamp);
             }
 
+            $hasFactory = false;
             if ($this->option('Factory')) {
                 $this->generateFactory($file, $json, $this->resolveModelInfo($file));
+                $hasFactory = true;
+            }
+
+            if ($this->option('Seeder')) {
+                $seederInfo = $this->generateSeeder($file, $json, $this->resolveModelInfo($file), $hasFactory);
+                if ($seederInfo) {
+                    $this->generatedSeeders[] = $seederInfo;
+                }
             }
         }
 
-        $this->info("\n✅ structure:model completed — Models, Fields, Relations, Requests, Migrations and Factory generated.\n");
+        if ($this->option('Seeder') && !empty($this->generatedSeeders)) {
+            $this->updateDatabaseSeeder();
+        }
+
+        $this->info("\n✅ structure:model completed — Models, Fields, Relations, Requests, Migrations, Factory and Seeders generated.\n");
     }
 
     private function resolveModelInfo($file): array
@@ -153,23 +168,30 @@ class StructureModel extends Command
 
             $methodName = Str::camel($rel['type']);
             $allowed[] = $methodName;
+
             $relatedFqn = $this->resolveRelationshipModel($rel['route']);
-            if (!$relatedFqn) {
-                continue;
-            }
+            if (!$relatedFqn) continue;
 
             $short = class_basename($relatedFqn);
+
             $imports[] = "use {$relatedFqn};";
             $imports[] = "use Illuminate\\Database\\Eloquent\\Relations\\HasOne;";
+
             $foreignKey = $rel['fields']['id'];
+
             $methods[] =
-                "    public function {$methodName}(): HasOne\n    {\n        return \$this->hasOne({$short}::class, '{$foreignKey}', '{$fieldName}');\n    }";
+                "    public function {$methodName}(): HasOne\n    {\n".
+                "        return \$this->hasOne({$short}::class, '{$foreignKey}', '{$fieldName}');\n".
+                "    }";
         }
 
         foreach ($allFiles as $pivotFile) {
-            $pivotFilename = pathinfo($pivotFile->getFilename(), PATHINFO_FILENAME);
+            $filename = pathinfo($pivotFile->getFilename(), PATHINFO_FILENAME);
 
-            if (!Str::startsWith($pivotFilename, $baseFilename . '_')) {
+            if (!Str::startsWith($filename, $baseFilename . '_')) {
+                continue;
+            }
+            if (substr_count($filename, '_') !== 1) {
                 continue;
             }
 
@@ -178,29 +200,65 @@ class StructureModel extends Command
                 continue;
             }
 
-            $childSlug = Str::after($pivotFilename, $baseFilename . '_');
-            if ($childSlug === '') {
-                continue;
-            }
+            $childSlug = Str::after($filename, $baseFilename . '_');
+            if ($childSlug === '') continue;
 
-            $pivotFqn = 'App\\Models\\' . implode('\\', $pivotInfo['namespaceParts']) . '\\' . $pivotInfo['modelName'] . 'Model';
+            $pivotFqn = 'App\\Models\\' .
+                implode('\\', $pivotInfo['namespaceParts']) .
+                '\\' .
+                $pivotInfo['modelName'] . 'Model';
+
             $pivotShort = $pivotInfo['modelName'] . 'Model';
+
             $imports[] = "use {$pivotFqn};";
             $imports[] = "use Illuminate\\Database\\Eloquent\\Relations\\HasMany;";
+
             $methodName = Str::camel(Str::plural($childSlug));
+
             $allowed[] = $methodName;
 
             $methods[] =
-                "    public function {$methodName}(): HasMany\n    {\n        return \$this->hasMany({$pivotShort}::class, '{$primaryKey}', '{$primaryKey}');\n    }";
+                "    public function {$methodName}(): HasMany\n    {\n".
+                "        return \$this->hasMany({$pivotShort}::class, '{$primaryKey}', '{$primaryKey}');\n".
+                "    }";
+        }
+
+        foreach ($allFiles as $childFile) {
+            $childName = pathinfo($childFile->getFilename(), PATHINFO_FILENAME);
+
+            if (!Str::startsWith($childName, $baseFilename . '_')) continue;
+            if (substr_count($childName, '_') !== 2) continue;
+
+            if ($info['depth'] !== 1) continue;
+
+            $childSlug = Str::after($childName, $baseFilename . '_');
+            if ($childSlug === '') continue;
+
+            $childInfo = $this->resolveModelInfo($childFile);
+
+            $childFqn = 'App\\Models\\' .
+                implode('\\', $childInfo['namespaceParts']) .
+                '\\' .
+                $childInfo['modelName'] . 'Model';
+
+            $childShort = $childInfo['modelName'] . 'Model';
+
+            $imports[] = "use {$childFqn};";
+            $imports[] = "use Illuminate\\Database\\Eloquent\\Relations\\HasMany;";
+
+            $methodName = Str::camel(Str::plural($childSlug));
+
+            $allowed[] = $methodName;
+
+            $methods[] =
+                "    public function {$methodName}(): HasMany\n    {\n".
+                "        return \$this->hasMany({$childShort}::class, '{$primaryKey}', '{$primaryKey}');\n".
+                "    }";
         }
 
         return [
-            'imports' => empty($imports = array_unique($imports))
-                ? ''
-                : implode("\n", $imports) . "\n",
-            'methods' => empty($methods)
-                ? ''
-                : implode("\n\n", $methods) . "\n",
+            'imports' => empty($imports = array_unique($imports)) ? '' : implode("\n", $imports) . "\n",
+            'methods' => empty($methods) ? '' : implode("\n\n", $methods) . "\n",
             'allowed' => array_values(array_unique($allowed)),
         ];
     }
@@ -507,9 +565,6 @@ class StructureModel extends Command
         return implode("\n", $lines);
     }
 
-    /**
-     * --Factory → Database\Factories altına Factory oluşturur
-     */
     private function generateFactory($file, array $json, array $info): void
     {
         $namespaceParts = $info['namespaceParts'];
@@ -522,7 +577,7 @@ class StructureModel extends Command
         $factoryDir = database_path('factories/' . implode('/', $namespaceParts));
         File::ensureDirectoryExists($factoryDir);
 
-        $factoryClass = "{$modelName}Factory";
+        $factoryClass = "{$modelClass}Factory";
         $primaryKey = $json['model']['primaryKey'] ?? null;
         $fieldsCode = $this->buildFactoryDefinitionArray($json['fields'] ?? [], $primaryKey);
 
@@ -557,18 +612,132 @@ class StructureModel extends Command
         $db = $meta['database'] ?? [];
         $type = $db['variable'] ?? 'string';
         $formType = $meta['form']['type'] ?? null;
+        $isUnique = $db['unique'] ?? false;
+        $maxLength = $db['length'] ?? null;
 
         $lower = strtolower($name);
 
-        if (str_contains($lower, 'uuid')) return '$this->faker->uuid()';
-        if (str_contains($lower, 'slug')) return '$this->faker->slug()';
-        if (str_contains($lower, 'email')) return '$this->faker->safeEmail()';
-        if (str_contains($lower, 'phone')) return '$this->faker->phoneNumber()';
-        if (str_contains($lower, 'name')) return '$this->faker->words(3, true)';
-        if (preg_match('/_id$/', $name)) return '$this->faker->numberBetween(1, 9999)';
-        if (str_contains($lower, 'price')) return '$this->faker->randomFloat(2, 10, 9999)';
-        if (str_contains($lower, 'date')) return '$this->faker->dateTime()';
-        if (str_contains($lower, 'status')) return '$this->faker->boolean()';
+        if (str_contains($lower, 'uuid')) {
+            return '$this->faker->uuid()';
+        }
+
+        if (str_contains($lower, 'slug')) {
+            return '$this->faker->unique()->slug()';
+        }
+
+        if (str_contains($lower, 'sku')) {
+            return '$this->faker->unique()->bothify("SKU-####-????")';
+        }
+
+        if (str_contains($lower, 'code')) {
+            return $isUnique
+                ? '$this->faker->unique()->bothify("CODE-####")'
+                : '$this->faker->bothify("CODE-####")';
+        }
+
+        if (str_contains($lower, 'email')) {
+            return '$this->faker->unique()->safeEmail()';
+        }
+
+        if (str_contains($lower, 'phone')) {
+            return $isUnique
+                ? '$this->faker->unique()->phoneNumber()'
+                : '$this->faker->phoneNumber()';
+        }
+
+        if (str_contains($lower, 'rating') || str_contains($lower, 'rate') || str_contains($lower, 'score')) {
+            return '$this->faker->numberBetween(1, 5)';
+        }
+
+        if (str_contains($lower, 'quantity') || str_contains($lower, 'stock') || str_contains($lower, 'count')) {
+            return '$this->faker->numberBetween(0, 1000)';
+        }
+
+        if (str_contains($lower, 'order') || str_contains($lower, 'sort') || str_contains($lower, 'position')) {
+            return '$this->faker->numberBetween(1, 100)';
+        }
+
+        if (str_contains($lower, 'year')) {
+            return '$this->faker->year()';
+        }
+
+        if (str_contains($lower, 'age')) {
+            return '$this->faker->numberBetween(18, 80)';
+        }
+
+        if (str_contains($lower, 'name')) {
+            return '$this->faker->words(3, true)';
+        }
+
+        if (str_contains($lower, 'author')) {
+            return '$this->faker->name()';
+        }
+
+        if (str_contains($lower, 'title')) {
+            return '$this->faker->sentence(4)';
+        }
+
+        if (str_contains($lower, 'summary')) {
+            return '$this->faker->sentence(10)';
+        }
+
+        if (str_contains($lower, 'description')) {
+            if ($type === 'string') {
+                return '$this->faker->realText(200)';
+            }
+            return '$this->faker->paragraph(2)';
+        }
+
+        if (str_contains($lower, 'content') || str_contains($lower, 'body')) {
+            if ($type === 'string') {
+                return '$this->faker->realText(200)';
+            }
+            return '$this->faker->paragraphs(3, true)';
+        }
+
+        if (str_contains($lower, 'address')) {
+            return '$this->faker->address()';
+        }
+
+        if (str_contains($lower, 'url') || str_contains($lower, 'link') || str_contains($lower, 'website')) {
+            return '$this->faker->url()';
+        }
+
+        if (str_contains($lower, 'image') || str_contains($lower, 'photo') || str_contains($lower, 'picture')) {
+            return '$this->faker->imageUrl(640, 480)';
+        }
+
+        if (str_contains($lower, 'currency')) {
+            return '$this->faker->currencyCode()';
+        }
+
+        if (str_contains($lower, 'country')) {
+            return '$this->faker->country()';
+        }
+
+        if (str_contains($lower, 'city')) {
+            return '$this->faker->city()';
+        }
+
+        if (preg_match('/_id$/', $name)) {
+            return '$this->faker->numberBetween(1, 100)';
+        }
+
+        if (str_contains($lower, 'price') || str_contains($lower, 'amount') || str_contains($lower, 'cost')) {
+            return '$this->faker->randomFloat(2, 10, 9999)';
+        }
+
+        if (str_contains($lower, 'date')) {
+            return '$this->faker->dateTime()';
+        }
+
+        if (str_contains($lower, 'status')) {
+            return '$this->faker->boolean()';
+        }
+
+        if (str_contains($lower, 'percent') || str_contains($lower, 'rate')) {
+            return '$this->faker->numberBetween(0, 100)';
+        }
 
         switch ($type) {
             case 'boolean':
@@ -576,17 +745,271 @@ class StructureModel extends Command
             case 'integer':
             case 'unsignedInteger':
             case 'unsignedBigInteger':
+            case 'tinyInteger':
+            case 'smallInteger':
+            case 'mediumInteger':
                 return '$this->faker->numberBetween(1, 9999)';
             case 'decimal':
+            case 'float':
+            case 'double':
                 return '$this->faker->randomFloat(2, 1, 9999)';
             case 'timestamp':
             case 'datetime':
+            case 'date':
                 return '$this->faker->dateTime()';
+            case 'time':
+                return '$this->faker->time()';
+            case 'text':
+            case 'mediumText':
+            case 'longText':
+                if (in_array($formType, ['textarea', 'editor'], true)) {
+                    return '$this->faker->paragraphs(2, true)';
+                }
+                return '$this->faker->paragraph()';
+            case 'json':
+                return "json_encode(['key' => \$this->faker->word()])";
+            case 'string':
+            default:
+                if ($isUnique) {
+                    return '$this->faker->unique()->word()';
+                }
+
+                if ($maxLength && $maxLength <= 50) {
+                    return '$this->faker->word()';
+                } elseif ($maxLength && $maxLength <= 100) {
+                    return '$this->faker->sentence(3)';
+                } elseif ($maxLength && $maxLength <= 255) {
+                    return '$this->faker->sentence(10)';
+                }
+
+                if (in_array($formType, ['textarea', 'editor'], true)) {
+                    return '$this->faker->sentence(10)';
+                }
+
+                return '$this->faker->word()';
+        }
+    }
+
+    private function generateSeeder($file, array $json, array $info, bool $hasFactory): ?array
+    {
+        $namespaceParts = $info['namespaceParts'];
+        $modelName = $info['modelName'];
+        $modelClass = "{$modelName}Model";
+        $table = $json['model']['table'];
+
+        $modelNamespace = 'App\\Models\\' . implode('\\', $namespaceParts);
+        $seederNamespace = 'Database\\Seeders\\' . implode('\\', $namespaceParts);
+
+        $seederDir = database_path('seeders/' . implode('/', $namespaceParts));
+        File::ensureDirectoryExists($seederDir);
+
+        $seederClass = "{$modelClass}Seeder";
+
+        if ($hasFactory) {
+            $runMethod = "    public function run(): void\n    {\n        // Önce tabloyu temizle\n        {$modelClass}::query()->delete();\n\n        {$modelClass}::factory()\n            ->count(rand(10, 50))\n            ->create();\n    }";
+        } else {
+            $primaryKey = $json['model']['primaryKey'] ?? null;
+            $insertData = $this->buildSeederInsertData($json['fields'] ?? [], $primaryKey, 10);
+
+            $runMethod = "    public function run(): void\n    {\n        // Önce tabloyu temizle\n        {$modelClass}::query()->delete();\n\n        \$data = [\n{$insertData}\n        ];\n\n        foreach (\$data as \$item) {\n            {$modelClass}::create(\$item);\n        }\n    }";
+        }
+
+        File::put(
+            "{$seederDir}/{$seederClass}.php",
+            "<?php\n\ndeclare(strict_types=1);\n\nnamespace {$seederNamespace};\n\nuse {$modelNamespace}\\{$modelClass};\nuse Illuminate\\Database\\Seeder;\n\nclass {$seederClass} extends Seeder\n{\n{$runMethod}\n}\n"
+        );
+
+        return [
+            'class' => $seederClass,
+            'namespace' => $seederNamespace,
+            'fqn' => "{$seederNamespace}\\{$seederClass}",
+        ];
+    }
+
+    private function updateDatabaseSeeder(): void
+    {
+        $databaseSeederPath = database_path('seeders/DatabaseSeeder.php');
+
+        if (!File::exists($databaseSeederPath)) {
+            $this->createDatabaseSeeder();
+            return;
+        }
+
+        $content = File::get($databaseSeederPath);
+
+        preg_match_all('/^use\s+(.+);$/m', $content, $existingUses);
+        $existingUseFqns = $existingUses[1] ?? [];
+
+        preg_match_all('/\$this->call\((.+?)::class\);/s', $content, $existingCalls);
+        $existingCallClasses = array_map(function($call) {
+            return trim(str_replace(['$this->call(', '::class);'], '', $call));
+        }, $existingCalls[0] ?? []);
+
+        $newUses = [];
+        $newCalls = [];
+
+        foreach ($this->generatedSeeders as $seederInfo) {
+            $fqn = $seederInfo['fqn'];
+            $class = $seederInfo['class'];
+
+            if (!in_array($fqn, $existingUseFqns)) {
+                $newUses[] = "use {$fqn};";
+            }
+
+            if (!in_array($class, $existingCallClasses)) {
+                $newCalls[] = "            \$this->call({$class}::class);";
+            }
+        }
+
+        if (empty($newUses) && empty($newCalls)) {
+            $this->info("DatabaseSeeder already up to date.");
+            return;
+        }
+
+        if (!empty($newUses)) {
+            $lastUsePos = strrpos($content, 'use ');
+            if ($lastUsePos !== false) {
+                $endOfLinePos = strpos($content, "\n", $lastUsePos);
+                $content = substr_replace(
+                    $content,
+                    "\n" . implode("\n", $newUses),
+                    $endOfLinePos,
+                    0
+                );
+            } else {
+                $namespacePos = strpos($content, 'namespace');
+                if ($namespacePos !== false) {
+                    $endOfLinePos = strpos($content, "\n", $namespacePos);
+                    $content = substr_replace(
+                        $content,
+                        "\n\n" . implode("\n", $newUses),
+                        $endOfLinePos,
+                        0
+                    );
+                }
+            }
+        }
+
+        if (!empty($newCalls)) {
+            if (preg_match('/try\s*\{([^}]+)\}/s', $content, $tryBlock)) {
+                $lastCallPos = strrpos($tryBlock[1], '$this->call(');
+                if ($lastCallPos !== false) {
+                    $tryContent = $tryBlock[1];
+                    $endOfLinePos = strpos($tryContent, "\n", $lastCallPos);
+                    $newTryContent = substr_replace(
+                        $tryContent,
+                        "\n" . implode("\n", $newCalls),
+                        $endOfLinePos,
+                        0
+                    );
+                    $content = str_replace($tryBlock[1], $newTryContent, $content);
+                }
+            }
+        }
+
+        File::put($databaseSeederPath, $content);
+        $this->info("✅ DatabaseSeeder.php updated with new seeders.");
+    }
+
+    private function createDatabaseSeeder(): void
+    {
+        $uses = [];
+        $calls = [];
+
+        foreach ($this->generatedSeeders as $seederInfo) {
+            $uses[] = "use {$seederInfo['fqn']};";
+            $calls[] = "            \$this->call({$seederInfo['class']}::class);";
+        }
+
+        $content = "<?php\n\nnamespace Database\\Seeders;\n\n";
+        $content .= implode("\n", $uses);
+        $content .= "\n\nuse Illuminate\\Database\\Seeder;\n";
+        $content .= "use Illuminate\\Support\\Facades\\DB;\n\n";
+        $content .= "class DatabaseSeeder extends Seeder\n{\n";
+        $content .= "    public function run(): void\n    {\n";
+        $content .= "        DB::statement('SET FOREIGN_KEY_CHECKS=0;');\n\n";
+        $content .= "        try {\n";
+        $content .= "            // Tüm tabloları temizle\n";
+        $content .= "            \$this->command->info('Truncating tables...');\n";
+        $content .= "            DB::table('cat_product')->truncate();\n";
+        $content .= "            // Diğer tablolar da eklenebilir\n\n";
+        $content .= implode("\n", $calls);
+        $content .= "\n        } finally {\n";
+        $content .= "            DB::statement('SET FOREIGN_KEY_CHECKS=1;');\n";
+        $content .= "        }\n";
+        $content .= "    }\n";
+        $content .= "}\n";
+
+        File::put(database_path('seeders/DatabaseSeeder.php'), $content);
+        $this->info("✅ DatabaseSeeder.php created with all seeders.");
+    }
+
+    private function buildSeederInsertData(array $fields, ?string $primaryKey, int $count): string
+    {
+        $records = [];
+
+        for ($i = 1; $i <= $count; $i++) {
+            $record = [];
+
+            foreach ($fields as $name => $meta) {
+                if ($name === $primaryKey) continue;
+                if (in_array($name, ['created_at', 'updated_at', 'created_by', 'updated_by'], true)) continue;
+
+                $value = $this->generateRandomValue($name, $meta, $i);
+                $record[] = "                '{$name}' => {$value}";
+            }
+
+            $records[] = "            [\n" . implode(",\n", $record) . ",\n            ]";
+        }
+
+        return implode(",\n", $records);
+    }
+
+    private function generateRandomValue(string $name, array $meta, int $index): string
+    {
+        $db = $meta['database'] ?? [];
+        $type = $db['variable'] ?? 'string';
+        $formType = $meta['form']['type'] ?? null;
+
+        $lower = strtolower($name);
+
+        if (str_contains($lower, 'email')) {
+            return "'user{$index}@example.com'";
+        }
+
+        if (str_contains($lower, 'phone')) {
+            return "'+90" . rand(5000000000, 5999999999) . "'";
+        }
+
+        if (str_contains($lower, 'name') || str_contains($lower, 'title')) {
+            return "'{$name} " . $index . "'";
+        }
+
+        if (preg_match('/_id$/', $name)) {
+            return (string)rand(1, 100);
+        }
+
+        if (str_contains($lower, 'price') || str_contains($lower, 'amount')) {
+            return (string)rand(100, 10000);
+        }
+
+        switch ($type) {
+            case 'boolean':
+                return rand(0, 1) ? 'true' : 'false';
+            case 'integer':
+            case 'unsignedInteger':
+            case 'unsignedBigInteger':
+                return (string)rand(1, 1000);
+            case 'decimal':
+                return "'" . number_format(rand(100, 100000) / 100, 2, '.', '') . "'";
+            case 'timestamp':
+            case 'datetime':
+                return "now()";
             default:
                 if (in_array($formType, ['textarea', 'editor'], true)) {
-                    return '$this->faker->paragraph()';
+                    return "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sample text for {$name}.'";
                 }
-                return '$this->faker->word()';
+                return "'{$name} value {$index}'";
         }
     }
 }

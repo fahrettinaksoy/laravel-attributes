@@ -6,16 +6,18 @@ namespace App\Http\Controllers\Parameter;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Parameter\ParameterResource;
-use App\Traits\ScansModulesTrait;
+use App\Services\Module\ModuleScannerService;
 use Illuminate\Http\JsonResponse;
 
 class ParameterController extends Controller
 {
-    use ScansModulesTrait;
+    public function __construct(
+        private readonly ModuleScannerService $moduleScanner
+    ) {}
 
     public function index(): JsonResponse
     {
-        $moduleResults = $this->getModules();
+        $moduleResults = $this->moduleScanner->getModules(true);
 
         return (new ParameterResource($moduleResults))
             ->response()

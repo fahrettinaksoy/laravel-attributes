@@ -21,7 +21,7 @@
             "database": {"variable": "unsignedBigInteger", "nullable": false},
             "actions": [],
             "table": [],
-            "form": {"type":"select","relationship":{"type":"product_image","route":"catalog/product-image","fields":{"id":"product_image_id","label":"code"}},"sort_order":2}
+            "form": {"type":"modal","sort_order":2}
         },
         "uuid": {
             "database": {"variable": "uuid", "nullable": false, "unique": true},
