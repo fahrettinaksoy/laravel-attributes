@@ -10,14 +10,16 @@ class ResolvedModuleDTO
         public bool $isPivotRoute,
         public string $modelClass,
         public string $tableName,
-        public ?string $parentModelClass,
-        public ?string $pivotModelClass,
-        public ?string $relationName,
-        public ?string $originalRelationName,
-        public ?int $parentId,
-        public ?int $relationId,
         public string $mainModelPath,
-        public string $fullPath
+        public string $fullPath,
+        public ?string $parentModelClass = null,
+        public ?string $pivotModelClass = null,
+        public ?string $relationName = null,
+        public ?string $originalRelationName = null,
+        public ?int $parentId = null,
+        public ?int $relationId = null,
+        public ?string $fullPathWithIds = null,
+        public ?string $pivotTableName = null,
     ) {}
 
     public function toArray(): array

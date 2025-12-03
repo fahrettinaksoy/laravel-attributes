@@ -11,6 +11,7 @@ class MainRouteResolver implements RouteResolverInterface
 {
     public function supports(array $segments): bool
     {
+        // Pivot değilse daima buraya düşer
         return true;
     }
 
@@ -22,14 +23,8 @@ class MainRouteResolver implements RouteResolverInterface
             isPivotRoute: false,
             modelClass: $parsed->modelClass,
             tableName: $parsed->tableName,
-            parentModelClass: null,
-            pivotModelClass: null,
-            relationName: null,
-            originalRelationName: null,
-            parentId: null,
-            relationId: null,
             mainModelPath: $parsed->mainModelPath,
-            fullPath: implode('/', $segments)
+            fullPath: implode('/', $segments),
         );
     }
 }
