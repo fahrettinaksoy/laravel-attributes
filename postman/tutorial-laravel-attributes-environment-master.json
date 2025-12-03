@@ -1,0 +1,64 @@
+{
+    "id": "80e96977-490c-4ad0-8b2d-44232f974ca0",
+    "name": "tutorial-laravel-attributes Master",
+    "values": [
+        {
+            "key": "protocol",
+            "value": "https:\/\/",
+            "enabled": true
+        },
+        {
+            "key": "subDomain",
+            "value": "",
+            "enabled": true
+        },
+        {
+            "key": "domain",
+            "value": "tutorial-laravel-attributes.loc",
+            "enabled": true
+        },
+        {
+            "key": "path",
+            "value": "\/api",
+            "enabled": true
+        },
+        {
+            "key": "version",
+            "value": "\/v1",
+            "enabled": true
+        },
+        {
+            "key": "apiURL",
+            "value": "{{protocol}}{{subDomain}}{{domain}}{{path}}",
+            "enabled": true
+        },
+        {
+            "key": "authEmail",
+            "value": "aksoy@tutorial-laravel-attributes.loc",
+            "enabled": true
+        },
+        {
+            "key": "authPassword",
+            "value": "19441944Aks%&",
+            "enabled": true
+        },
+        {
+            "key": "authNameFirst",
+            "value": "Fahrettin",
+            "enabled": true
+        },
+        {
+            "key": "authNameLast",
+            "value": "Aksoy",
+            "enabled": true
+        },
+        {
+            "key": "authToken",
+            "value": "",
+            "enabled": true
+        }
+    ],
+    "_postman_variable_scope": "environment",
+    "_postman_exported_at": "2025-12-03T13:56:21+00:00",
+    "_postman_exported_using": "Postman\/10.0.0"
+}

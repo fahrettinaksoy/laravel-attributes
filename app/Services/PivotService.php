@@ -9,8 +9,6 @@ use App\Actions\Pivot\PivotActionFilter;
 use App\Actions\Pivot\PivotActionShow;
 use App\Actions\Pivot\PivotActionStore;
 use App\Actions\Pivot\PivotActionUpdate;
-use App\Exceptions\BusinessLogicException;
-use App\Exceptions\NotFoundException;
 use App\Factories\ModelFactory;
 use App\Repositories\PivotRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -40,34 +38,14 @@ class PivotService
     {
         $this->setupPivotContext($parentId, $relationName);
 
-        try {
-            return $this->actions['filter']->execute($filter);
-        } catch (ModelNotFoundException $e) {
-            throw new NotFoundException(__('exceptions/filter.not_found'));
-        } catch (\Exception $e) {
-            throw new BusinessLogicException(
-                message: __('exceptions/filter.generic_error'),
-                context: ['parent_id' => $parentId, 'relation' => $relationName, 'filter' => $filter],
-                errorCode: 'PIVOT_FILTER_OPERATION_FAILED',
-            );
-        }
+        return $this->actions['filter']->execute($filter);
     }
 
     public function show(int $parentId, string $relationName, int $relationId, array $filter)
     {
-        try {
-            $this->setupPivotContext($parentId, $relationName);
+        $this->setupPivotContext($parentId, $relationName);
 
-            return $this->actions['show']->execute($relationId);
-        } catch (ModelNotFoundException $e) {
-            throw new NotFoundException(__('exceptions/show.not_found'));
-        } catch (\Exception $e) {
-            throw new BusinessLogicException(
-                message: $e->getMessage(),
-                context: ['parent_id' => $parentId, 'relation' => $relationName, 'relation_id' => $relationId],
-                errorCode: 'PIVOT_SHOW_OPERATION_FAILED',
-            );
-        }
+        return $this->actions['show']->execute($relationId);
     }
 
     public function store(int $parentId, string $relationName, array $data)
@@ -83,18 +61,10 @@ class PivotService
             DB::commit();
 
             return $model->fresh();
-        } catch (ModelNotFoundException $e) {
-            DB::rollBack();
-
-            throw new NotFoundException(__('exceptions/store.not_found'));
         } catch (\Exception $e) {
             DB::rollBack();
 
-            throw new BusinessLogicException(
-                message: $e->getMessage(),
-                context: ['parent_id' => $parentId, 'relation' => $relationName, 'data' => $data],
-                errorCode: 'PIVOT_STORE_OPERATION_FAILED',
-            );
+            throw $e;
         }
     }
 
@@ -109,18 +79,10 @@ class PivotService
             DB::commit();
 
             return $model;
-        } catch (ModelNotFoundException $e) {
-            DB::rollBack();
-
-            throw new NotFoundException(__('exceptions/update.not_found'));
         } catch (\Exception $e) {
             DB::rollBack();
 
-            throw new BusinessLogicException(
-                message: $e->getMessage(),
-                context: ['parent_id' => $parentId, 'relation' => $relationName, 'relation_id' => $relationId],
-                errorCode: 'PIVOT_UPDATE_OPERATION_FAILED',
-            );
+            throw $e;
         }
     }
 
@@ -135,18 +97,10 @@ class PivotService
             DB::commit();
 
             return $deletedCount;
-        } catch (ModelNotFoundException $e) {
-            DB::rollBack();
-
-            throw new NotFoundException(__('exceptions/destroy.not_found'));
         } catch (\Exception $e) {
             DB::rollBack();
 
-            throw new BusinessLogicException(
-                message: $e->getMessage(),
-                context: ['parent_id' => $parentId, 'relation' => $relationName, 'relation_id' => $relationId],
-                errorCode: 'PIVOT_DESTROY_OPERATION_FAILED',
-            );
+            throw $e;
         }
     }
 

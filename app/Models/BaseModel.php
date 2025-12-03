@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\System\User\UserModel;
+use App\Traits\LocaleHelper;
 use App\Traits\SetFieldFromAttributes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 abstract class BaseModel extends Model
 {
     use HasFactory;
+    use LocaleHelper;
     use SetFieldFromAttributes;
 
     public $fillable = [];

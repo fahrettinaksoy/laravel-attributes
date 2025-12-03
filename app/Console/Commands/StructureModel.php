@@ -805,10 +805,32 @@ class StructureModel extends Command
 
         $seederClass = "{$modelClass}Seeder";
 
+        $isRelation = $info['isRelation'];
+        $depth = $info['depth'];
+        $primaryKey = $json['model']['primaryKey'];
+
         if ($hasFactory) {
-            $runMethod = "    public function run(): void\n    {\n        // Önce tabloyu temizle\n        {$modelClass}::query()->delete();\n\n        {$modelClass}::factory()\n            ->count(rand(10, 50))\n            ->create();\n    }";
+            if ($isRelation && $depth === 1) {
+                $parentModelName = $this->getParentModelFromFilename($info['filename']);
+                $parentClass = Str::studly($parentModelName) . 'Model';
+                $parentNamespace = 'App\\Models\\' . implode('\\', array_slice($namespaceParts, 0, -2));
+                $foreignKey = Str::snake($parentModelName) . '_id';
+                $parentPrimaryKey = Str::snake($parentModelName) . '_id';
+                $runMethod = "    public function run(): void\n    {\n        // Önce tabloyu temizle\n        {$modelClass}::query()->delete();\n\n        // Parent modelden kayıtları al\n        \$parents = \\{$parentNamespace}\\{$parentClass}::all();\n\n        // Her parent için 1-5 arası ilişkili kayıt oluştur\n        foreach (\$parents as \$parent) {\n            {$modelClass}::factory()\n                ->count(rand(1, 5))\n                ->create(['{$foreignKey}' => \$parent->{$parentPrimaryKey}]);\n        }\n    }";
+            } elseif ($isRelation && $depth === 2) {
+                $parts = explode('_', $info['filename']);
+                $parentFilename = $parts[0] . '_' . $parts[1];
+                $parentClass = Str::studly($parentFilename) . 'Model';
+                $parentNamespaceParts = array_slice($namespaceParts, 0, -2);
+                $parentNamespace = 'App\\Models\\' . implode('\\', $parentNamespaceParts);
+                $foreignKey = Str::snake($parentFilename) . '_id';
+                $parentPrimaryKey = Str::snake($parentFilename) . '_id';
+
+                $runMethod = "    public function run(): void\n    {\n        // Önce tabloyu temizle\n        {$modelClass}::query()->delete();\n\n        // Parent modelden kayıtları al\n        \$parents = \\{$parentNamespace}\\{$parentClass}::all();\n\n        // Her parent için 1-3 arası ilişkili kayıt oluştur\n        foreach (\$parents as \$parent) {\n            {$modelClass}::factory()\n                ->count(rand(1, 3))\n                ->create(['{$foreignKey}' => \$parent->{$parentPrimaryKey}]);\n        }\n    }";
+            } else {
+                $runMethod = "    public function run(): void\n    {\n        // Önce tabloyu temizle\n        {$modelClass}::query()->delete();\n\n        {$modelClass}::factory()\n            ->count(rand(10, 50))\n            ->create();\n    }";
+            }
         } else {
-            $primaryKey = $json['model']['primaryKey'] ?? null;
             $insertData = $this->buildSeederInsertData($json['fields'] ?? [], $primaryKey, 10);
 
             $runMethod = "    public function run(): void\n    {\n        // Önce tabloyu temizle\n        {$modelClass}::query()->delete();\n\n        \$data = [\n{$insertData}\n        ];\n\n        foreach (\$data as \$item) {\n            {$modelClass}::create(\$item);\n        }\n    }";
@@ -823,7 +845,14 @@ class StructureModel extends Command
             'class' => $seederClass,
             'namespace' => $seederNamespace,
             'fqn' => "{$seederNamespace}\\{$seederClass}",
+            'depth' => $depth,
         ];
+    }
+
+    private function getParentModelFromFilename(string $filename): string
+    {
+        $parts = explode('_', $filename);
+        return $parts[0];
     }
 
     private function updateDatabaseSeeder(): void
@@ -834,6 +863,8 @@ class StructureModel extends Command
             $this->createDatabaseSeeder();
             return;
         }
+
+        usort($this->generatedSeeders, fn($a, $b) => ($a['depth'] ?? 0) <=> ($b['depth'] ?? 0));
 
         $content = File::get($databaseSeederPath);
 

@@ -15,19 +15,10 @@ use Illuminate\Support\Str;
 
 class BaseResource extends JsonResource
 {
-    /**
-     * Static cache for relation loading optimization
-     */
     protected static array $relationCache = [];
 
-    /**
-     * Batch size for eager loading optimization
-     */
     protected int $batchSize = 50;
 
-    /**
-     * Cache TTL for field mappings
-     */
     protected int $fieldMappingCacheTtl = 3600;
 
     public function toArray($request): array
@@ -42,9 +33,6 @@ class BaseResource extends JsonResource
         ];
     }
 
-    /**
-     * Resolve resource type with caching
-     */
     protected function resolveResourceType(): string
     {
         if (property_exists($this->resource, 'resourceType') && ! empty($this->resource->resourceType)) {
@@ -54,14 +42,10 @@ class BaseResource extends JsonResource
         return class_basename($this->resource);
     }
 
-    /**
-     * Get optimized attributes with field selection and caching
-     */
     protected function getOptimizedAttributes($request): array
     {
         $resource = $this->resource;
 
-        // Early return if no allowed fields configured
         if (empty($resource->allowedShowing)) {
             return $this->getFallbackAttributes();
         }
@@ -73,9 +57,6 @@ class BaseResource extends JsonResource
         });
     }
 
-    /**
-     * Process attributes with field selection logic
-     */
     protected function processAttributes($request, $resource): array
     {
         $fieldsRequested = $this->parseRequestedFields($request);
@@ -100,9 +81,6 @@ class BaseResource extends JsonResource
         return $attributes;
     }
 
-    /**
-     * Parse requested fields from query parameters
-     */
     protected function parseRequestedFields($request): array
     {
         $fieldsParam = $request->query('fields', []);
@@ -119,9 +97,6 @@ class BaseResource extends JsonResource
             ->toArray();
     }
 
-    /**
-     * Get allowed fields with proper mapping
-     */
     protected function getAllowedFields($resource): array
     {
         return array_map(
@@ -131,17 +106,11 @@ class BaseResource extends JsonResource
         );
     }
 
-    /**
-     * Determine which fields to show based on request and permissions
-     */
     protected function determineFieldsToShow(array $requested, array $allowed): array
     {
         return empty($requested) ? $allowed : array_intersect($allowed, $requested);
     }
 
-    /**
-     * Resolve database field name with alias support
-     */
     protected function resolveDbField($key, $value, string $fieldKey, $resource): string
     {
         if (is_int($key)) {
@@ -151,14 +120,10 @@ class BaseResource extends JsonResource
         return $value ?: ($resource->aliasMapping[$fieldKey] ?? $fieldKey);
     }
 
-    /**
-     * Get attribute value with type casting and date formatting
-     */
     protected function getAttributeValue($resource, string $dbField, string $fieldKey)
     {
         $attributeValue = $resource->{$dbField} ?? null;
 
-        // Handle null date fields
         if ($attributeValue === null && $this->isDateField($fieldKey)) {
             $rawValue = $resource->getRawOriginal($dbField) ?? $resource->getOriginal($dbField);
 
@@ -170,16 +135,12 @@ class BaseResource extends JsonResource
         return $this->castAttributeValue($attributeValue, $fieldKey);
     }
 
-    /**
-     * Cast attribute value to appropriate type
-     */
     protected function castAttributeValue($value, string $fieldKey)
     {
         if ($value === null) {
             return null;
         }
 
-        // Auto-casting based on field patterns
         if (Str::endsWith($fieldKey, '_id')) {
             return (int) $value;
         }
@@ -195,9 +156,6 @@ class BaseResource extends JsonResource
         return $value;
     }
 
-    /**
-     * Get optimized relationships with eager loading and batch processing
-     */
     protected function getOptimizedRelationships($request): array
     {
         $requestedIncludes = $this->parseIncludeParameter($request);
@@ -216,9 +174,6 @@ class BaseResource extends JsonResource
         return $this->loadAndProcessRelationships($validIncludes, $request);
     }
 
-    /**
-     * Parse include parameter with nested relation support
-     */
     protected function parseIncludeParameter($request): array
     {
         $includeParam = $request->query('include');
@@ -230,9 +185,6 @@ class BaseResource extends JsonResource
         return array_map('trim', explode(',', $includeParam));
     }
 
-    /**
-     * Load and process relationships with optimization
-     */
     protected function loadAndProcessRelationships(array $validIncludes, $request): array
     {
         $relationships = [];
@@ -256,9 +208,6 @@ class BaseResource extends JsonResource
         return $relationships;
     }
 
-    /**
-     * Eager load missing relations efficiently
-     */
     protected function eagerLoadMissingRelations(array $relations): void
     {
         $missingRelations = [];
@@ -270,14 +219,10 @@ class BaseResource extends JsonResource
         }
 
         if (! empty($missingRelations)) {
-            // Use load() instead of individual queries
             $this->resource->load($missingRelations);
         }
     }
 
-    /**
-     * Transform relation data based on type
-     */
     protected function transformRelationData($relationData, $request)
     {
         if ($relationData === null) {
@@ -295,9 +240,6 @@ class BaseResource extends JsonResource
         return $relationData;
     }
 
-    /**
-     * Transform single model relation
-     */
     protected function transformSingleRelation(Model $model, $request): array
     {
         $resourceClass = $this->resolveRelationResourceClass($model);
@@ -312,9 +254,6 @@ class BaseResource extends JsonResource
         return (new static($model))->toArray($request)['attributes'] ?? [];
     }
 
-    /**
-     * Transform collection relation with batching
-     */
     protected function transformCollectionRelation($collection, $request): array
     {
         if ($collection->isEmpty()) {
@@ -322,8 +261,6 @@ class BaseResource extends JsonResource
         }
 
         $transformed = [];
-
-        // Process in batches to prevent memory issues
         $batches = $collection->chunk($this->batchSize);
 
         foreach ($batches as $batch) {
@@ -337,9 +274,6 @@ class BaseResource extends JsonResource
         return $transformed;
     }
 
-    /**
-     * Resolve specific resource class for relation
-     */
     protected function resolveRelationResourceClass(Model $model): ?string
     {
         $modelBasename = class_basename($model);
@@ -348,22 +282,15 @@ class BaseResource extends JsonResource
         return class_exists($resourceClass) ? $resourceClass : null;
     }
 
-    /**
-     * Get fallback attributes when allowedShowing is not configured
-     */
     protected function getFallbackAttributes(): array
     {
         $attributes = $this->resource->toArray();
 
-        // Remove sensitive fields
         $sensitiveFields = ['password', 'remember_token', 'api_token'];
 
         return array_diff_key($attributes, array_flip($sensitiveFields));
     }
 
-    /**
-     * Get cache key for attributes
-     */
     protected function getAttributesCacheKey($request): string
     {
         $fields = $request->query('fields', []);
@@ -376,15 +303,39 @@ class BaseResource extends JsonResource
             'resource_id' => $resourceKey,
             'fields' => is_array($fields) ? $fields : [$fields],
             'locale' => $locale,
-            'updated_at' => $this->resource->updated_at?->timestamp,
+            'updated_at' => $this->getUpdatedAtTimestamp(),
         ];
 
         return 'resource_attributes_'.md5(serialize($keyData));
     }
 
-    /**
-     * Get resource meta information
-     */
+    protected function getUpdatedAtTimestamp(): ?int
+    {
+        if (!isset($this->resource->updated_at)) {
+            return null;
+        }
+
+        $updatedAt = $this->resource->updated_at;
+
+        if ($updatedAt instanceof \Carbon\Carbon) {
+            return $updatedAt->timestamp;
+        }
+
+        if (is_string($updatedAt)) {
+            try {
+                return \Carbon\Carbon::parse($updatedAt)->timestamp;
+            } catch (\Exception $e) {
+                \Log::warning('Failed to parse updated_at', [
+                    'value' => $updatedAt,
+                    'resource_type' => class_basename($this->resource),
+                ]);
+                return null;
+            }
+        }
+
+        return null;
+    }
+
     protected function getResourceMeta($request): array
     {
         return [
@@ -394,20 +345,14 @@ class BaseResource extends JsonResource
         ];
     }
 
-    /**
-     * Get resource links with improved performance
-     */
     protected function getLinks($request): array
     {
         return [
             'self' => $this->getSelfLink($request),
-            'type' => $this->getTypeLink(),
+            //'type' => $this->getTypeLink(),
         ];
     }
 
-    /**
-     * Get type-specific link
-     */
     protected function getTypeLink(): string
     {
         $type = Str::plural(Str::snake($this->resolveResourceType()));
@@ -415,9 +360,6 @@ class BaseResource extends JsonResource
         return url("/api/v1/{$type}");
     }
 
-    /**
-     * Enhanced self link generation
-     */
     protected function getSelfLink($request): string
     {
         try {
@@ -438,26 +380,18 @@ class BaseResource extends JsonResource
         }
     }
 
-    /**
-     * Build pivot route self link
-     */
     private function buildPivotSelfLink($request): string
     {
-        $mainModelPath = $request->attributes->get('mainModelPath');
-        $parentId = $request->attributes->get('parentId');
-        $originalRelationName = $request->attributes->get('originalRelationName');
+        $fullPathWithIds = $request->attributes->get('fullPathWithIds');
         $pivotId = $this->resource->getKey();
 
-        if ($mainModelPath && $parentId && $originalRelationName) {
-            return url("/api/v1/{$mainModelPath}/{$parentId}/{$originalRelationName}/{$pivotId}");
+        if ($fullPathWithIds) {
+            return url("/api/v1/{$fullPathWithIds}/{$pivotId}");
         }
 
         return $this->buildFallbackPivotLink($request);
     }
 
-    /**
-     * Build fallback pivot link from segments
-     */
     private function buildFallbackPivotLink($request): string
     {
         $segments = $request->segments();
@@ -479,9 +413,6 @@ class BaseResource extends JsonResource
         return url("/api/v1/pivot/{$this->resource->getKey()}");
     }
 
-    /**
-     * Build main route self link
-     */
     private function buildMainSelfLink($request): string
     {
         $mainModelPath = $request->attributes->get('mainModelPath');
@@ -493,9 +424,6 @@ class BaseResource extends JsonResource
         return $this->buildFallbackMainLink($request);
     }
 
-    /**
-     * Build fallback main link
-     */
     private function buildFallbackMainLink($request): string
     {
         $segments = $request->segments();
@@ -515,9 +443,6 @@ class BaseResource extends JsonResource
         return $this->buildModelBasedLink();
     }
 
-    /**
-     * Build link based on model class
-     */
     private function buildModelBasedLink(): string
     {
         $modelClass = get_class($this->resource);
@@ -539,9 +464,6 @@ class BaseResource extends JsonResource
         return url("/api/v1/unknown/{$this->resource->getKey()}");
     }
 
-    /**
-     * Global resource meta
-     */
     public function with($request): array
     {
         return [
@@ -558,9 +480,6 @@ class BaseResource extends JsonResource
         ];
     }
 
-    /**
-     * Get executed queries count for performance monitoring
-     */
     protected function getQueriesCount(): int
     {
         if (config('app.debug')) {
@@ -570,9 +489,6 @@ class BaseResource extends JsonResource
         return 0;
     }
 
-    /**
-     * Check if field is a date field
-     */
     protected function isDateField(string $field): bool
     {
         $dateFields = [
@@ -590,9 +506,6 @@ class BaseResource extends JsonResource
             Str::endsWith($field, ['_date', '_at']);
     }
 
-    /**
-     * Format date based on field type and locale
-     */
     protected function formatDateBasedOnField(string $field, $value): ?string
     {
         if (is_null($value)) {
@@ -624,9 +537,6 @@ class BaseResource extends JsonResource
         }
     }
 
-    /**
-     * Clear static caches (useful for testing)
-     */
     public static function clearCaches(): void
     {
         static::$relationCache = [];
