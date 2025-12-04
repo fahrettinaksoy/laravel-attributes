@@ -7,7 +7,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BaseCollection;
 use App\Http\Resources\BaseResource;
 use App\Services\BaseService;
-use App\Services\Request\FormRequestService;
+use App\Services\Module\ModuleRequestService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,13 +20,13 @@ abstract class BaseController extends Controller
         protected readonly BaseService $service,
         protected readonly BaseResource $resource,
         protected readonly BaseCollection $collection,
-        protected readonly FormRequestService $formRequestService,
+        protected readonly ModuleRequestService $moduleRequestService,
         protected readonly array $requests,
     ) {}
 
     public function index(): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             request(),
             $this->requests['index']
         );
@@ -41,7 +41,7 @@ abstract class BaseController extends Controller
 
     public function show(): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             request(),
             $this->requests['show']
         );
@@ -56,14 +56,14 @@ abstract class BaseController extends Controller
 
     public function store(): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             request(),
             $this->requests['store']
         );
 
         $validatedData = $formRequest->validated();
 
-        $validatedData = $this->formRequestService->validateNestedData(
+        $validatedData = $this->moduleRequestService->validateNestedRelations(
             $validatedData,
             'store',
             $this->model
@@ -78,14 +78,14 @@ abstract class BaseController extends Controller
 
     public function update(): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             request(),
             $this->requests['update']
         );
 
         $validatedData = $formRequest->validated();
 
-        $validatedData = $this->formRequestService->validateNestedData(
+        $validatedData = $this->moduleRequestService->validateNestedRelations(
             $validatedData,
             'update',
             $this->model
@@ -100,7 +100,7 @@ abstract class BaseController extends Controller
 
     public function destroy(Request $request): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             $request,
             $this->requests['destroy']
         );
@@ -113,9 +113,7 @@ abstract class BaseController extends Controller
         if ($routeId !== null) {
             $deleteFilter = [$primaryKey => (int) $routeId];
         } else {
-            $ids = is_array($validatedData['ids'])
-                ? array_map('intval', $validatedData['ids'])
-                : [(int) $validatedData['ids']];
+            $ids = is_array($validatedData['ids']) ? array_map('intval', $validatedData['ids']) : [(int) $validatedData['ids']];
             $deleteFilter = [$primaryKey => $ids];
         }
 

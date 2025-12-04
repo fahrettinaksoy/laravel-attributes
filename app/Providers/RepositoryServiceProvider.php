@@ -21,40 +21,41 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use RuntimeException;
 
+/**
+ * Handles dependency injection for repositories, services, and resources.
+ */
 class RepositoryServiceProvider extends ServiceProvider
 {
-    private const NAMESPACE_TEMPLATE = [
-        'service' => 'App\Services\%s\%sService',
-        'repository' => 'App\Repositories\%s\%sRepository',
-        'interface' => 'App\Repositories\%s\%sRepositoryInterface',
-    ];
-
     private const COMMON_CONTROLLERS = [
         'App\Http\Controllers\Common\CommonController',
     ];
 
     public function register(): void
     {
-        $this->registerBaseBindings();
-        $this->registerResourceBindings();
-        $this->registerPivotBindings();
-        $this->registerSpecialBindings();
+        $this->registerBase();
+        $this->registerResources();
+        $this->registerPivot();
+        $this->registerModules();
     }
 
-    private function registerBaseBindings(): void
-    {
-        $this->bindBaseRepository();
-        $this->bindBaseRepositoryCache();
-        $this->bindBaseService();
-    }
+    // ==================== BASE BINDINGS ====================
 
-    private function bindBaseRepository(): void
+    private function registerBase(): void
     {
+        // BaseRepository needs Model
         $this->app->when(BaseRepository::class)
             ->needs(Model::class)
-            ->give(function (): ?Model {
-                return $this->resolveModel();
-            });
+            ->give(fn() => $this->resolveModel());
+
+        // BaseRepositoryCache -> BaseRepository
+        $this->app->when(BaseRepositoryCache::class)
+            ->needs(BaseRepositoryInterface::class)
+            ->give(BaseRepository::class);
+
+        // BaseService -> BaseRepositoryCache
+        $this->app->when(BaseService::class)
+            ->needs(BaseRepositoryInterface::class)
+            ->give(BaseRepositoryCache::class);
     }
 
     private function resolveModel(): Model
@@ -66,145 +67,83 @@ class RepositoryServiceProvider extends ServiceProvider
         return $factory->create($modelClass);
     }
 
-    private function bindBaseRepositoryCache(): void
-    {
-        $this->app->when(BaseRepositoryCache::class)
-            ->needs(BaseRepositoryInterface::class)
-            ->give(BaseRepository::class);
-    }
+    // ==================== RESOURCE BINDINGS ====================
 
-    private function bindBaseService(): void
+    private function registerResources(): void
     {
-        $this->app->when(BaseService::class)
-            ->needs(BaseRepositoryInterface::class)
-            ->give(BaseRepositoryCache::class);
-    }
+        $this->app->bind(BaseResource::class, function ($app, $params) {
+            return new BaseResource($params['resource'] ?? new \stdClass);
+        });
 
-    private function registerResourceBindings(): void
-    {
-        $this->bindBaseResource();
-        $this->bindBaseCollection();
-    }
-
-    private function bindBaseResource(): void
-    {
-        $this->app->bind(BaseResource::class, function ($app, array $parameters = []) {
-            $resource = $parameters['resource'] ?? new \stdClass;
-
-            return new BaseResource($resource);
+        $this->app->bind(BaseCollection::class, function ($app, $params) {
+            return new BaseCollection($params['resource'] ?? new Collection);
         });
     }
 
-    private function bindBaseCollection(): void
-    {
-        $this->app->bind(BaseCollection::class, function ($app, array $parameters = []) {
-            $resource = $parameters['resource'] ?? new Collection;
+    // ==================== PIVOT BINDINGS ====================
 
-            return new BaseCollection($resource);
-        });
-    }
-
-    private function registerPivotBindings(): void
+    private function registerPivot(): void
     {
-        $this->app->bind(PivotRepository::class, function ($app) {
-            return new PivotRepository;
-        });
+        $this->app->singleton(PivotRepository::class);
 
         $this->app->when(PivotService::class)
             ->needs(PivotRepository::class)
-            ->give(function ($app) {
-                return $app->make(PivotRepository::class);
-            });
+            ->give(PivotRepository::class);
     }
 
-    private function registerSpecialBindings(): void
+    // ==================== MODULE BINDINGS ====================
+
+    private function registerModules(): void
     {
-        collect($this->findSpecialControllers())
-            ->each(fn (string $controller) => $this->registerControllerBindings($controller));
+        foreach ($this->getControllers() as $controller) {
+            $this->bindModule($controller);
+        }
     }
 
-    private function findSpecialControllers(): array
+    private function getControllers(): array
     {
         return collect($this->app['router']->getRoutes()->getRoutes())
-            ->map(fn (Route $route) => $this->getControllerFromRoute($route))
+            ->map(fn(Route $route) => $this->extractController($route))
             ->filter()
-            ->reject(fn (string $controller) => in_array($controller, self::COMMON_CONTROLLERS, true))
+            ->reject(fn($c) => in_array($c, self::COMMON_CONTROLLERS, true))
             ->unique()
             ->values()
             ->all();
     }
 
-    private function getControllerFromRoute(Route $route): ?string
+    private function extractController(Route $route): ?string
     {
         $action = $route->getAction();
+        $controller = $action['controller'] ?? $action['uses'] ?? null;
 
-        if (isset($action['controller']) && is_string($action['controller'])) {
-            return explode('@', $action['controller'])[0];
-        }
-
-        if (isset($action['uses']) && is_string($action['uses'])) {
-            return explode('@', $action['uses'])[0];
-        }
-
-        return null;
+        return is_string($controller) ? explode('@', $controller)[0] : null;
     }
 
-    private function registerControllerBindings(string $controllerClass): void
+    private function bindModule(string $controller): void
     {
-        $module = $this->getModuleNameFromController($controllerClass);
+        $module = Str::before(class_basename($controller), 'Controller');
 
-        $serviceClass = $this->getNamespacedClass('service', $module);
-        $repositoryClass = $this->getNamespacedClass('repository', $module);
-        $repositoryInterface = $this->getNamespacedClass('interface', $module);
+        $service = "App\\Services\\{$module}\\{$module}Service";
+        $repository = "App\\Repositories\\{$module}\\{$module}Repository";
+        $interface = "App\\Repositories\\{$module}\\{$module}RepositoryInterface";
 
-        if (! $this->areClassesValid($serviceClass, $repositoryClass, $repositoryInterface)) {
+        // Skip if classes don't exist
+        if (!class_exists($service) || !class_exists($repository) || !interface_exists($interface)) {
             return;
         }
 
-        $this->bindModuleRepository($serviceClass, $repositoryClass, $repositoryInterface);
-    }
-
-    private function getModuleNameFromController(string $controllerClass): string
-    {
-        return Str::before(class_basename($controllerClass), 'Controller');
-    }
-
-    private function getNamespacedClass(string $type, string $module): string
-    {
-        return sprintf(self::NAMESPACE_TEMPLATE[$type], $module, $module);
-    }
-
-    private function areClassesValid(string $serviceClass, string $repositoryClass, string $repositoryInterface): bool
-    {
-        return class_exists($serviceClass)
-            && class_exists($repositoryClass)
-            && interface_exists($repositoryInterface);
-    }
-
-    private function bindModuleRepository(
-        string $serviceClass,
-        string $repositoryClass,
-        string $repositoryInterface,
-    ): void {
-        $this->app->when($serviceClass)
+        $this->app->when($service)
             ->needs(BaseRepositoryInterface::class)
-            ->give(function () use ($repositoryClass, $repositoryInterface) {
-                $repository = $this->app->make($repositoryClass);
+            ->give(function () use ($repository, $interface) {
+                $repo = $this->app->make($repository);
 
-                $this->validateRepository($repository, $repositoryInterface);
+                if (!$repo instanceof $interface) {
+                    throw new RuntimeException(
+                        sprintf('%s must implement %s', get_class($repo), $interface)
+                    );
+                }
 
-                return $repository;
+                return $repo;
             });
-    }
-
-    private function validateRepository(object $repository, string $repositoryInterface): void
-    {
-        if (! $repository instanceof $repositoryInterface) {
-            throw new RuntimeException(sprintf(
-                '%s must implement %s',
-                get_class($repository),
-                $repositoryInterface,
-            ));
-        }
     }
 }

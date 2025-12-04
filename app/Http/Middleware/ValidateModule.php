@@ -12,76 +12,87 @@ use InvalidArgumentException;
 
 class ValidateModule
 {
-    private array $modelClassCache = [];
+    private array $cache = [];
 
     private const CACHE_TTL = 3600;
+    private const MIN_SEGMENTS = 3;
+    private const SKIP_SEGMENTS = 2;
 
-    private const EXCEPTION_ROUTES = [];
+    private const EXCEPTION_ROUTES = [
+        // Add your exception routes here
+        // 'auth/login',
+        // 'auth/register',
+    ];
 
     public function handle(Request $request, Closure $next): mixed
     {
-        $segments = $request->segments();
-
-        if (count($segments) < 3) {
+        if (!$this->shouldProcess($request)) {
             return $next($request);
         }
 
-        $pathAfterApi = implode('/', array_slice($segments, 2));
-        if ($this->isExceptionRoute($pathAfterApi)) {
-            return $next($request);
+        $segments = array_slice($request->segments(), self::SKIP_SEGMENTS);
+        $result = $this->resolveWithCache($request, $segments);
+
+        foreach ($result as $key => $value) {
+            $request->attributes->set($key, $value);
         }
-
-        $cacheKey = 'model_resolution_'.md5(implode('/', $segments));
-        if (isset($this->modelClassCache[$cacheKey])) {
-            $this->setRequestAttributes($request, $this->modelClassCache[$cacheKey]);
-
-            return $next($request);
-        }
-
-        $pathSegments = array_slice($segments, 2);
-        $result = $this->resolveModelClass($pathSegments);
-
-        $this->modelClassCache[$cacheKey] = $result;
-        Cache::put($cacheKey, $result, self::CACHE_TTL);
-
-        $this->setRequestAttributes($request, $result);
 
         return $next($request);
     }
 
-    private function isExceptionRoute(string $path): bool
+    private function shouldProcess(Request $request): bool
     {
-        foreach (self::EXCEPTION_ROUTES as $exceptionRoute) {
-            if (str_starts_with($path, $exceptionRoute)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function resolveModelClass(array $pathSegments): array
-    {
-        if ($this->isPivotRoute($pathSegments)) {
-            return $this->processPivotRoute($pathSegments);
-        }
-
-        return $this->processMainRoute($pathSegments);
-    }
-
-    private function isPivotRoute(array $pathSegments): bool
-    {
-        if (count($pathSegments) < 3) {
+        if (count($request->segments()) < self::MIN_SEGMENTS) {
             return false;
         }
 
-        foreach ($pathSegments as $i => $segment) {
-            if (
-                is_numeric($segment)
-                && isset($pathSegments[$i + 1])
-                && ! is_numeric($pathSegments[$i + 1])
-                && preg_match('/^[a-zA-Z_-]+$/', $pathSegments[$i + 1])
-            ) {
+        $path = implode('/', array_slice($request->segments(), self::SKIP_SEGMENTS));
+
+        foreach (self::EXCEPTION_ROUTES as $exception) {
+            if (str_starts_with($path, $exception)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function resolveWithCache(Request $request, array $segments): array
+    {
+        $key = 'model_resolution_' . md5(implode('/', $request->segments()));
+
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
+        }
+
+        if ($cached = Cache::get($key)) {
+            return $this->cache[$key] = $cached;
+        }
+
+        $result = $this->resolve($segments);
+        $this->cache[$key] = $result;
+        Cache::put($key, $result, self::CACHE_TTL);
+
+        return $result;
+    }
+
+    private function resolve(array $segments): array
+    {
+        return $this->hasPivotPattern($segments)
+            ? $this->resolvePivot($segments)
+            : $this->resolveMain($segments);
+    }
+
+    private function hasPivotPattern(array $segments): bool
+    {
+        if (count($segments) < 3) {
+            return false;
+        }
+
+        foreach ($segments as $i => $segment) {
+            $next = $segments[$i + 1] ?? null;
+
+            if (is_numeric($segment) && $next && !is_numeric($next) && ctype_alpha($next)) {
                 return true;
             }
         }
@@ -89,157 +100,115 @@ class ValidateModule
         return false;
     }
 
-    private function processPivotRoute(array $pathSegments): array
+    private function resolveMain(array $segments): array
     {
-        $parentIdIndex = null;
-        $parentId = null;
-        $originalRelation = null;
-
-        for ($i = count($pathSegments) - 1; $i >= 0; $i--) {
-            $segment = $pathSegments[$i];
-
-            if (
-                ! is_numeric($segment)
-                && preg_match('/^[a-zA-Z_-]+$/', $segment)
-                && $i > 0
-                && is_numeric($pathSegments[$i - 1])
-            ) {
-                $originalRelation = $segment;
-                $parentId = (int) $pathSegments[$i - 1];
-                $parentIdIndex = $i - 1;
-                break;
-            }
-        }
-
-        if ($parentIdIndex === null) {
-            throw new InvalidArgumentException('Invalid pivot route structure');
-        }
-
-        $parentModelEndIndex = $parentIdIndex;
-
-        for ($i = $parentIdIndex - 1; $i >= 0; $i--) {
-            if (is_numeric($pathSegments[$i])) {
-                $parentModelEndIndex = $i;
-                break;
-            }
-        }
-
-        $parentModelPath = [];
-        for ($i = 0; $i < $parentModelEndIndex; $i++) {
-            if (! is_numeric($pathSegments[$i])) {
-                $parentModelPath[] = $pathSegments[$i];
-            }
-        }
-
-        if ($parentModelEndIndex < $parentIdIndex && count($parentModelPath) > 0) {
-            $baseModelClass = $this->buildModelClass($parentModelPath);
-            $baseModel = new $baseModelClass;
-            $intermediateRelation = null;
-            for ($i = $parentModelEndIndex + 1; $i < $parentIdIndex; $i++) {
-                if (! is_numeric($pathSegments[$i])) {
-                    $intermediateRelation = Str::snake($pathSegments[$i]);
-                    break;
-                }
-            }
-
-            if ($intermediateRelation && method_exists($baseModel, $intermediateRelation)) {
-                $intermediateRelationObj = $baseModel->{$intermediateRelation}();
-                $mainModelClass = get_class($intermediateRelationObj->getRelated());
-            } else {
-                throw new InvalidArgumentException('Cannot resolve intermediate relation');
-            }
-        } else {
-            $mainModelClass = $this->buildModelClass($parentModelPath);
-        }
-
-        $relationMethod = Str::snake($originalRelation);
-        $parentModel = new $mainModelClass;
-
-        if (! method_exists($parentModel, $relationMethod)) {
-            throw new InvalidArgumentException("Relation '{$relationMethod}' not defined on {$mainModelClass}");
-        }
-
-        $relationObj = $parentModel->{$relationMethod}();
-        $relatedInstance = $relationObj->getRelated();
-        $pivotModelClass = get_class($relatedInstance);
-        $relationId = null;
-
-        if (isset($pathSegments[$parentIdIndex + 2]) && is_numeric($pathSegments[$parentIdIndex + 2])) {
-            $relationId = (int) $pathSegments[$parentIdIndex + 2];
-        }
-
-        $tableName = end($parentModelPath);
-        $fullPathWithIds = [];
-        $skipNext = false;
-
-        for ($i = 0; $i < count($pathSegments); $i++) {
-            if ($skipNext) {
-                $skipNext = false;
-
-                continue;
-            }
-
-            $segment = $pathSegments[$i];
-
-            if (! is_numeric($segment)) {
-                $fullPathWithIds[] = $segment;
-            } elseif (isset($pathSegments[$i + 1]) && ! is_numeric($pathSegments[$i + 1]) && preg_match('/^[a-zA-Z_-]+$/', $pathSegments[$i + 1])) {
-                $fullPathWithIds[] = $segment;
-            }
-        }
-
-        return [
-            'isPivotRoute' => true,
-            'parentModelClass' => $mainModelClass,
-            'pivotModelClass' => $pivotModelClass,
-            'relationName' => $relationMethod,
-            'originalRelationName' => $originalRelation,
-            'parentId' => $parentId,
-            'relationId' => $relationId,
-            'mainModelPath' => implode('/', $parentModelPath),
-            'fullPathWithIds' => implode('/', $fullPathWithIds),
-            'tableName' => $tableName,
-            'pivotTableName' => $relatedInstance->getTable(),
-            'modelClass' => $pivotModelClass,
-            'fullPath' => implode('/', $pathSegments),
-        ];
-    }
-
-    private function processMainRoute(array $pathSegments): array
-    {
-        $modelPath = $pathSegments;
-        if (is_numeric(end($pathSegments))) {
-            $modelPath = array_slice($pathSegments, 0, -1);
-        }
+        $modelPath = is_numeric(end($segments)) ? array_slice($segments, 0, -1) : $segments;
 
         if (empty($modelPath)) {
             throw new InvalidArgumentException('Empty model path');
         }
 
-        $modelClass = $this->buildModelClass($modelPath);
-
         return [
             'isPivotRoute' => false,
-            'modelClass' => $modelClass,
+            'modelClass' => $this->buildModelClass($modelPath),
             'tableName' => end($modelPath),
             'mainModelPath' => implode('/', $modelPath),
-            'fullPath' => implode('/', $pathSegments),
+            'fullPath' => implode('/', $segments),
         ];
     }
 
-    private function buildModelClass(array $pathSegments, ?string $customName = null): string
+    private function resolvePivot(array $segments): array
     {
-        $nsParts = array_map([Str::class, 'studly'], $pathSegments);
-        $namespace = 'App\\Models\\'.implode('\\', $nsParts);
-        $className = $customName ?: (Str::studly(end($pathSegments)).'Model');
+        $pivot = $this->extractPivotInfo($segments);
+        $parentClass = $this->buildModelClass($pivot['parentPath']);
 
-        return $namespace.'\\'.$className;
+        if ($pivot['parentModelEndIndex'] < count($segments) - 2) {
+            $parentModel = new $parentClass;
+            $intermediateRelationName = null;
+            for ($i = $pivot['parentModelEndIndex'] + 1; $i < count($segments); $i++) {
+                if (!is_numeric($segments[$i]) && $i < count($segments) - 1 && is_numeric($segments[$i - 1])) {
+                    $intermediateRelationName = Str::snake($segments[$i]);
+                    break;
+                }
+            }
+
+            if ($intermediateRelationName && method_exists($parentModel, $intermediateRelationName)) {
+                $intermediateRelation = $parentModel->{$intermediateRelationName}();
+                $parentClass = get_class($intermediateRelation->getRelated());
+                $parentModel = new $parentClass;
+            }
+        } else {
+            $parentModel = new $parentClass;
+        }
+
+        $relationMethod = Str::snake($pivot['relation']);
+
+        if (!method_exists($parentModel, $relationMethod)) {
+            throw new InvalidArgumentException(
+                "Relation '{$relationMethod}' not found on {$parentClass}"
+            );
+        }
+
+        $relationObj = $parentModel->{$relationMethod}();
+        $relatedModel = $relationObj->getRelated();
+
+        return [
+            'isPivotRoute' => true,
+            'modelClass' => get_class($relatedModel),
+            'parentModelClass' => $parentClass,
+            'pivotModelClass' => get_class($relatedModel),
+            'relationName' => $relationMethod,
+            'originalRelationName' => $pivot['relation'],
+            'parentId' => $pivot['parentId'],
+            'relationId' => $pivot['relationId'],
+            'tableName' => end($pivot['parentPath']),
+            'pivotTableName' => $relatedModel->getTable(),
+            'mainModelPath' => implode('/', $pivot['parentPath']),
+            'fullPath' => implode('/', $segments),
+        ];
     }
 
-    private function setRequestAttributes(Request $request, array $attributes): void
+    private function extractPivotInfo(array $segments): array
     {
-        foreach ($attributes as $key => $value) {
-            $request->attributes->set($key, $value);
+        for ($i = count($segments) - 1; $i > 0; $i--) {
+            $current = $segments[$i];
+            $prev = $segments[$i - 1];
+
+            if (!is_numeric($current) && ctype_alpha($current) && is_numeric($prev)) {
+                $parentModelEndIndex = $i - 1;
+                for ($j = $i - 2; $j >= 0; $j--) {
+                    if (is_numeric($segments[$j])) {
+                        $parentModelEndIndex = $j;
+                        break;
+                    }
+                }
+
+                $parentPath = [];
+                for ($j = 0; $j < $parentModelEndIndex; $j++) {
+                    if (!is_numeric($segments[$j])) {
+                        $parentPath[] = $segments[$j];
+                    }
+                }
+
+                return [
+                    'parentId' => (int) $prev,
+                    'relation' => $current,
+                    'relationId' => isset($segments[$i + 1]) && is_numeric($segments[$i + 1]) ? (int) $segments[$i + 1] : null,
+                    'parentPath' => $parentPath,
+                    'parentModelEndIndex' => $parentModelEndIndex,
+                ];
+            }
         }
+
+        throw new InvalidArgumentException('Invalid pivot route structure');
+    }
+
+    private function buildModelClass(array $segments): string
+    {
+        $parts = array_map([Str::class, 'studly'], $segments);
+        $namespace = 'App\\Models\\' . implode('\\', $parts);
+        $className = Str::studly(end($segments)) . 'Model';
+
+        return $namespace . '\\' . $className;
     }
 }

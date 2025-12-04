@@ -14,7 +14,7 @@ use App\Http\Resources\BaseCollection;
 use App\Http\Resources\BaseResource;
 use App\Services\BaseService;
 use App\Services\PivotService;
-use App\Services\Request\FormRequestService;
+use App\Services\Module\ModuleRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -27,7 +27,7 @@ class CommonController extends BaseController
         BaseResource $resource,
         BaseCollection $collection,
         PivotService $pivotService,
-        FormRequestService $formRequestService,
+        ModuleRequestService $moduleRequestService,
     ) {
         $this->pivotService = $pivotService;
 
@@ -36,7 +36,7 @@ class CommonController extends BaseController
             service: $service,
             resource: $resource,
             collection: $collection,
-            formRequestService: $formRequestService,
+            moduleRequestService: $moduleRequestService,
             requests: [
                 'index' => BaseIndexRequest::class,
                 'show' => BaseShowRequest::class,
@@ -49,7 +49,7 @@ class CommonController extends BaseController
 
     public function pivotIndex(Request $request): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             $request,
             $this->requests['index']
         );
@@ -68,7 +68,7 @@ class CommonController extends BaseController
 
     public function pivotShow(Request $request): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             $request,
             $this->requests['show']
         );
@@ -88,7 +88,7 @@ class CommonController extends BaseController
 
     public function pivotStore(Request $request): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             $request,
             $this->requests['store']
         );
@@ -107,7 +107,7 @@ class CommonController extends BaseController
 
     public function pivotUpdate(Request $request): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             $request,
             $this->requests['update']
         );
@@ -127,7 +127,7 @@ class CommonController extends BaseController
 
     public function pivotDestroy(Request $request): JsonResponse
     {
-        $formRequest = $this->formRequestService->resolve(
+        $formRequest = $this->moduleRequestService->resolveFormRequest(
             $request,
             $this->requests['destroy']
         );
