@@ -18,7 +18,7 @@ class ReviewModelFactory extends Factory
     {
         return [
             'uuid' => $this->faker->uuid(),
-            'code' => $this->faker->unique()->bothify("CODE-####"),
+            'code' => $this->faker->unique()->bothify('CODE-####'),
             'product_id' => $this->faker->numberBetween(1, 100),
             'account_id' => $this->faker->numberBetween(0, 1000),
             'author' => $this->faker->name(),

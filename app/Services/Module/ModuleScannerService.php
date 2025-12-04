@@ -25,13 +25,21 @@ use Throwable;
 final class ModuleScannerService
 {
     private const MODEL_SUFFIX = 'Model';
+
     private const FILE_EXTENSION = '.php';
+
     private const MODEL_PATTERN = '/Model\.php$/i';
+
     private const CACHE_KEY = 'app:modules:tree';
+
     private const CACHE_TTL = 3600;
+
     private const CACHE_TAG = 'modules';
+
     private const API_PREFIX = '/api/v1';
+
     private const BASE_NAMESPACE = 'App\\Models\\';
+
     private const REQUEST_NAMESPACE = 'App\\Http\\Requests\\';
 
     private const REST_ACTIONS = [
@@ -62,39 +70,39 @@ final class ModuleScannerService
 
     public function getModules(bool $useCache = false, ?int $cacheTtl = null): array
     {
-        if (!$useCache) {
+        if (! $useCache) {
             return $this->scanDirectory($this->modelsPath, '');
         }
 
         return Cache::tags([self::CACHE_TAG])->remember(
             $this->getCacheKey(),
             $cacheTtl ?? self::CACHE_TTL,
-            fn() => $this->scanDirectory($this->modelsPath, '')
+            fn () => $this->scanDirectory($this->modelsPath, '')
         );
     }
 
     private function validateModelsPath(): void
     {
-        if (!File::isDirectory($this->modelsPath)) {
+        if (! File::isDirectory($this->modelsPath)) {
             throw new InvalidArgumentException("Models directory not found: {$this->modelsPath}");
         }
     }
 
     private function getCacheKey(): string
     {
-        return self::CACHE_KEY . ':' . md5($this->modelsPath);
+        return self::CACHE_KEY.':'.md5($this->modelsPath);
     }
 
     private function scanDirectory(string $path, string $parentKey): array
     {
-        if (!File::isDirectory($path)) {
+        if (! File::isDirectory($path)) {
             return [];
         }
 
         $modules = [];
 
         foreach ($this->getFiles($path) as $file) {
-            if (!$this->isValidModelFile($file->getFilename())) {
+            if (! $this->isValidModelFile($file->getFilename())) {
                 continue;
             }
 
@@ -116,7 +124,7 @@ final class ModuleScannerService
             try {
                 $children = $this->processDirectory($subdirectory, $fullKey);
 
-                if (!empty($children)) {
+                if (! empty($children)) {
                     $modules[$code] = [
                         'code' => $fullKey,
                         'type' => 'directory',
@@ -136,6 +144,7 @@ final class ModuleScannerService
     private function processDirectory(string $path, string $parentKey): array
     {
         $children = $this->processModelFiles($path, $parentKey);
+
         return $this->processSubdirectories($path, $parentKey, $children);
     }
 
@@ -144,7 +153,7 @@ final class ModuleScannerService
         $modules = [];
 
         foreach ($this->getFiles($path) as $file) {
-            if (!$this->isValidModelFile($file->getFilename())) {
+            if (! $this->isValidModelFile($file->getFilename())) {
                 continue;
             }
 
@@ -175,12 +184,13 @@ final class ModuleScannerService
                     $file = reset($modelFiles);
                     $moduleCode = $this->extractCode($file->getFilename());
                     $existing[$moduleCode] = $this->buildModuleDefinition($file, $subdirectory, $parentKey);
+
                     continue;
                 }
 
                 $children = $this->processDirectory($subdirectory, $newKey);
 
-                if (!empty($children)) {
+                if (! empty($children)) {
                     $existing[$code] = [
                         'code' => $newKey,
                         'type' => 'directory',
@@ -217,7 +227,7 @@ final class ModuleScannerService
 
     private function extractFields(string $className): array
     {
-        if (!$this->isValidModel($className)) {
+        if (! $this->isValidModel($className)) {
             return [];
         }
 
@@ -236,6 +246,7 @@ final class ModuleScannerService
             return $fields;
         } catch (ReflectionException $e) {
             Log::error("Failed to extract fields: {$className}", ['exception' => $e->getMessage()]);
+
             return [];
         }
     }
@@ -278,9 +289,11 @@ final class ModuleScannerService
             $field['relationship'] = $instance->relationship ?? '';
             $field['options'] = $this->normalizeOptions($instance->options ?? []);
             $field['sort_order'] = $instance->sort_order ?? 0;
+
             return true;
         } catch (Throwable $e) {
-            Log::warning("Failed to apply FormField attribute", ['exception' => $e->getMessage()]);
+            Log::warning('Failed to apply FormField attribute', ['exception' => $e->getMessage()]);
+
             return false;
         }
     }
@@ -297,17 +310,18 @@ final class ModuleScannerService
             $instance = $attributes[0]->newInstance();
             $field['tables'] = $instance->actions ?? [];
 
-            if (!empty($instance->sorting)) {
+            if (! empty($instance->sorting)) {
                 $field['sorting'] = $instance->sorting;
             }
 
-            if (!empty($instance->primaryKey)) {
+            if (! empty($instance->primaryKey)) {
                 $field['meta']['primary_key'] = $instance->primaryKey;
             }
 
             return true;
         } catch (Throwable $e) {
-            Log::warning("Failed to apply TableColumn attribute", ['exception' => $e->getMessage()]);
+            Log::warning('Failed to apply TableColumn attribute', ['exception' => $e->getMessage()]);
+
             return false;
         }
     }
@@ -323,16 +337,18 @@ final class ModuleScannerService
         try {
             $instance = $attributes[0]->newInstance();
             $field['actions'] = $instance->actions ?? [];
+
             return true;
         } catch (Throwable $e) {
-            Log::warning("Failed to apply ActionType attribute", ['exception' => $e->getMessage()]);
+            Log::warning('Failed to apply ActionType attribute', ['exception' => $e->getMessage()]);
+
             return false;
         }
     }
 
     private function normalizeOptions(array $options): array
     {
-        return collect($options)->map(fn($label, $key) => [
+        return collect($options)->map(fn ($label, $key) => [
             'value' => (string) $key,
             'label' => (string) $label,
         ])->values()->toArray();
@@ -340,7 +356,7 @@ final class ModuleScannerService
 
     private function extractActions(string $className): array
     {
-        if (!$this->isValidModel($className)) {
+        if (! $this->isValidModel($className)) {
             return [];
         }
 
@@ -353,6 +369,7 @@ final class ModuleScannerService
             return $this->attachValidation($className, $actions);
         } catch (Throwable $e) {
             Log::error("Failed to extract actions: {$className}", ['exception' => $e->getMessage()]);
+
             return [];
         }
     }
@@ -369,13 +386,13 @@ final class ModuleScannerService
 
                     if (is_array($actionList)) {
                         $normalized = array_map(
-                            fn($action) => $action === 'filter' ? 'index' : $action,
+                            fn ($action) => $action === 'filter' ? 'index' : $action,
                             $actionList
                         );
                         $actions = array_merge($actions, $normalized);
                     }
                 } catch (Throwable $e) {
-                    Log::warning("Failed to collect action names", ['exception' => $e->getMessage()]);
+                    Log::warning('Failed to collect action names', ['exception' => $e->getMessage()]);
                 }
             }
         }
@@ -388,7 +405,7 @@ final class ModuleScannerService
         $actions = [];
 
         foreach ($actionNames as $name) {
-            if (empty($name) || !is_string($name)) {
+            if (empty($name) || ! is_string($name)) {
                 continue;
             }
 
@@ -407,15 +424,15 @@ final class ModuleScannerService
 
     private function buildRoute(string $base, string $action, bool $hasParam): string
     {
-        $route = '/' . $base;
+        $route = '/'.$base;
 
         if ($hasParam) {
             $modelName = basename($base);
-            $route .= '/{' . $modelName . '_id}';
+            $route .= '/{'.$modelName.'_id}';
         }
 
-        if (!array_key_exists($action, self::REST_ACTIONS)) {
-            $route .= '/' . $action;
+        if (! array_key_exists($action, self::REST_ACTIONS)) {
+            $route .= '/'.$action;
         }
 
         return $route;
@@ -436,23 +453,26 @@ final class ModuleScannerService
 
     private function buildRequestClass(string $namespace, string $model, string $action, string $suffix = ''): string
     {
-        $requestSuffix = self::REQUEST_SUFFIXES[$action] ?? Str::ucfirst($action) . 'Request';
-        return self::REQUEST_NAMESPACE . $namespace . '\\' . $model . $suffix . $requestSuffix;
+        $requestSuffix = self::REQUEST_SUFFIXES[$action] ?? Str::ucfirst($action).'Request';
+
+        return self::REQUEST_NAMESPACE.$namespace.'\\'.$model.$suffix.$requestSuffix;
     }
 
     private function extractValidationRules(string $className): ?array
     {
-        if (!$this->isValidRequest($className)) {
+        if (! $this->isValidRequest($className)) {
             return null;
         }
 
         try {
             $instance = new $className;
+
             return [
                 'rules' => method_exists($instance, 'rules') ? $instance->rules() : [],
             ];
         } catch (Throwable $e) {
             Log::debug("Failed to extract validation: {$className}", ['exception' => $e->getMessage()]);
+
             return null;
         }
     }
@@ -465,12 +485,13 @@ final class ModuleScannerService
     private function getRequestPath(string $className): string
     {
         $relative = str_replace(['App\\', '\\'], ['', '/'], $className);
-        return app_path($relative . self::FILE_EXTENSION);
+
+        return app_path($relative.self::FILE_EXTENSION);
     }
 
     private function extractRelations(string $className): array
     {
-        if (!$this->isValidModel($className)) {
+        if (! $this->isValidModel($className)) {
             return [];
         }
 
@@ -480,7 +501,7 @@ final class ModuleScannerService
             $relations = [];
 
             foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-                if (!$this->isValidRelationMethod($method, $className, $instance)) {
+                if (! $this->isValidRelationMethod($method, $className, $instance)) {
                     continue;
                 }
 
@@ -499,9 +520,11 @@ final class ModuleScannerService
             }
 
             ksort($relations);
+
             return $relations;
         } catch (Throwable $e) {
             Log::error("Failed to extract relations: {$className}", ['exception' => $e->getMessage()]);
+
             return [];
         }
     }
@@ -546,9 +569,9 @@ final class ModuleScannerService
         $base = $this->buildRouteBase($parentClass);
         $relation = Str::snake($method);
         $parentName = $this->getModelName($parentClass);
-        $parentId = Str::snake($parentName) . '_id';
+        $parentId = Str::snake($parentName).'_id';
 
-        return $base . '/{' . $parentId . '}/' . $relation;
+        return $base.'/{'.$parentId.'}/'.$relation;
     }
 
     private function buildRelationActions(string $parentClass, string $method, string $relatedClass): array
@@ -564,23 +587,23 @@ final class ModuleScannerService
             $base = $this->buildRouteBase($parentClass);
             $relation = Str::snake($method);
             $parentName = $this->getModelName($parentClass);
-            $parentId = Str::snake($parentName) . '_id';
-            $relationId = $relation . '_id';
-            $routeBase = $base . '/{' . $parentId . '}/' . $relation;
+            $parentId = Str::snake($parentName).'_id';
+            $relationId = $relation.'_id';
+            $routeBase = $base.'/{'.$parentId.'}/'.$relation;
 
             $actions = [];
 
             foreach ($actionNames as $actionName) {
                 $config = self::REST_ACTIONS[$actionName] ?? ['method' => 'POST', 'has_param' => true];
 
-                $route = '/' . $routeBase;
+                $route = '/'.$routeBase;
 
                 if ($config['has_param']) {
-                    $route .= '/{' . $relationId . '}';
+                    $route .= '/{'.$relationId.'}';
                 }
 
-                if (!array_key_exists($actionName, self::REST_ACTIONS)) {
-                    $route .= '/' . $actionName;
+                if (! array_key_exists($actionName, self::REST_ACTIONS)) {
+                    $route .= '/'.$actionName;
                 }
 
                 $actions[$actionName] = [
@@ -620,6 +643,7 @@ final class ModuleScannerService
     {
         $base = class_basename($className);
         $clean = str_ireplace(self::MODEL_SUFFIX, '', $base);
+
         return Str::snake($clean);
     }
 
@@ -633,6 +657,7 @@ final class ModuleScannerService
         $relative = Str::after($className, self::BASE_NAMESPACE);
         $parts = explode('\\', $relative);
         array_pop($parts);
+
         return implode('\\', $parts);
     }
 
@@ -646,42 +671,45 @@ final class ModuleScannerService
             array_pop($parts);
         }
 
-        return collect($parts)->map(fn($part) => Str::snake($part))->implode('/');
+        return collect($parts)->map(fn ($part) => Str::snake($part))->implode('/');
     }
 
     private function buildFullRoute(string $pattern): string
     {
         $baseUrl = rtrim(config('app.url', 'http://localhost'), '/');
-        return $baseUrl . self::API_PREFIX . $pattern;
+
+        return $baseUrl.self::API_PREFIX.$pattern;
     }
 
     private function isValidModel(string $className): bool
     {
-        if (!class_exists($className)) {
+        if (! class_exists($className)) {
             return false;
         }
 
         $reflection = new ReflectionClass($className);
-        return $reflection->isSubclassOf(Model::class) && !$reflection->isAbstract() && !$reflection->isInterface();
+
+        return $reflection->isSubclassOf(Model::class) && ! $reflection->isAbstract() && ! $reflection->isInterface();
     }
 
     private function collectValidModelFiles(string $path): array
     {
         return array_filter(
             $this->getFiles($path),
-            fn(SplFileInfo $file) => $this->isValidModelFile($file->getFilename())
+            fn (SplFileInfo $file) => $this->isValidModelFile($file->getFilename())
         );
     }
 
     private function isValidModelFile(string $filename): bool
     {
-        return preg_match(self::MODEL_PATTERN, $filename) && !in_array($filename, self::EXCLUDED_FILES, true);
+        return preg_match(self::MODEL_PATTERN, $filename) && ! in_array($filename, self::EXCLUDED_FILES, true);
     }
 
     private function extractCode(string $filename): string
     {
         $base = pathinfo($filename, PATHINFO_FILENAME);
         $clean = str_replace(self::MODEL_SUFFIX, '', $base);
+
         return Str::snake($clean);
     }
 
@@ -691,7 +719,7 @@ final class ModuleScannerService
         $namespace = trim(str_replace(['/', '\\'], '\\', $relative), '\\');
         $class = pathinfo($filename, PATHINFO_FILENAME);
 
-        return self::BASE_NAMESPACE . ($namespace ? $namespace . '\\' : '') . $class;
+        return self::BASE_NAMESPACE.($namespace ? $namespace.'\\' : '').$class;
     }
 
     private function buildKey(string $parent, string $current): string
@@ -707,11 +735,12 @@ final class ModuleScannerService
 
         $file = reset($modelFiles);
 
-        if (!$file instanceof SplFileInfo) {
+        if (! $file instanceof SplFileInfo) {
             return false;
         }
 
-        $base = str_replace(self::MODEL_SUFFIX . self::FILE_EXTENSION, '', $file->getFilename());
+        $base = str_replace(self::MODEL_SUFFIX.self::FILE_EXTENSION, '', $file->getFilename());
+
         return strcasecmp($base, $directoryName) === 0;
     }
 
@@ -721,6 +750,7 @@ final class ModuleScannerService
             return File::directories($path);
         } catch (Throwable $e) {
             Log::error("Failed to read subdirectories: {$path}", ['exception' => $e->getMessage()]);
+
             return [];
         }
     }
@@ -731,6 +761,7 @@ final class ModuleScannerService
             return File::files($path);
         } catch (Throwable $e) {
             Log::error("Failed to read files: {$path}", ['exception' => $e->getMessage()]);
+
             return [];
         }
     }

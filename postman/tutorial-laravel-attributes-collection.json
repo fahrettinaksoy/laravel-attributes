@@ -1,7 +1,7 @@
 {
     "info": {
         "name": "tutorial-laravel-attributes",
-        "description": "TransferCab API Collection\n\nThis collection contains all API endpoints for the TransferCab platform.\n\nFeatures:\n- Dynamic model-based endpoints\n- Automatic CRUD operations\n- Filtering, sorting, field selection, includes\n- Raw JSON body generation (typed) for Create\/Update\n- Bearer token authentication: enabled\n\nGenerated on: 2025-12-03 13:56:19",
+        "description": "TransferCab API Collection\n\nThis collection contains all API endpoints for the TransferCab platform.\n\nFeatures:\n- Dynamic model-based endpoints\n- Automatic CRUD operations\n- Filtering, sorting, field selection, includes\n- Raw JSON body generation (typed) for Create\/Update\n- Bearer token authentication: disabled\n\nGenerated on: 2025-12-03 18:17:56",
         "version": "1.0.0",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -23,11 +23,6 @@
                                             {
                                                 "key": "Accept",
                                                 "value": "application\/json",
-                                                "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
                                                 "type": "text"
                                             }
                                         ],
@@ -156,11 +151,6 @@
                                                 "key": "Content-Type",
                                                 "value": "application\/json",
                                                 "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
-                                                "type": "text"
                                             }
                                         ],
                                         "url": {
@@ -188,11 +178,6 @@
                                             {
                                                 "key": "Accept",
                                                 "value": "application\/json",
-                                                "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
                                                 "type": "text"
                                             }
                                         ],
@@ -231,11 +216,6 @@
                                                 "key": "Content-Type",
                                                 "value": "application\/json",
                                                 "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
-                                                "type": "text"
                                             }
                                         ],
                                         "url": {
@@ -271,11 +251,6 @@
                                             {
                                                 "key": "Accept",
                                                 "value": "application\/json",
-                                                "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
                                                 "type": "text"
                                             }
                                         ],
@@ -314,11 +289,6 @@
                                                             {
                                                                 "key": "Accept",
                                                                 "value": "application\/json",
-                                                                "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
                                                                 "type": "text"
                                                             }
                                                         ],
@@ -413,11 +383,6 @@
                                                                 "key": "Content-Type",
                                                                 "value": "application\/json",
                                                                 "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
-                                                                "type": "text"
                                                             }
                                                         ],
                                                         "url": {
@@ -447,11 +412,6 @@
                                                             {
                                                                 "key": "Accept",
                                                                 "value": "application\/json",
-                                                                "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
                                                                 "type": "text"
                                                             }
                                                         ],
@@ -492,11 +452,6 @@
                                                                 "key": "Content-Type",
                                                                 "value": "application\/json",
                                                                 "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
-                                                                "type": "text"
                                                             }
                                                         ],
                                                         "url": {
@@ -534,11 +489,6 @@
                                                             {
                                                                 "key": "Accept",
                                                                 "value": "application\/json",
-                                                                "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
                                                                 "type": "text"
                                                             }
                                                         ],
@@ -579,11 +529,6 @@
                                                                             {
                                                                                 "key": "Accept",
                                                                                 "value": "application\/json",
-                                                                                "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
                                                                                 "type": "text"
                                                                             }
                                                                         ],
@@ -680,11 +625,6 @@
                                                                                 "key": "Content-Type",
                                                                                 "value": "application\/json",
                                                                                 "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
-                                                                                "type": "text"
                                                                             }
                                                                         ],
                                                                         "url": {
@@ -716,11 +656,6 @@
                                                                             {
                                                                                 "key": "Accept",
                                                                                 "value": "application\/json",
-                                                                                "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
                                                                                 "type": "text"
                                                                             }
                                                                         ],
@@ -763,11 +698,6 @@
                                                                                 "key": "Content-Type",
                                                                                 "value": "application\/json",
                                                                                 "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
-                                                                                "type": "text"
                                                                             }
                                                                         ],
                                                                         "url": {
@@ -807,11 +737,6 @@
                                                                             {
                                                                                 "key": "Accept",
                                                                                 "value": "application\/json",
-                                                                                "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
                                                                                 "type": "text"
                                                                             }
                                                                         ],
@@ -860,11 +785,6 @@
                                                             {
                                                                 "key": "Accept",
                                                                 "value": "application\/json",
-                                                                "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
                                                                 "type": "text"
                                                             }
                                                         ],
@@ -971,11 +891,6 @@
                                                                 "key": "Content-Type",
                                                                 "value": "application\/json",
                                                                 "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
-                                                                "type": "text"
                                                             }
                                                         ],
                                                         "url": {
@@ -1005,11 +920,6 @@
                                                             {
                                                                 "key": "Accept",
                                                                 "value": "application\/json",
-                                                                "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
                                                                 "type": "text"
                                                             }
                                                         ],
@@ -1050,11 +960,6 @@
                                                                 "key": "Content-Type",
                                                                 "value": "application\/json",
                                                                 "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
-                                                                "type": "text"
                                                             }
                                                         ],
                                                         "url": {
@@ -1092,11 +997,6 @@
                                                             {
                                                                 "key": "Accept",
                                                                 "value": "application\/json",
-                                                                "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
                                                                 "type": "text"
                                                             }
                                                         ],
@@ -1137,11 +1037,6 @@
                                                             {
                                                                 "key": "Accept",
                                                                 "value": "application\/json",
-                                                                "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
                                                                 "type": "text"
                                                             }
                                                         ],
@@ -1236,11 +1131,6 @@
                                                                 "key": "Content-Type",
                                                                 "value": "application\/json",
                                                                 "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
-                                                                "type": "text"
                                                             }
                                                         ],
                                                         "url": {
@@ -1270,11 +1160,6 @@
                                                             {
                                                                 "key": "Accept",
                                                                 "value": "application\/json",
-                                                                "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
                                                                 "type": "text"
                                                             }
                                                         ],
@@ -1315,11 +1200,6 @@
                                                                 "key": "Content-Type",
                                                                 "value": "application\/json",
                                                                 "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
-                                                                "type": "text"
                                                             }
                                                         ],
                                                         "url": {
@@ -1357,11 +1237,6 @@
                                                             {
                                                                 "key": "Accept",
                                                                 "value": "application\/json",
-                                                                "type": "text"
-                                                            },
-                                                            {
-                                                                "key": "Authorization",
-                                                                "value": "Bearer {{authToken}}",
                                                                 "type": "text"
                                                             }
                                                         ],
@@ -1402,11 +1277,6 @@
                                                                             {
                                                                                 "key": "Accept",
                                                                                 "value": "application\/json",
-                                                                                "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
                                                                                 "type": "text"
                                                                             }
                                                                         ],
@@ -1503,11 +1373,6 @@
                                                                                 "key": "Content-Type",
                                                                                 "value": "application\/json",
                                                                                 "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
-                                                                                "type": "text"
                                                                             }
                                                                         ],
                                                                         "url": {
@@ -1539,11 +1404,6 @@
                                                                             {
                                                                                 "key": "Accept",
                                                                                 "value": "application\/json",
-                                                                                "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
                                                                                 "type": "text"
                                                                             }
                                                                         ],
@@ -1586,11 +1446,6 @@
                                                                                 "key": "Content-Type",
                                                                                 "value": "application\/json",
                                                                                 "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
-                                                                                "type": "text"
                                                                             }
                                                                         ],
                                                                         "url": {
@@ -1630,11 +1485,6 @@
                                                                             {
                                                                                 "key": "Accept",
                                                                                 "value": "application\/json",
-                                                                                "type": "text"
-                                                                            },
-                                                                            {
-                                                                                "key": "Authorization",
-                                                                                "value": "Bearer {{authToken}}",
                                                                                 "type": "text"
                                                                             }
                                                                         ],
@@ -1689,11 +1539,6 @@
                                             {
                                                 "key": "Accept",
                                                 "value": "application\/json",
-                                                "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
                                                 "type": "text"
                                             }
                                         ],
@@ -1816,11 +1661,6 @@
                                                 "key": "Content-Type",
                                                 "value": "application\/json",
                                                 "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
-                                                "type": "text"
                                             }
                                         ],
                                         "url": {
@@ -1848,11 +1688,6 @@
                                             {
                                                 "key": "Accept",
                                                 "value": "application\/json",
-                                                "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
                                                 "type": "text"
                                             }
                                         ],
@@ -1891,11 +1726,6 @@
                                                 "key": "Content-Type",
                                                 "value": "application\/json",
                                                 "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
-                                                "type": "text"
                                             }
                                         ],
                                         "url": {
@@ -1931,11 +1761,6 @@
                                             {
                                                 "key": "Accept",
                                                 "value": "application\/json",
-                                                "type": "text"
-                                            },
-                                            {
-                                                "key": "Authorization",
-                                                "value": "Bearer {{authToken}}",
                                                 "type": "text"
                                             }
                                         ],
@@ -1983,11 +1808,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -2117,11 +1937,6 @@
                                                         "key": "Content-Type",
                                                         "value": "application\/json",
                                                         "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
-                                                        "type": "text"
                                                     }
                                                 ],
                                                 "url": {
@@ -2150,11 +1965,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -2194,11 +2004,6 @@
                                                         "key": "Content-Type",
                                                         "value": "application\/json",
                                                         "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
-                                                        "type": "text"
                                                     }
                                                 ],
                                                 "url": {
@@ -2235,11 +2040,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -2279,11 +2079,6 @@
                                                                     {
                                                                         "key": "Accept",
                                                                         "value": "application\/json",
-                                                                        "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
                                                                         "type": "text"
                                                                     }
                                                                 ],
@@ -2415,11 +2210,6 @@
                                                                         "key": "Content-Type",
                                                                         "value": "application\/json",
                                                                         "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
-                                                                        "type": "text"
                                                                     }
                                                                 ],
                                                                 "url": {
@@ -2450,11 +2240,6 @@
                                                                     {
                                                                         "key": "Accept",
                                                                         "value": "application\/json",
-                                                                        "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
                                                                         "type": "text"
                                                                     }
                                                                 ],
@@ -2496,11 +2281,6 @@
                                                                         "key": "Content-Type",
                                                                         "value": "application\/json",
                                                                         "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
-                                                                        "type": "text"
                                                                     }
                                                                 ],
                                                                 "url": {
@@ -2539,11 +2319,6 @@
                                                                     {
                                                                         "key": "Accept",
                                                                         "value": "application\/json",
-                                                                        "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
                                                                         "type": "text"
                                                                     }
                                                                 ],
@@ -2591,11 +2366,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -2725,11 +2495,6 @@
                                                         "key": "Content-Type",
                                                         "value": "application\/json",
                                                         "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
-                                                        "type": "text"
                                                     }
                                                 ],
                                                 "url": {
@@ -2758,11 +2523,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -2802,11 +2562,6 @@
                                                         "key": "Content-Type",
                                                         "value": "application\/json",
                                                         "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
-                                                        "type": "text"
                                                     }
                                                 ],
                                                 "url": {
@@ -2843,11 +2598,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -2887,11 +2637,6 @@
                                                                     {
                                                                         "key": "Accept",
                                                                         "value": "application\/json",
-                                                                        "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
                                                                         "type": "text"
                                                                     }
                                                                 ],
@@ -3023,11 +2768,6 @@
                                                                         "key": "Content-Type",
                                                                         "value": "application\/json",
                                                                         "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
-                                                                        "type": "text"
                                                                     }
                                                                 ],
                                                                 "url": {
@@ -3058,11 +2798,6 @@
                                                                     {
                                                                         "key": "Accept",
                                                                         "value": "application\/json",
-                                                                        "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
                                                                         "type": "text"
                                                                     }
                                                                 ],
@@ -3104,11 +2839,6 @@
                                                                         "key": "Content-Type",
                                                                         "value": "application\/json",
                                                                         "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
-                                                                        "type": "text"
                                                                     }
                                                                 ],
                                                                 "url": {
@@ -3147,11 +2877,6 @@
                                                                     {
                                                                         "key": "Accept",
                                                                         "value": "application\/json",
-                                                                        "type": "text"
-                                                                    },
-                                                                    {
-                                                                        "key": "Authorization",
-                                                                        "value": "Bearer {{authToken}}",
                                                                         "type": "text"
                                                                     }
                                                                 ],
@@ -3205,11 +2930,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -3363,11 +3083,6 @@
                                                         "key": "Content-Type",
                                                         "value": "application\/json",
                                                         "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
-                                                        "type": "text"
                                                     }
                                                 ],
                                                 "url": {
@@ -3396,11 +3111,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -3440,11 +3150,6 @@
                                                         "key": "Content-Type",
                                                         "value": "application\/json",
                                                         "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
-                                                        "type": "text"
                                                     }
                                                 ],
                                                 "url": {
@@ -3481,11 +3186,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -3525,11 +3225,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -3659,11 +3354,6 @@
                                                         "key": "Content-Type",
                                                         "value": "application\/json",
                                                         "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
-                                                        "type": "text"
                                                     }
                                                 ],
                                                 "url": {
@@ -3692,11 +3382,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -3736,11 +3421,6 @@
                                                         "key": "Content-Type",
                                                         "value": "application\/json",
                                                         "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
-                                                        "type": "text"
                                                     }
                                                 ],
                                                 "url": {
@@ -3777,11 +3457,6 @@
                                                     {
                                                         "key": "Accept",
                                                         "value": "application\/json",
-                                                        "type": "text"
-                                                    },
-                                                    {
-                                                        "key": "Authorization",
-                                                        "value": "Bearer {{authToken}}",
                                                         "type": "text"
                                                     }
                                                 ],
@@ -3845,137 +3520,7 @@
                     ]
                 }
             ],
-            "description": "All API endpoints (Models + Routes)",
-            "auth": {
-                "type": "bearer",
-                "bearer": [
-                    {
-                        "key": "token",
-                        "value": "{{authToken}}",
-                        "type": "string"
-                    }
-                ]
-            },
-            "event": [
-                {
-                    "listen": "prerequest",
-                    "script": {
-                        "exec": [
-                            "const protocol = pm.environment.get(\"protocol\");",
-                            "const subdomain = pm.environment.get(\"subDomain\");",
-                            "const domain = pm.environment.get(\"domain\");",
-                            "const path = pm.environment.get(\"path\");",
-                            "const version = pm.environment.get(\"version\");",
-                            "",
-                            "const baseUrl = `${protocol}${subdomain}${domain}${path}${version}`;",
-                            "",
-                            "if (!pm.environment.get(\"authToken\")) {",
-                            "  pm.sendRequest({",
-                            "    url: `${baseUrl}\/auth\/login`,",
-                            "    method: \"POST\",",
-                            "    header: { \"Content-Type\": \"application\/json\" },",
-                            "    body: {",
-                            "      mode: \"raw\",",
-                            "      raw: JSON.stringify({",
-                            "        email: pm.environment.get(\"authEmail\"),",
-                            "        password: pm.environment.get(\"authPassword\"),",
-                            "        device_name: \"postman\"",
-                            "      })",
-                            "    }",
-                            "  }, (err, res) => {",
-                            "    if (err) { console.error(\"Token isteğinde hata:\", err); return; }",
-                            "    let json;",
-                            "    try { json = res.json(); } catch (e) { console.error(\"Geçersiz JSON:\", res.text()); return; }",
-                            "    if (json.token) {",
-                            "      pm.environment.set(\"authToken\", json.token);",
-                            "      postman.setNextRequest(pm.info.requestName);",
-                            "    } else { console.error(\"Token alınamadı:\", json); }",
-                            "  });",
-                            "}"
-                        ],
-                        "type": "text\/javascript"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Auth",
-            "description": "Authentication endpoints",
-            "item": [
-                {
-                    "name": "Login",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Accept",
-                                "value": "application\/json",
-                                "type": "text"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{apiURL}}{{version}}\/auth\/login",
-                            "host": [
-                                "{{apiURL}}{{version}}"
-                            ],
-                            "path": [
-                                "auth",
-                                "login"
-                            ]
-                        },
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"email\":\"{{authEmail}}\",\"password\":\"{{authPassword}}\",\"device_name\":\"postman\"}"
-                        },
-                        "description": "User login"
-                    }
-                },
-                {
-                    "name": "Register",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Accept",
-                                "value": "application\/json",
-                                "type": "text"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json",
-                                "type": "text"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{apiURL}}{{version}}\/auth\/register",
-                            "host": [
-                                "{{apiURL}}{{version}}"
-                            ],
-                            "path": [
-                                "auth",
-                                "register"
-                            ]
-                        },
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"first_name\":\"{{authNameFirst}}\",\"last_name\":\"{{authNameLast}}\",\"email\":\"{{authEmail}}\",\"password\":\"{{authPassword}}\",\"password_confirmation\":\"{{authPassword}}\"}"
-                        },
-                        "description": "User registration"
-                    }
-                }
-            ]
-        }
-    ],
-    "variable": [
-        {
-            "key": "authToken",
-            "value": "your_bearer_token_here",
-            "type": "string"
+            "description": "All API endpoints (Models + Routes)"
         }
     ]
 }

@@ -15,7 +15,6 @@ use Database\Seeders\Definition\Catalog\Category\CategoryModelSeeder;
 use Database\Seeders\Definition\Catalog\Category\Relations\CategoryTranslation\CategoryTranslationModelSeeder;
 use Database\Seeders\Definition\Localization\Currency\CurrencyModelSeeder;
 use Database\Seeders\Definition\Localization\Language\LanguageModelSeeder;
-
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 

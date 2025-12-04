@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Localization\Currency;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Definition\Localization\Currency\CurrencyField;
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
@@ -22,9 +21,10 @@ class CurrencyModel extends BaseModel
     use CurrencyField;
 
     public $table = 'def_loc_currency';
+
     public $primaryKey = 'currency_id';
+
     public string $defaultSorting = '-currency_id';
 
     public array $allowedRelations = [];
-
 }

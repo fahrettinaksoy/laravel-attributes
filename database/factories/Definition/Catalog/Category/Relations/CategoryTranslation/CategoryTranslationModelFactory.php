@@ -18,9 +18,9 @@ class CategoryTranslationModelFactory extends Factory
     {
         return [
             'uuid' => $this->faker->uuid(),
-            'code' => $this->faker->unique()->bothify("CODE-####"),
+            'code' => $this->faker->unique()->bothify('CODE-####'),
             'category_id' => $this->faker->numberBetween(1, 100),
-            'language_code' => $this->faker->bothify("CODE-####"),
+            'language_code' => $this->faker->bothify('CODE-####'),
             'name' => $this->faker->words(3, true),
             'summary' => $this->faker->sentence(10),
             'description' => $this->faker->realText(200),

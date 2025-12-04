@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Localization\Language;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Definition\Localization\Language\LanguageField;
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
@@ -22,9 +21,10 @@ class LanguageModel extends BaseModel
     use LanguageField;
 
     public $table = 'def_loc_language';
+
     public $primaryKey = 'language_id';
+
     public string $defaultSorting = '-language_id';
 
     public array $allowedRelations = [];
-
 }

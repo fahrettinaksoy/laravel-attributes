@@ -311,7 +311,7 @@ class BaseResource extends JsonResource
 
     protected function getUpdatedAtTimestamp(): ?int
     {
-        if (!isset($this->resource->updated_at)) {
+        if (! isset($this->resource->updated_at)) {
             return null;
         }
 
@@ -329,6 +329,7 @@ class BaseResource extends JsonResource
                     'value' => $updatedAt,
                     'resource_type' => class_basename($this->resource),
                 ]);
+
                 return null;
             }
         }
@@ -349,7 +350,7 @@ class BaseResource extends JsonResource
     {
         return [
             'self' => $this->getSelfLink($request),
-            //'type' => $this->getTypeLink(),
+            // 'type' => $this->getTypeLink(),
         ];
     }
 

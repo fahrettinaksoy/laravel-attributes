@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Catalog\Category;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Definition\Catalog\Category\CategoryField;
-
-use App\Models\Definition\Catalog\Category\CategoryModel;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 use App\Models\Definition\Catalog\Category\Relations\CategoryTranslation\CategoryTranslationModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
@@ -26,7 +24,9 @@ class CategoryModel extends BaseModel
     use CategoryField;
 
     public $table = 'def_cat_category';
+
     public $primaryKey = 'category_id';
+
     public string $defaultSorting = '-category_id';
 
     public array $allowedRelations = [

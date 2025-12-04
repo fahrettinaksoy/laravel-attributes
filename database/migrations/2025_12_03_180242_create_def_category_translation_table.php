@@ -4,14 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        Schema::create('cat_product_translation', function (Blueprint $table) {
-            $table->bigIncrements('product_translation_id');
-            $table->unsignedBigInteger('product_id');
-            $table->uuid('uuid')->unique();
+        Schema::create('def_category_translation', function (Blueprint $table) {
+            $table->bigIncrements('category_translation_id');
+            $table->string('uuid')->unique();
             $table->string('code')->unique();
+            $table->unsignedBigInteger('category_id');
+            $table->string('language_code');
             $table->string('name');
             $table->string('summary')->nullable();
             $table->string('description')->nullable();
@@ -28,6 +30,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('cat_product_translation');
+        Schema::dropIfExists('def_category_translation');
     }
 };

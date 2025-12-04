@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models\Catalog\Product\Relations\ProductVideo;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Catalog\Product\Relations\ProductVideo\ProductVideoField;
-
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 use App\Models\Catalog\Product\ProductModel;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Catalog\Product\Relations\ProductVideo\Relations\ProductVideoTranslation\ProductVideoTranslationModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
@@ -26,7 +25,9 @@ class ProductVideoModel extends BaseModel
     use ProductVideoField;
 
     public $table = 'cat_product_video';
+
     public $primaryKey = 'product_video_id';
+
     public string $defaultSorting = '-product_video_id';
 
     public array $allowedRelations = [

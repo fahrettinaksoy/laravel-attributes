@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Catalog\Brand\Relations\BrandTranslation;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Definition\Catalog\Brand\Relations\BrandTranslation\BrandTranslationField;
-
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 use App\Models\Definition\Catalog\Brand\BrandModel;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Definition\Localization\Language\LanguageModel;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
@@ -25,7 +24,9 @@ class BrandTranslationModel extends BaseModel
     use BrandTranslationField;
 
     public $table = 'def_brand_translation';
+
     public $primaryKey = 'brand_translation_id';
+
     public string $defaultSorting = '-brand_translation_id';
 
     public array $allowedRelations = [

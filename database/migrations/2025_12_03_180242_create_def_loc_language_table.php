@@ -4,19 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        Schema::create('cat_review', function (Blueprint $table) {
-            $table->bigIncrements('review_id');
+        Schema::create('def_loc_language', function (Blueprint $table) {
+            $table->bigIncrements('language_id');
             $table->string('uuid')->unique();
             $table->string('code')->unique();
-            $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('account_id')->nullable()->default('0');
-            $table->string('author');
-            $table->string('content');
-            $table->unsignedTinyInteger('rating')->default('0');
-            $table->boolean('status')->default(true);
+            $table->string('name');
+            $table->string('description')->nullable();
+            $table->string('flag_path');
+            $table->string('direction');
+            $table->string('directory');
+            $table->string('locale');
+            $table->unsignedInteger('sort_order')->default('0');
+            $table->boolean('status')->nullable()->default(true);
             $table->timestamp('created_at')->useCurrent();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
@@ -26,6 +29,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('cat_review');
+        Schema::dropIfExists('def_loc_language');
     }
 };

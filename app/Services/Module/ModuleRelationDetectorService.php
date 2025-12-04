@@ -17,7 +17,7 @@ final class ModuleRelationDetectorService
     {
         $class = get_class($model);
 
-        if (!isset($this->cache[$class])) {
+        if (! isset($this->cache[$class])) {
             $this->cache[$class] = $this->detectHasManyRelations($model);
         }
 
@@ -40,7 +40,8 @@ final class ModuleRelationDetectorService
                 if ($relation instanceof HasMany) {
                     $methods[] = $method->getName();
                 }
-            } catch (Throwable $e) {}
+            } catch (Throwable $e) {
+            }
         }
 
         return $methods;

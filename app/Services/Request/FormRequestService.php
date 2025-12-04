@@ -415,7 +415,7 @@ final class FormRequestService
     ): ValidationException {
         $errors = collect($exception->errors())
             ->mapWithKeys(fn ($messages, $field) => [
-                "{$relationName}.{$index}.{$field}" => $messages
+                "{$relationName}.{$index}.{$field}" => $messages,
             ])
             ->toArray();
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Localization\Language;
 
+use App\Attributes\Model\ActionType;
 use App\Attributes\Model\FormField;
 use App\Attributes\Model\TableColumn;
-use App\Attributes\Model\ActionType;
 
 trait LanguageField
 {
@@ -40,7 +40,7 @@ trait LanguageField
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $flag_path;
 
-    #[FormField(type: 'select', required: false, options: [ 'ltr' => 'Left-To-Right', 'rtl' => 'Right-To-Left', ], sort_order: 7)]
+    #[FormField(type: 'select', required: false, options: ['ltr' => 'Left-To-Right', 'rtl' => 'Right-To-Left'], sort_order: 7)]
     #[TableColumn(['filtering'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $direction;
@@ -60,7 +60,7 @@ trait LanguageField
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected int $sort_order;
 
-    #[FormField(type: 'boolean', required: false, options: [ 'true' => 'active', 'false' => 'passive', ], sort_order: 11)]
+    #[FormField(type: 'boolean', required: false, options: ['true' => 'active', 'false' => 'passive'], sort_order: 11)]
     #[TableColumn(['sorting', 'filtering', 'showing'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected ?bool $status;
@@ -70,7 +70,7 @@ trait LanguageField
     #[ActionType(['index', 'show'])]
     protected ?string $created_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'created_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 13)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'created_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 13)]
     #[TableColumn(['sorting', 'filtering', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $created_by;
@@ -80,7 +80,7 @@ trait LanguageField
     #[ActionType(['index', 'show'])]
     protected ?string $updated_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'updated_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 14)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'updated_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 14)]
     #[TableColumn(['sorting', 'filtering', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $updated_by;

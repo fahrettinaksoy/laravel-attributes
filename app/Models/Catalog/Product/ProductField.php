@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Catalog\Product;
 
+use App\Attributes\Model\ActionType;
 use App\Attributes\Model\FormField;
 use App\Attributes\Model\TableColumn;
-use App\Attributes\Model\ActionType;
 
 trait ProductField
 {
@@ -45,7 +45,7 @@ trait ProductField
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected ?int $price;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'type' => 'currency', 'route' => 'definition/localization/currency', 'fields' => [ 'id' => 'code', 'label' => 'name', ], ], sort_order: 8)]
+    #[FormField(type: 'modal', required: false, relationship: ['type' => 'currency', 'route' => 'definition/localization/currency', 'fields' => ['id' => 'code', 'label' => 'name']], sort_order: 8)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $currency_code;
@@ -60,12 +60,12 @@ trait ProductField
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $sku;
 
-    #[FormField(type: 'select', required: false, relationship: [ 'type' => 'category', 'route' => 'definition/catalog/category', 'fields' => [ 'id' => 'category_id', 'label' => 'name', ], ], sort_order: 11)]
+    #[FormField(type: 'select', required: false, relationship: ['type' => 'category', 'route' => 'definition/catalog/category', 'fields' => ['id' => 'category_id', 'label' => 'name']], sort_order: 11)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $category_id;
 
-    #[FormField(type: 'boolean', required: false, default: '1', options: [ 'true' => 'active', 'false' => 'passive', ], sort_order: 12)]
+    #[FormField(type: 'boolean', required: false, default: '1', options: ['true' => 'active', 'false' => 'passive'], sort_order: 12)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected bool $status;
@@ -75,7 +75,7 @@ trait ProductField
     #[ActionType(['index', 'show'])]
     protected ?string $created_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'created_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 14)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'created_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 14)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $created_by;
@@ -85,7 +85,7 @@ trait ProductField
     #[ActionType(['index', 'show'])]
     protected ?string $updated_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'updated_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 16)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'updated_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 16)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $updated_by;

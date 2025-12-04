@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Catalog\Product\Relations\ProductVideo\Relations\ProductVideoTranslation;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Catalog\Product\Relations\ProductVideo\Relations\ProductVideoTranslation\ProductVideoTranslationField;
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
@@ -22,9 +21,10 @@ class ProductVideoTranslationModel extends BaseModel
     use ProductVideoTranslationField;
 
     public $table = 'cat_product_video_translation';
+
     public $primaryKey = 'product_video_translation_id';
+
     public string $defaultSorting = '-product_video_translation_id';
 
     public array $allowedRelations = [];
-
 }

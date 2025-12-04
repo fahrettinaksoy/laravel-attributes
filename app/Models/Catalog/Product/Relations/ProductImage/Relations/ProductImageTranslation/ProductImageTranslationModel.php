@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Catalog\Product\Relations\ProductImage\Relations\ProductImageTranslation;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Catalog\Product\Relations\ProductImage\Relations\ProductImageTranslation\ProductImageTranslationField;
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
@@ -22,9 +21,10 @@ class ProductImageTranslationModel extends BaseModel
     use ProductImageTranslationField;
 
     public $table = 'cat_product_image_translation';
+
     public $primaryKey = 'product_image_translation_id';
+
     public string $defaultSorting = '-product_image_translation_id';
 
     public array $allowedRelations = [];
-
 }

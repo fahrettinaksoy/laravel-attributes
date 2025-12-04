@@ -24,8 +24,9 @@ class StructureModel extends Command
         foreach ($jsonFiles as $file) {
             $json = json_decode(File::get($file->getRealPath()), true);
 
-            if (!$json || !isset($json['model'])) {
+            if (! $json || ! isset($json['model'])) {
                 $this->error("⚠️ Skipped: {$file->getRelativePathname()} — missing 'model' key");
+
                 continue;
             }
 
@@ -53,7 +54,7 @@ class StructureModel extends Command
             }
         }
 
-        if ($this->option('Seeder') && !empty($this->generatedSeeders)) {
+        if ($this->option('Seeder') && ! empty($this->generatedSeeders)) {
             $this->updateDatabaseSeeder();
         }
 
@@ -64,7 +65,7 @@ class StructureModel extends Command
     {
         $relative = str_replace(['\\', '/'], '/', $file->getRelativePath());
         $segments = array_filter(explode('/', $relative));
-        $segmentsStudly = array_map(fn($s) => Str::studly($s), $segments);
+        $segmentsStudly = array_map(fn ($s) => Str::studly($s), $segments);
         $filename = pathinfo($file->getFilename(), PATHINFO_FILENAME);
         $underscoreCount = substr_count($filename, '_');
 
@@ -76,11 +77,11 @@ class StructureModel extends Command
 
             return [
                 'namespaceParts' => $segmentsStudly,
-                'modelName'      => $modelName,
-                'isRelation'     => false,
-                'segments'       => $segments,
-                'filename'       => $filename,
-                'depth'          => 0,
+                'modelName' => $modelName,
+                'isRelation' => false,
+                'segments' => $segments,
+                'filename' => $filename,
+                'depth' => 0,
             ];
         }
 
@@ -106,11 +107,11 @@ class StructureModel extends Command
 
         return [
             'namespaceParts' => $segmentsStudly,
-            'modelName'      => Str::studly($filename),
-            'isRelation'     => true,
-            'segments'       => $segments,
-            'filename'       => $filename,
-            'depth'          => $depth,
+            'modelName' => Str::studly($filename),
+            'isRelation' => true,
+            'segments' => $segments,
+            'filename' => $filename,
+            'depth' => $depth,
         ];
     }
 
@@ -119,8 +120,8 @@ class StructureModel extends Command
         $info = $this->resolveModelInfo($file);
         $namespaceParts = $info['namespaceParts'];
         $modelName = $info['modelName'];
-        $modelNamespace = 'App\\Models\\' . implode('\\', $namespaceParts);
-        $modelDir = app_path('Models/' . implode('/', $namespaceParts));
+        $modelNamespace = 'App\\Models\\'.implode('\\', $namespaceParts);
+        $modelDir = app_path('Models/'.implode('/', $namespaceParts));
         File::ensureDirectoryExists($modelDir);
 
         $table = $json['model']['table'];
@@ -139,7 +140,7 @@ class StructureModel extends Command
         $relations = $this->generateRelationshipMethods($file, $json, $info, $allFiles);
         $allowedRelationsCode = empty($relations['allowed'])
             ? '[]'
-            : "[\n        '" . implode("',\n        '", $relations['allowed']) . "',\n    ]";
+            : "[\n        '".implode("',\n        '", $relations['allowed'])."',\n    ]";
 
         $moduleUsage = "#[ModuleUsage(enabled: {$enabled}, sort_order: {$sortOrder})]";
         $moduleOperation = $this->generateOperationAttribute($json['operations'] ?? [], $info['segments'], $info['filename']);
@@ -162,7 +163,7 @@ class StructureModel extends Command
 
         foreach ($json['fields'] as $fieldName => $meta) {
             $rel = ($meta['form'] ?? [])['relationship'] ?? null;
-            if (!$rel || empty($rel['type']) || empty($rel['route']) || empty($rel['fields']['id'])) {
+            if (! $rel || empty($rel['type']) || empty($rel['route']) || empty($rel['fields']['id'])) {
                 continue;
             }
 
@@ -170,25 +171,27 @@ class StructureModel extends Command
             $allowed[] = $methodName;
 
             $relatedFqn = $this->resolveRelationshipModel($rel['route']);
-            if (!$relatedFqn) continue;
+            if (! $relatedFqn) {
+                continue;
+            }
 
             $short = class_basename($relatedFqn);
 
             $imports[] = "use {$relatedFqn};";
-            $imports[] = "use Illuminate\\Database\\Eloquent\\Relations\\HasOne;";
+            $imports[] = 'use Illuminate\\Database\\Eloquent\\Relations\\HasOne;';
 
             $foreignKey = $rel['fields']['id'];
 
             $methods[] =
                 "    public function {$methodName}(): HasOne\n    {\n".
                 "        return \$this->hasOne({$short}::class, '{$foreignKey}', '{$fieldName}');\n".
-                "    }";
+                '    }';
         }
 
         foreach ($allFiles as $pivotFile) {
             $filename = pathinfo($pivotFile->getFilename(), PATHINFO_FILENAME);
 
-            if (!Str::startsWith($filename, $baseFilename . '_')) {
+            if (! Str::startsWith($filename, $baseFilename.'_')) {
                 continue;
             }
             if (substr_count($filename, '_') !== 1) {
@@ -200,18 +203,20 @@ class StructureModel extends Command
                 continue;
             }
 
-            $childSlug = Str::after($filename, $baseFilename . '_');
-            if ($childSlug === '') continue;
+            $childSlug = Str::after($filename, $baseFilename.'_');
+            if ($childSlug === '') {
+                continue;
+            }
 
-            $pivotFqn = 'App\\Models\\' .
-                implode('\\', $pivotInfo['namespaceParts']) .
-                '\\' .
-                $pivotInfo['modelName'] . 'Model';
+            $pivotFqn = 'App\\Models\\'.
+                implode('\\', $pivotInfo['namespaceParts']).
+                '\\'.
+                $pivotInfo['modelName'].'Model';
 
-            $pivotShort = $pivotInfo['modelName'] . 'Model';
+            $pivotShort = $pivotInfo['modelName'].'Model';
 
             $imports[] = "use {$pivotFqn};";
-            $imports[] = "use Illuminate\\Database\\Eloquent\\Relations\\HasMany;";
+            $imports[] = 'use Illuminate\\Database\\Eloquent\\Relations\\HasMany;';
 
             $methodName = Str::camel(Str::plural($childSlug));
 
@@ -220,31 +225,39 @@ class StructureModel extends Command
             $methods[] =
                 "    public function {$methodName}(): HasMany\n    {\n".
                 "        return \$this->hasMany({$pivotShort}::class, '{$primaryKey}', '{$primaryKey}');\n".
-                "    }";
+                '    }';
         }
 
         foreach ($allFiles as $childFile) {
             $childName = pathinfo($childFile->getFilename(), PATHINFO_FILENAME);
 
-            if (!Str::startsWith($childName, $baseFilename . '_')) continue;
-            if (substr_count($childName, '_') !== 2) continue;
+            if (! Str::startsWith($childName, $baseFilename.'_')) {
+                continue;
+            }
+            if (substr_count($childName, '_') !== 2) {
+                continue;
+            }
 
-            if ($info['depth'] !== 1) continue;
+            if ($info['depth'] !== 1) {
+                continue;
+            }
 
-            $childSlug = Str::after($childName, $baseFilename . '_');
-            if ($childSlug === '') continue;
+            $childSlug = Str::after($childName, $baseFilename.'_');
+            if ($childSlug === '') {
+                continue;
+            }
 
             $childInfo = $this->resolveModelInfo($childFile);
 
-            $childFqn = 'App\\Models\\' .
-                implode('\\', $childInfo['namespaceParts']) .
-                '\\' .
-                $childInfo['modelName'] . 'Model';
+            $childFqn = 'App\\Models\\'.
+                implode('\\', $childInfo['namespaceParts']).
+                '\\'.
+                $childInfo['modelName'].'Model';
 
-            $childShort = $childInfo['modelName'] . 'Model';
+            $childShort = $childInfo['modelName'].'Model';
 
             $imports[] = "use {$childFqn};";
-            $imports[] = "use Illuminate\\Database\\Eloquent\\Relations\\HasMany;";
+            $imports[] = 'use Illuminate\\Database\\Eloquent\\Relations\\HasMany;';
 
             $methodName = Str::camel(Str::plural($childSlug));
 
@@ -253,12 +266,12 @@ class StructureModel extends Command
             $methods[] =
                 "    public function {$methodName}(): HasMany\n    {\n".
                 "        return \$this->hasMany({$childShort}::class, '{$primaryKey}', '{$primaryKey}');\n".
-                "    }";
+                '    }';
         }
 
         return [
-            'imports' => empty($imports = array_unique($imports)) ? '' : implode("\n", $imports) . "\n",
-            'methods' => empty($methods) ? '' : implode("\n\n", $methods) . "\n",
+            'imports' => empty($imports = array_unique($imports)) ? '' : implode("\n", $imports)."\n",
+            'methods' => empty($methods) ? '' : implode("\n\n", $methods)."\n",
             'allowed' => array_values(array_unique($allowed)),
         ];
     }
@@ -266,8 +279,8 @@ class StructureModel extends Command
     private function generateRequests($file, array $json): void
     {
         $info = $this->resolveModelInfo($file);
-        $requestDir = app_path('Http/Requests/' . implode('/', $info['namespaceParts']));
-        $requestNamespace = 'App\\Http\\Requests\\' . implode('\\', $info['namespaceParts']);
+        $requestDir = app_path('Http/Requests/'.implode('/', $info['namespaceParts']));
+        $requestNamespace = 'App\\Http\\Requests\\'.implode('\\', $info['namespaceParts']);
         File::ensureDirectoryExists($requestDir);
 
         $actionsMap = [];
@@ -289,20 +302,20 @@ class StructureModel extends Command
             $baseClassName = $baseMap[$action] ?? 'FormRequest';
             $useBase =
                 $baseClassName === 'FormRequest'
-                    ? "use Illuminate\\Foundation\\Http\\FormRequest;"
+                    ? 'use Illuminate\\Foundation\\Http\\FormRequest;'
                     : "use App\\Http\\Requests\\{$baseClassName};";
             $extends = $baseClassName === 'FormRequest' ? 'FormRequest' : $baseClassName;
 
             $hasAnyValidation = false;
 
             foreach ($fieldsByAction as $meta) {
-                if (!empty($meta['validations'][$action] ?? [])) {
+                if (! empty($meta['validations'][$action] ?? [])) {
                     $hasAnyValidation = true;
                     break;
                 }
             }
 
-            if (!$hasAnyValidation) {
+            if (! $hasAnyValidation) {
                 $rulesMethod =
                     "    public function rules(): array\n    {\n        return array_merge(parent::rules(), []);\n    }";
                 $messagesMethod =
@@ -313,7 +326,7 @@ class StructureModel extends Command
 
                 foreach ($fieldsByAction as $field => $meta) {
                     $validations = array_values(
-                        array_filter($meta['validations'][$action] ?? [], fn($r) => is_string($r))
+                        array_filter($meta['validations'][$action] ?? [], fn ($r) => is_string($r))
                     );
 
                     if (empty($validations)) {
@@ -321,8 +334,8 @@ class StructureModel extends Command
                     }
 
                     $rulesLines[] =
-                        "            '{$field}' => ['" .
-                        implode("', '", $validations) .
+                        "            '{$field}' => ['".
+                        implode("', '", $validations).
                         "'],";
 
                     foreach ($validations as $rule) {
@@ -334,17 +347,17 @@ class StructureModel extends Command
                 }
 
                 $rulesMethod =
-                    "    public function rules(): array\n    {\n        return array_merge(parent::rules(), [\n" .
-                    implode("\n", $rulesLines) .
+                    "    public function rules(): array\n    {\n        return array_merge(parent::rules(), [\n".
+                    implode("\n", $rulesLines).
                     "\n        ]);\n    }";
 
                 $messagesMethod =
-                    "    public function messages(): array\n    {\n        return array_merge(parent::messages(), [\n" .
-                    implode("\n", $messagesLines) .
+                    "    public function messages(): array\n    {\n        return array_merge(parent::messages(), [\n".
+                    implode("\n", $messagesLines).
                     "\n        ]);\n    }";
             }
 
-            $requestClass = "{$info['modelName']}" . Str::studly($action) . "Request";
+            $requestClass = "{$info['modelName']}".Str::studly($action).'Request';
             $content =
                 "<?php\n\ndeclare(strict_types=1);\n\nnamespace {$requestNamespace};\n\n{$useBase}\n\nclass {$requestClass} extends {$extends}\n{\n{$rulesMethod}\n\n{$messagesMethod}\n}\n";
 
@@ -367,8 +380,8 @@ class StructureModel extends Command
                     : "#[TableColumn({$tableList})]";
 
             $actionAttr =
-                '#[ActionType(' .
-                $this->simpleList($meta['actions'] ?? []) .
+                '#[ActionType('.
+                $this->simpleList($meta['actions'] ?? []).
                 ')]';
 
             $phpType = match (($meta['form'] ?? [])['type'] ?? 'text') {
@@ -377,7 +390,7 @@ class StructureModel extends Command
                 default => 'string'
             };
 
-            $nullable = !empty($meta['database']['nullable']) ? '?' : '';
+            $nullable = ! empty($meta['database']['nullable']) ? '?' : '';
 
             $lines[] =
                 "    {$formFieldAttr}\n    {$tableAttr}\n    {$actionAttr}\n    protected {$nullable}{$phpType} \${$name};";
@@ -390,7 +403,7 @@ class StructureModel extends Command
     {
         $form = $meta['form'] ?? [];
         $parts = [
-            "type: '" . ($form['type'] ?? 'text') . "'",
+            "type: '".($form['type'] ?? 'text')."'",
             ($form['required'] ?? false)
                 ? 'required: true'
                 : 'required: false',
@@ -404,7 +417,7 @@ class StructureModel extends Command
             $parts[] = "value: '{$form['value']}'";
         }
 
-        if (!empty($form['relationship'])) {
+        if (! empty($form['relationship'])) {
             $rel = preg_replace(
                 '/\s+/',
                 ' ',
@@ -413,7 +426,7 @@ class StructureModel extends Command
             $parts[] = "relationship: {$rel}";
         }
 
-        if (!empty($form['options'])) {
+        if (! empty($form['options'])) {
             $opt = preg_replace(
                 '/\s+/',
                 ' ',
@@ -422,20 +435,20 @@ class StructureModel extends Command
             $parts[] = "options: {$opt}";
         }
 
-        $parts[] = "sort_order: " . ($form['sort_order'] ?? 0);
+        $parts[] = 'sort_order: '.($form['sort_order'] ?? 0);
 
-        return "#[FormField(" . implode(', ', $parts) . ")]";
+        return '#[FormField('.implode(', ', $parts).')]';
     }
 
     private function simpleList(array $arr): string
     {
         return empty($arr)
             ? '[]'
-            : '[' .
+            : '['.
             implode(
                 ', ',
-                array_map(fn($v) => "'" . addslashes((string) $v) . "'", $arr)
-            ) .
+                array_map(fn ($v) => "'".addslashes((string) $v)."'", $arr)
+            ).
             ']';
     }
 
@@ -445,14 +458,14 @@ class StructureModel extends Command
             return null;
         }
 
-        $studly = array_map(fn($p) => Str::studly($p), explode('/', $route));
+        $studly = array_map(fn ($p) => Str::studly($p), explode('/', $route));
 
         return empty($studly)
             ? null
-            : 'App\\Models\\' .
-            implode('\\', $studly) .
-            '\\' .
-            end($studly) .
+            : 'App\\Models\\'.
+            implode('\\', $studly).
+            '\\'.
+            end($studly).
             'Model';
     }
 
@@ -466,27 +479,27 @@ class StructureModel extends Command
         $items = [];
 
         foreach ($operations as $code => $op) {
-            $plural = !empty($op['plural']) ? 'true' : 'false';
-            $singular = !empty($op['singular']) ? 'true' : 'false';
+            $plural = ! empty($op['plural']) ? 'true' : 'false';
+            $singular = ! empty($op['singular']) ? 'true' : 'false';
             $lastSegment = end($segments);
 
             $routeName =
                 $lastSegment && $lastSegment === $filename
                     ? "{$prefix}.{$code}"
-                    : "{$prefix}." .
+                    : "{$prefix}.".
                     Str::of($filename)
                         ->replace('_', '.')
-                        ->lower() .
+                        ->lower().
                     ".{$code}";
 
             $items[] =
-                "        ['code' => '{$code}', 'plural' => {$plural}, 'singular' => {$singular}, 'route_name' => '{$routeName}', 'sort_order' => " .
-                ($op['sort_order'] ?? 0) .
-                "],";
+                "        ['code' => '{$code}', 'plural' => {$plural}, 'singular' => {$singular}, 'route_name' => '{$routeName}', 'sort_order' => ".
+                ($op['sort_order'] ?? 0).
+                '],';
         }
 
-        return "#[ModuleOperation(\n    items: [\n" .
-            implode("\n", $items) .
+        return "#[ModuleOperation(\n    items: [\n".
+            implode("\n", $items).
             "\n    ]\n)]";
     }
 
@@ -509,12 +522,14 @@ class StructureModel extends Command
             if ($name === 'created_at') {
                 $lines[] =
                     "            \$table->timestamp('created_at')->useCurrent();";
+
                 continue;
             }
 
             if ($name === 'updated_at') {
                 $lines[] =
                     "            \$table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();";
+
                 continue;
             }
 
@@ -524,6 +539,7 @@ class StructureModel extends Command
             if ($name === $primaryKey && $type === 'bigIncrements') {
                 $lines[] =
                     "            \$table->bigIncrements('{$name}');";
+
                 continue;
             }
 
@@ -539,6 +555,7 @@ class StructureModel extends Command
 
             if ($type === 'bigIncrements') {
                 $lines[] = "            {$col};";
+
                 continue;
             }
 
@@ -571,10 +588,10 @@ class StructureModel extends Command
         $modelName = $info['modelName'];
         $modelClass = "{$modelName}Model";
 
-        $modelNamespace = 'App\\Models\\' . implode('\\', $namespaceParts);
-        $factoryNamespace = 'Database\\Factories\\' . implode('\\', $namespaceParts);
+        $modelNamespace = 'App\\Models\\'.implode('\\', $namespaceParts);
+        $factoryNamespace = 'Database\\Factories\\'.implode('\\', $namespaceParts);
 
-        $factoryDir = database_path('factories/' . implode('/', $namespaceParts));
+        $factoryDir = database_path('factories/'.implode('/', $namespaceParts));
         File::ensureDirectoryExists($factoryDir);
 
         $factoryClass = "{$modelClass}Factory";
@@ -592,13 +609,17 @@ class StructureModel extends Command
         $lines = [];
 
         foreach ($fields as $name => $meta) {
-            if ($name === $primaryKey) continue;
+            if ($name === $primaryKey) {
+                continue;
+            }
             if (in_array($name, [
                 'created_at',
                 'updated_at',
                 'created_by',
-                'updated_by'
-            ], true)) continue;
+                'updated_by',
+            ], true)) {
+                continue;
+            }
 
             $value = $this->guessFactoryValue($name, $meta);
             $lines[] = "            '{$name}' => {$value},";
@@ -685,6 +706,7 @@ class StructureModel extends Command
             if ($type === 'string') {
                 return '$this->faker->realText(200)';
             }
+
             return '$this->faker->paragraph(2)';
         }
 
@@ -692,6 +714,7 @@ class StructureModel extends Command
             if ($type === 'string') {
                 return '$this->faker->realText(200)';
             }
+
             return '$this->faker->paragraphs(3, true)';
         }
 
@@ -765,6 +788,7 @@ class StructureModel extends Command
                 if (in_array($formType, ['textarea', 'editor'], true)) {
                     return '$this->faker->paragraphs(2, true)';
                 }
+
                 return '$this->faker->paragraph()';
             case 'json':
                 return "json_encode(['key' => \$this->faker->word()])";
@@ -797,10 +821,10 @@ class StructureModel extends Command
         $modelClass = "{$modelName}Model";
         $table = $json['model']['table'];
 
-        $modelNamespace = 'App\\Models\\' . implode('\\', $namespaceParts);
-        $seederNamespace = 'Database\\Seeders\\' . implode('\\', $namespaceParts);
+        $modelNamespace = 'App\\Models\\'.implode('\\', $namespaceParts);
+        $seederNamespace = 'Database\\Seeders\\'.implode('\\', $namespaceParts);
 
-        $seederDir = database_path('seeders/' . implode('/', $namespaceParts));
+        $seederDir = database_path('seeders/'.implode('/', $namespaceParts));
         File::ensureDirectoryExists($seederDir);
 
         $seederClass = "{$modelClass}Seeder";
@@ -812,19 +836,19 @@ class StructureModel extends Command
         if ($hasFactory) {
             if ($isRelation && $depth === 1) {
                 $parentModelName = $this->getParentModelFromFilename($info['filename']);
-                $parentClass = Str::studly($parentModelName) . 'Model';
-                $parentNamespace = 'App\\Models\\' . implode('\\', array_slice($namespaceParts, 0, -2));
-                $foreignKey = Str::snake($parentModelName) . '_id';
-                $parentPrimaryKey = Str::snake($parentModelName) . '_id';
+                $parentClass = Str::studly($parentModelName).'Model';
+                $parentNamespace = 'App\\Models\\'.implode('\\', array_slice($namespaceParts, 0, -2));
+                $foreignKey = Str::snake($parentModelName).'_id';
+                $parentPrimaryKey = Str::snake($parentModelName).'_id';
                 $runMethod = "    public function run(): void\n    {\n        // Önce tabloyu temizle\n        {$modelClass}::query()->delete();\n\n        // Parent modelden kayıtları al\n        \$parents = \\{$parentNamespace}\\{$parentClass}::all();\n\n        // Her parent için 1-5 arası ilişkili kayıt oluştur\n        foreach (\$parents as \$parent) {\n            {$modelClass}::factory()\n                ->count(rand(1, 5))\n                ->create(['{$foreignKey}' => \$parent->{$parentPrimaryKey}]);\n        }\n    }";
             } elseif ($isRelation && $depth === 2) {
                 $parts = explode('_', $info['filename']);
-                $parentFilename = $parts[0] . '_' . $parts[1];
-                $parentClass = Str::studly($parentFilename) . 'Model';
+                $parentFilename = $parts[0].'_'.$parts[1];
+                $parentClass = Str::studly($parentFilename).'Model';
                 $parentNamespaceParts = array_slice($namespaceParts, 0, -2);
-                $parentNamespace = 'App\\Models\\' . implode('\\', $parentNamespaceParts);
-                $foreignKey = Str::snake($parentFilename) . '_id';
-                $parentPrimaryKey = Str::snake($parentFilename) . '_id';
+                $parentNamespace = 'App\\Models\\'.implode('\\', $parentNamespaceParts);
+                $foreignKey = Str::snake($parentFilename).'_id';
+                $parentPrimaryKey = Str::snake($parentFilename).'_id';
 
                 $runMethod = "    public function run(): void\n    {\n        // Önce tabloyu temizle\n        {$modelClass}::query()->delete();\n\n        // Parent modelden kayıtları al\n        \$parents = \\{$parentNamespace}\\{$parentClass}::all();\n\n        // Her parent için 1-3 arası ilişkili kayıt oluştur\n        foreach (\$parents as \$parent) {\n            {$modelClass}::factory()\n                ->count(rand(1, 3))\n                ->create(['{$foreignKey}' => \$parent->{$parentPrimaryKey}]);\n        }\n    }";
             } else {
@@ -852,6 +876,7 @@ class StructureModel extends Command
     private function getParentModelFromFilename(string $filename): string
     {
         $parts = explode('_', $filename);
+
         return $parts[0];
     }
 
@@ -859,12 +884,13 @@ class StructureModel extends Command
     {
         $databaseSeederPath = database_path('seeders/DatabaseSeeder.php');
 
-        if (!File::exists($databaseSeederPath)) {
+        if (! File::exists($databaseSeederPath)) {
             $this->createDatabaseSeeder();
+
             return;
         }
 
-        usort($this->generatedSeeders, fn($a, $b) => ($a['depth'] ?? 0) <=> ($b['depth'] ?? 0));
+        usort($this->generatedSeeders, fn ($a, $b) => ($a['depth'] ?? 0) <=> ($b['depth'] ?? 0));
 
         $content = File::get($databaseSeederPath);
 
@@ -872,7 +898,7 @@ class StructureModel extends Command
         $existingUseFqns = $existingUses[1] ?? [];
 
         preg_match_all('/\$this->call\((.+?)::class\);/s', $content, $existingCalls);
-        $existingCallClasses = array_map(function($call) {
+        $existingCallClasses = array_map(function ($call) {
             return trim(str_replace(['$this->call(', '::class);'], '', $call));
         }, $existingCalls[0] ?? []);
 
@@ -883,27 +909,28 @@ class StructureModel extends Command
             $fqn = $seederInfo['fqn'];
             $class = $seederInfo['class'];
 
-            if (!in_array($fqn, $existingUseFqns)) {
+            if (! in_array($fqn, $existingUseFqns)) {
                 $newUses[] = "use {$fqn};";
             }
 
-            if (!in_array($class, $existingCallClasses)) {
+            if (! in_array($class, $existingCallClasses)) {
                 $newCalls[] = "            \$this->call({$class}::class);";
             }
         }
 
         if (empty($newUses) && empty($newCalls)) {
-            $this->info("DatabaseSeeder already up to date.");
+            $this->info('DatabaseSeeder already up to date.');
+
             return;
         }
 
-        if (!empty($newUses)) {
+        if (! empty($newUses)) {
             $lastUsePos = strrpos($content, 'use ');
             if ($lastUsePos !== false) {
                 $endOfLinePos = strpos($content, "\n", $lastUsePos);
                 $content = substr_replace(
                     $content,
-                    "\n" . implode("\n", $newUses),
+                    "\n".implode("\n", $newUses),
                     $endOfLinePos,
                     0
                 );
@@ -913,7 +940,7 @@ class StructureModel extends Command
                     $endOfLinePos = strpos($content, "\n", $namespacePos);
                     $content = substr_replace(
                         $content,
-                        "\n\n" . implode("\n", $newUses),
+                        "\n\n".implode("\n", $newUses),
                         $endOfLinePos,
                         0
                     );
@@ -921,7 +948,7 @@ class StructureModel extends Command
             }
         }
 
-        if (!empty($newCalls)) {
+        if (! empty($newCalls)) {
             if (preg_match('/try\s*\{([^}]+)\}/s', $content, $tryBlock)) {
                 $lastCallPos = strrpos($tryBlock[1], '$this->call(');
                 if ($lastCallPos !== false) {
@@ -929,7 +956,7 @@ class StructureModel extends Command
                     $endOfLinePos = strpos($tryContent, "\n", $lastCallPos);
                     $newTryContent = substr_replace(
                         $tryContent,
-                        "\n" . implode("\n", $newCalls),
+                        "\n".implode("\n", $newCalls),
                         $endOfLinePos,
                         0
                     );
@@ -939,7 +966,7 @@ class StructureModel extends Command
         }
 
         File::put($databaseSeederPath, $content);
-        $this->info("✅ DatabaseSeeder.php updated with new seeders.");
+        $this->info('✅ DatabaseSeeder.php updated with new seeders.');
     }
 
     private function createDatabaseSeeder(): void
@@ -972,7 +999,7 @@ class StructureModel extends Command
         $content .= "}\n";
 
         File::put(database_path('seeders/DatabaseSeeder.php'), $content);
-        $this->info("✅ DatabaseSeeder.php created with all seeders.");
+        $this->info('✅ DatabaseSeeder.php created with all seeders.');
     }
 
     private function buildSeederInsertData(array $fields, ?string $primaryKey, int $count): string
@@ -983,14 +1010,18 @@ class StructureModel extends Command
             $record = [];
 
             foreach ($fields as $name => $meta) {
-                if ($name === $primaryKey) continue;
-                if (in_array($name, ['created_at', 'updated_at', 'created_by', 'updated_by'], true)) continue;
+                if ($name === $primaryKey) {
+                    continue;
+                }
+                if (in_array($name, ['created_at', 'updated_at', 'created_by', 'updated_by'], true)) {
+                    continue;
+                }
 
                 $value = $this->generateRandomValue($name, $meta, $i);
                 $record[] = "                '{$name}' => {$value}";
             }
 
-            $records[] = "            [\n" . implode(",\n", $record) . ",\n            ]";
+            $records[] = "            [\n".implode(",\n", $record).",\n            ]";
         }
 
         return implode(",\n", $records);
@@ -1009,19 +1040,19 @@ class StructureModel extends Command
         }
 
         if (str_contains($lower, 'phone')) {
-            return "'+90" . rand(5000000000, 5999999999) . "'";
+            return "'+90".rand(5000000000, 5999999999)."'";
         }
 
         if (str_contains($lower, 'name') || str_contains($lower, 'title')) {
-            return "'{$name} " . $index . "'";
+            return "'{$name} ".$index."'";
         }
 
         if (preg_match('/_id$/', $name)) {
-            return (string)rand(1, 100);
+            return (string) rand(1, 100);
         }
 
         if (str_contains($lower, 'price') || str_contains($lower, 'amount')) {
-            return (string)rand(100, 10000);
+            return (string) rand(100, 10000);
         }
 
         switch ($type) {
@@ -1030,16 +1061,17 @@ class StructureModel extends Command
             case 'integer':
             case 'unsignedInteger':
             case 'unsignedBigInteger':
-                return (string)rand(1, 1000);
+                return (string) rand(1, 1000);
             case 'decimal':
-                return "'" . number_format(rand(100, 100000) / 100, 2, '.', '') . "'";
+                return "'".number_format(rand(100, 100000) / 100, 2, '.', '')."'";
             case 'timestamp':
             case 'datetime':
-                return "now()";
+                return 'now()';
             default:
                 if (in_array($formType, ['textarea', 'editor'], true)) {
                     return "'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sample text for {$name}.'";
                 }
+
                 return "'{$name} value {$index}'";
         }
     }

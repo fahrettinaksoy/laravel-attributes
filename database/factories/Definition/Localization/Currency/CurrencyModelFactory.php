@@ -18,7 +18,7 @@ class CurrencyModelFactory extends Factory
     {
         return [
             'uuid' => $this->faker->uuid(),
-            'code' => $this->faker->unique()->bothify("CODE-####"),
+            'code' => $this->faker->unique()->bothify('CODE-####'),
             'name' => $this->faker->words(3, true),
             'description' => $this->faker->realText(200),
             'image_path' => $this->faker->numberBetween(18, 80),

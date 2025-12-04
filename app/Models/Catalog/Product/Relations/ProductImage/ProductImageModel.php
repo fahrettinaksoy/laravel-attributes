@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models\Catalog\Product\Relations\ProductImage;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Catalog\Product\Relations\ProductImage\ProductImageField;
-
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 use App\Models\Catalog\Product\ProductModel;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Catalog\Product\Relations\ProductImage\Relations\ProductImageTranslation\ProductImageTranslationModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
@@ -26,7 +25,9 @@ class ProductImageModel extends BaseModel
     use ProductImageField;
 
     public $table = 'cat_product_image';
+
     public $primaryKey = 'product_image_id';
+
     public string $defaultSorting = '-product_image_id';
 
     public array $allowedRelations = [

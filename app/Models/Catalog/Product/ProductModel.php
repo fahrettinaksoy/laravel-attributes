@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models\Catalog\Product;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Catalog\Product\ProductField;
-
-use App\Models\Definition\Localization\Currency\CurrencyModel;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use App\Models\Definition\Catalog\Category\CategoryModel;
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 use App\Models\Catalog\Product\Relations\ProductImage\ProductImageModel;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Catalog\Product\Relations\ProductTranslation\ProductTranslationModel;
 use App\Models\Catalog\Product\Relations\ProductVideo\ProductVideoModel;
+use App\Models\Definition\Catalog\Category\CategoryModel;
+use App\Models\Definition\Localization\Currency\CurrencyModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
@@ -31,7 +30,9 @@ class ProductModel extends BaseModel
     use ProductField;
 
     public $table = 'cat_product';
+
     public $primaryKey = 'product_id';
+
     public string $defaultSorting = '-product_id';
 
     public array $allowedRelations = [

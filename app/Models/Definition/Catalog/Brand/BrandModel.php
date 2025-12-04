@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Catalog\Brand;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Definition\Catalog\Brand\BrandField;
-
-use App\Models\Definition\Catalog\Brand\BrandModel;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 use App\Models\Definition\Catalog\Brand\Relations\BrandTranslation\BrandTranslationModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
@@ -26,7 +24,9 @@ class BrandModel extends BaseModel
     use BrandField;
 
     public $table = 'def_cat_brand';
+
     public $primaryKey = 'brand_id';
+
     public string $defaultSorting = '-brand_id';
 
     public array $allowedRelations = [

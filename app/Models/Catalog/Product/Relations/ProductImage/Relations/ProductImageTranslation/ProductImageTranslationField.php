@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Catalog\Product\Relations\ProductImage\Relations\ProductImageTranslation;
 
+use App\Attributes\Model\ActionType;
 use App\Attributes\Model\FormField;
 use App\Attributes\Model\TableColumn;
-use App\Attributes\Model\ActionType;
 
 trait ProductImageTranslationField
 {
@@ -50,7 +50,7 @@ trait ProductImageTranslationField
     #[ActionType(['index', 'show'])]
     protected ?string $created_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'created_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 9)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'created_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 9)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $created_by;
@@ -60,7 +60,7 @@ trait ProductImageTranslationField
     #[ActionType(['index', 'show'])]
     protected ?string $updated_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'updated_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 10)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'updated_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 10)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $updated_by;

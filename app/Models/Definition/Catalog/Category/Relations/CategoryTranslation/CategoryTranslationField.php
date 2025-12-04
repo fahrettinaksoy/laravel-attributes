@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Catalog\Category\Relations\CategoryTranslation;
 
+use App\Attributes\Model\ActionType;
 use App\Attributes\Model\FormField;
 use App\Attributes\Model\TableColumn;
-use App\Attributes\Model\ActionType;
 
 trait CategoryTranslationField
 {
@@ -25,12 +25,12 @@ trait CategoryTranslationField
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $code;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'type' => 'category', 'route' => 'definition/catalog/category', 'fields' => [ 'id' => 'category_id', 'label' => 'name', ], ], sort_order: 4)]
+    #[FormField(type: 'modal', required: false, relationship: ['type' => 'category', 'route' => 'definition/catalog/category', 'fields' => ['id' => 'category_id', 'label' => 'name']], sort_order: 4)]
     #[TableColumn(['filtering', 'sorting', 'showing'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $category_id;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'type' => 'language', 'route' => 'definition/localization/language', 'fields' => [ 'id' => 'code', 'label' => 'name', ], ], sort_order: 5)]
+    #[FormField(type: 'modal', required: false, relationship: ['type' => 'language', 'route' => 'definition/localization/language', 'fields' => ['id' => 'code', 'label' => 'name']], sort_order: 5)]
     #[TableColumn(['filtering', 'sorting', 'showing'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $language_code;
@@ -75,7 +75,7 @@ trait CategoryTranslationField
     #[ActionType(['index', 'show'])]
     protected ?string $created_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'created_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 14)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'created_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 14)]
     #[TableColumn(['filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $created_by;
@@ -85,7 +85,7 @@ trait CategoryTranslationField
     #[ActionType(['index', 'show'])]
     protected ?string $updated_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'updated_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 15)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'updated_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 15)]
     #[TableColumn(['filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $updated_by;

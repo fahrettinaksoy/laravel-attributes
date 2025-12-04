@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Catalog\Product\Relations\ProductTranslation;
 
+use App\Attributes\Model\ActionType;
 use App\Attributes\Model\FormField;
 use App\Attributes\Model\TableColumn;
-use App\Attributes\Model\ActionType;
 
 trait ProductTranslationField
 {
@@ -15,7 +15,7 @@ trait ProductTranslationField
     #[ActionType(['index', 'show', 'destroy'])]
     protected int $product_translation_id;
 
-    #[FormField(type: 'select', required: false, relationship: [ 'type' => 'product', 'route' => 'catalog/product', 'fields' => [ 'id' => 'product_id', 'label' => 'name', ], ], sort_order: 2)]
+    #[FormField(type: 'select', required: false, relationship: ['type' => 'product', 'route' => 'catalog/product', 'fields' => ['id' => 'product_id', 'label' => 'name']], sort_order: 2)]
     #[TableColumn([])]
     #[ActionType([])]
     protected string $product_id;
@@ -70,7 +70,7 @@ trait ProductTranslationField
     #[ActionType(['index', 'show'])]
     protected ?string $created_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'created_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 13)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'created_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 13)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $created_by;
@@ -80,7 +80,7 @@ trait ProductTranslationField
     #[ActionType(['index', 'show'])]
     protected ?string $updated_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'updated_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 14)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'updated_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 14)]
     #[TableColumn(['showing', 'filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $updated_by;

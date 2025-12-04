@@ -19,7 +19,7 @@ class ProductVideoModelFactory extends Factory
         return [
             'product_id' => $this->faker->numberBetween(1, 100),
             'uuid' => $this->faker->uuid(),
-            'code' => $this->faker->unique()->bothify("CODE-####"),
+            'code' => $this->faker->unique()->bothify('CODE-####'),
             'source' => $this->faker->word(),
             'content' => $this->faker->realText(200),
         ];

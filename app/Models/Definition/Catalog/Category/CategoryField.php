@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Catalog\Category;
 
+use App\Attributes\Model\ActionType;
 use App\Attributes\Model\FormField;
 use App\Attributes\Model\TableColumn;
-use App\Attributes\Model\ActionType;
 
 trait CategoryField
 {
@@ -40,7 +40,7 @@ trait CategoryField
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected ?string $image_path;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'type' => 'category', 'route' => 'definition/catalog/category', 'fields' => [ 'id' => 'category_id', 'label' => 'name', ], ], sort_order: 7)]
+    #[FormField(type: 'modal', required: false, relationship: ['type' => 'category', 'route' => 'definition/catalog/category', 'fields' => ['id' => 'category_id', 'label' => 'name']], sort_order: 7)]
     #[TableColumn(['filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected string $parent_id;
@@ -55,7 +55,7 @@ trait CategoryField
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected int $membership;
 
-    #[FormField(type: 'boolean', required: false, options: [ 'true' => 'active', 'false' => 'passive', ], sort_order: 10)]
+    #[FormField(type: 'boolean', required: false, options: ['true' => 'active', 'false' => 'passive'], sort_order: 10)]
     #[TableColumn(['showing', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected bool $status;
@@ -65,7 +65,7 @@ trait CategoryField
     #[ActionType(['index', 'show'])]
     protected ?string $created_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'created_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 12)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'created_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 12)]
     #[TableColumn(['filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $created_by;
@@ -75,7 +75,7 @@ trait CategoryField
     #[ActionType(['index', 'show'])]
     protected ?string $updated_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'updated_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 13)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'updated_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 13)]
     #[TableColumn(['filtering', 'sorting', 'hiding'])]
     #[ActionType(['index', 'show'])]
     protected ?string $updated_by;

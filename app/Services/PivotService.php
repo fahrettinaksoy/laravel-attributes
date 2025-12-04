@@ -11,7 +11,6 @@ use App\Actions\Pivot\PivotActionStore;
 use App\Actions\Pivot\PivotActionUpdate;
 use App\Factories\ModelFactory;
 use App\Repositories\PivotRepository;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 class PivotService

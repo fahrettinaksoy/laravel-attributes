@@ -18,8 +18,7 @@ class BaseRepository implements BaseRepositoryInterface
     public function __construct(
         Model $model,
         protected readonly ModuleRelationDetectorService $moduleRelationDetectorService,
-    )
-    {
+    ) {
         $this->model = $model;
     }
 

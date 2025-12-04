@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Localization\Currency;
 
+use App\Attributes\Model\ActionType;
 use App\Attributes\Model\FormField;
 use App\Attributes\Model\TableColumn;
-use App\Attributes\Model\ActionType;
 
 trait CurrencyField
 {
@@ -80,12 +80,12 @@ trait CurrencyField
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected ?string $last_synced_at;
 
-    #[FormField(type: 'boolean', required: false, options: [ 'true' => 'crypto', 'false' => 'fiat', ], sort_order: 15)]
+    #[FormField(type: 'boolean', required: false, options: ['true' => 'crypto', 'false' => 'fiat'], sort_order: 15)]
     #[TableColumn(['filtering', 'sorting'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected ?bool $is_crypto;
 
-    #[FormField(type: 'boolean', required: false, options: [ 'true' => 'active', 'false' => 'passive', ], sort_order: 16)]
+    #[FormField(type: 'boolean', required: false, options: ['true' => 'active', 'false' => 'passive'], sort_order: 16)]
     #[TableColumn(['filtering', 'sorting', 'showing'])]
     #[ActionType(['index', 'show', 'store', 'update'])]
     protected ?bool $status;
@@ -95,7 +95,7 @@ trait CurrencyField
     #[ActionType(['index', 'show'])]
     protected ?string $created_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'created_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 18)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'created_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 18)]
     #[TableColumn(['hiding', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show'])]
     protected ?string $created_by;
@@ -105,7 +105,7 @@ trait CurrencyField
     #[ActionType(['index', 'show'])]
     protected ?string $updated_at;
 
-    #[FormField(type: 'modal', required: false, relationship: [ 'name' => 'updated_by', 'route' => 'system/user', 'fields' => [ 'id' => 'user_id', 'label' => 'first_name', ], ], sort_order: 19)]
+    #[FormField(type: 'modal', required: false, relationship: ['name' => 'updated_by', 'route' => 'system/user', 'fields' => ['id' => 'user_id', 'label' => 'first_name']], sort_order: 19)]
     #[TableColumn(['hiding', 'filtering', 'sorting'])]
     #[ActionType(['index', 'show'])]
     protected ?string $updated_by;

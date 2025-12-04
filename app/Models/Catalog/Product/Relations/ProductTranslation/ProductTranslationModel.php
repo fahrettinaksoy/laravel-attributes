@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models\Catalog\Product\Relations\ProductTranslation;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Catalog\Product\Relations\ProductTranslation\ProductTranslationField;
-
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 use App\Models\Catalog\Product\ProductModel;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
@@ -24,7 +23,9 @@ class ProductTranslationModel extends BaseModel
     use ProductTranslationField;
 
     public $table = 'cat_product_translation';
+
     public $primaryKey = 'product_translation_id';
+
     public string $defaultSorting = '-product_translation_id';
 
     public array $allowedRelations = [

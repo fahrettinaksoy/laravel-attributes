@@ -19,7 +19,7 @@ class ProductImageTranslationModelFactory extends Factory
         return [
             'product_image_id' => $this->faker->numberBetween(18, 80),
             'uuid' => $this->faker->uuid(),
-            'code' => $this->faker->unique()->bothify("CODE-####"),
+            'code' => $this->faker->unique()->bothify('CODE-####'),
             'name' => $this->faker->words(3, true),
             'summary' => $this->faker->sentence(10),
             'description' => $this->faker->realText(200),

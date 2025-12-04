@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Definition\Catalog\Category\Relations\CategoryTranslation;
 
-use App\Models\BaseModel;
-use App\Attributes\Model\ModuleUsage;
 use App\Attributes\Model\ModuleOperation;
-use App\Models\Definition\Catalog\Category\Relations\CategoryTranslation\CategoryTranslationField;
-
+use App\Attributes\Model\ModuleUsage;
+use App\Models\BaseModel;
 use App\Models\Definition\Catalog\Category\CategoryModel;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Definition\Localization\Language\LanguageModel;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 #[ModuleUsage(enabled: true, sort_order: 1)]
 #[ModuleOperation(
     items: [
@@ -25,7 +24,9 @@ class CategoryTranslationModel extends BaseModel
     use CategoryTranslationField;
 
     public $table = 'def_category_translation';
+
     public $primaryKey = 'category_translation_id';
+
     public string $defaultSorting = '-category_translation_id';
 
     public array $allowedRelations = [
