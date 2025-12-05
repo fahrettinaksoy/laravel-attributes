@@ -24,306 +24,93 @@ use Illuminate\Support\ServiceProvider;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-/**
- * Unified service provider for module system.
- *
- * Registers:
- * - Module services (ModuleRequestService)
- * - Repository layer (Base, Cache, Pivot)
- * - Resource layer (BaseResource, BaseCollection)
- * - Dynamic module bindings (per controller)
- *
- * Replaces: RepositoryServiceProvider
- *
- * @package App\Providers
- */
 class ModuleServiceProvider extends ServiceProvider
 {
-    /**
-     * Controllers to exclude from dynamic binding.
-     *
-     * @var array<string>
-     */
-    private const EXCLUDED_CONTROLLERS = [
-        'App\Http\Controllers\Common\CommonController',
-    ];
+    private const EXCLUDED = ['CommonController'];
 
-    /**
-     * Register services.
-     *
-     * This method is called first during application bootstrap.
-     * Register all service bindings here.
-     *
-     * @return void
-     */
     public function register(): void
     {
-        $this->registerCoreServices();
-        $this->registerRepositoryLayer();
-        $this->registerResourceLayer();
-        $this->registerDynamicBindings();
+        $this->app->singleton(ModuleRequestService::class, fn ($app) => new ModuleRequestService($app, $app->make(LoggerInterface::class))
+        );
+
+        $this->bindRepositories();
+        $this->bindResources();
+        $this->bindModules();
     }
 
-    /**
-     * Bootstrap services.
-     *
-     * This method is called after all providers are registered.
-     * Perform any post-registration actions here.
-     *
-     * @return void
-     */
-    public function boot(): void
-    {
-        // Future: Register commands, migrations, etc.
-    }
-
-    // ==================== CORE SERVICES ====================
-
-    /**
-     * Register core module services.
-     *
-     * @return void
-     */
-    private function registerCoreServices(): void
-    {
-        // ModuleRequestService - singleton for request resolution
-        $this->app->singleton(ModuleRequestService::class, function (Application $app) {
-            return new ModuleRequestService(
-                container: $app,
-                logger: $app->make(LoggerInterface::class),
-            );
-        });
-    }
-
-    // ==================== REPOSITORY LAYER ====================
-
-    /**
-     * Register repository layer bindings.
-     *
-     * Hierarchy:
-     * BaseService -> BaseRepositoryCache -> BaseRepository -> Model
-     *
-     * @return void
-     */
-    private function registerRepositoryLayer(): void
-    {
-        $this->registerBaseRepository();
-        $this->registerBaseRepositoryCache();
-        $this->registerBaseService();
-        $this->registerPivotBindings();
-    }
-
-    /**
-     * Register BaseRepository with dynamic model resolution.
-     *
-     * The model is resolved from request attributes set by
-     * ResolveModelFromRoute middleware.
-     *
-     * @return void
-     */
-    private function registerBaseRepository(): void
+    private function bindRepositories(): void
     {
         $this->app->when(BaseRepository::class)
             ->needs(Model::class)
-            ->give(function (Application $app): Model {
-                return $this->resolveModelFromRequest($app);
-            });
-    }
+            ->give(fn ($app) => $this->modelFromRequest($app));
 
-    /**
-     * Register BaseRepositoryCache with BaseRepository dependency.
-     *
-     * Provides caching layer over base repository operations.
-     *
-     * @return void
-     */
-    private function registerBaseRepositoryCache(): void
-    {
         $this->app->when(BaseRepositoryCache::class)
             ->needs(BaseRepositoryInterface::class)
             ->give(BaseRepository::class);
-    }
 
-    /**
-     * Register BaseService with BaseRepositoryCache dependency.
-     *
-     * Services consume repositories through the cache layer.
-     *
-     * @return void
-     */
-    private function registerBaseService(): void
-    {
         $this->app->when(BaseService::class)
             ->needs(BaseRepositoryInterface::class)
             ->give(BaseRepositoryCache::class);
-    }
 
-    /**
-     * Register pivot-specific bindings.
-     *
-     * PivotRepository and PivotService for relationship operations.
-     *
-     * @return void
-     */
-    private function registerPivotBindings(): void
-    {
-        // PivotRepository - singleton
         $this->app->singleton(PivotRepository::class);
-
-        // PivotService - uses PivotRepository
         $this->app->when(PivotService::class)
             ->needs(PivotRepository::class)
-            ->give(function (Application $app) {
-                return $app->make(PivotRepository::class);
-            });
+            ->give(PivotRepository::class);
     }
 
-    /**
-     * Resolve model instance from request attributes.
-     *
-     * Uses ModelFactory to create model from class name
-     * set by ResolveModelFromRoute middleware.
-     *
-     * @param Application $app Application instance
-     * @return Model Resolved model instance
-     * @throws RuntimeException If model class not found in request
-     */
-    private function resolveModelFromRequest(Application $app): Model
+    private function modelFromRequest(Application $app): Model
     {
         $request = $app->make(Request::class);
         $modelClass = $request->attributes->get('modelClass');
 
-        if (!$modelClass) {
+        if (! $modelClass) {
             throw new RuntimeException(
-                'Model class not found in request attributes. ' .
-                'Ensure ResolveModelFromRoute middleware is registered.'
+                'Model class not in request. Check ResolveModelFromRoute middleware.'
             );
         }
 
-        $factory = $app->make(ModelFactory::class);
-
-        return $factory->create($modelClass);
+        return $app->make(ModelFactory::class)->create($modelClass);
     }
 
-    // ==================== RESOURCE LAYER ====================
-
-    /**
-     * Register API resource layer bindings.
-     *
-     * Provides consistent JSON transformation layer.
-     *
-     * @return void
-     */
-    private function registerResourceLayer(): void
+    private function bindResources(): void
     {
-        $this->registerBaseResource();
-        $this->registerBaseCollection();
+        $this->app->bind(BaseResource::class, fn ($app, $params) => new BaseResource($params['resource'] ?? new \stdClass)
+        );
+
+        $this->app->bind(BaseCollection::class, fn ($app, $params) => new BaseCollection($params['resource'] ?? new Collection)
+        );
     }
 
-    /**
-     * Register BaseResource for single model transformation.
-     *
-     * @return void
-     */
-    private function registerBaseResource(): void
+    private function bindModules(): void
     {
-        $this->app->bind(BaseResource::class, function (Application $app, array $parameters) {
-            $resource = $parameters['resource'] ?? new \stdClass;
-
-            return new BaseResource($resource);
-        });
-    }
-
-    /**
-     * Register BaseCollection for model collection transformation.
-     *
-     * @return void
-     */
-    private function registerBaseCollection(): void
-    {
-        $this->app->bind(BaseCollection::class, function (Application $app, array $parameters) {
-            $resource = $parameters['resource'] ?? new Collection;
-
-            return new BaseCollection($resource);
-        });
-    }
-
-    // ==================== DYNAMIC MODULE BINDINGS ====================
-
-    /**
-     * Register dynamic module-specific bindings.
-     *
-     * Scans all registered routes and creates bindings for each
-     * module's Service -> Repository -> Interface chain.
-     *
-     * Example:
-     * VehiclesService -> VehiclesRepository (implements VehiclesRepositoryInterface)
-     *
-     * @return void
-     */
-    private function registerDynamicBindings(): void
-    {
-        $controllers = $this->discoverControllers();
-
-        foreach ($controllers as $controllerClass) {
-            $this->bindModuleServices($controllerClass);
+        foreach ($this->controllers() as $controller) {
+            $this->bindModule($controller);
         }
     }
 
-    /**
-     * Discover all controllers from registered routes.
-     *
-     * Filters out:
-     * - Closure routes
-     * - Common/shared controllers
-     * - Duplicate controllers
-     *
-     * @return array<string> Unique controller class names
-     */
-    private function discoverControllers(): array
+    private function controllers(): array
     {
         return collect($this->app['router']->getRoutes()->getRoutes())
-            ->map(fn(Route $route) => $this->extractControllerClass($route))
+            ->map(fn (Route $r) => $this->parseController($r))
             ->filter()
-            ->reject(fn(string $controller) => $this->isExcludedController($controller))
+            ->reject(fn ($c) => $this->isExcluded($c))
             ->unique()
             ->values()
             ->all();
     }
 
-    /**
-     * Extract controller class from route.
-     *
-     * @param Route $route Route instance
-     * @return string|null Controller class name or null
-     */
-    private function extractControllerClass(Route $route): ?string
+    private function parseController(Route $route): ?string
     {
         $action = $route->getAction();
+        $key = $action['controller'] ?? $action['uses'] ?? null;
 
-        // Try 'controller' key first (Laravel 11+)
-        if (isset($action['controller']) && is_string($action['controller'])) {
-            return explode('@', $action['controller'])[0];
-        }
-
-        // Fallback to 'uses' key (Laravel 10-)
-        if (isset($action['uses']) && is_string($action['uses'])) {
-            return explode('@', $action['uses'])[0];
-        }
-
-        return null;
+        return is_string($key) ? explode('@', $key)[0] : null;
     }
 
-    /**
-     * Check if controller should be excluded from dynamic binding.
-     *
-     * @param string $controllerClass Controller class name
-     * @return bool True if should be excluded
-     */
-    private function isExcludedController(string $controllerClass): bool
+    private function isExcluded(string $controller): bool
     {
-        foreach (self::EXCLUDED_CONTROLLERS as $excluded) {
-            if (str_contains($controllerClass, $excluded)) {
+        foreach (self::EXCLUDED as $pattern) {
+            if (str_contains($controller, $pattern)) {
                 return true;
             }
         }
@@ -331,173 +118,43 @@ class ModuleServiceProvider extends ServiceProvider
         return false;
     }
 
-    /**
-     * Bind module-specific services.
-     *
-     * Creates contextual binding:
-     * When ModuleService needs BaseRepositoryInterface,
-     * give it ModuleRepository (validated against ModuleRepositoryInterface).
-     *
-     * @param string $controllerClass Controller class name
-     * @return void
-     */
-    private function bindModuleServices(string $controllerClass): void
+    private function bindModule(string $controller): void
     {
-        // Extract module name from controller
-        $module = ModulePathResolver::extractModuleFromController($controllerClass);
+        $module = ModulePathResolver::extractModuleFromController($controller);
+        $service = ModulePathResolver::buildServiceClass($module);
+        $repo = ModulePathResolver::buildRepositoryClass($module);
+        $interface = ModulePathResolver::buildRepositoryInterface($module);
 
-        // Build class names using ModulePathResolver
-        $serviceClass = ModulePathResolver::buildServiceClass($module);
-        $repositoryClass = ModulePathResolver::buildRepositoryClass($module);
-        $repositoryInterface = ModulePathResolver::buildRepositoryInterface($module);
-
-        // Validate classes exist
-        if (!$this->validateModuleClasses($serviceClass, $repositoryClass, $repositoryInterface)) {
+        if (! $this->exists($service, $repo, $interface)) {
             return;
         }
 
-        // Create contextual binding
-        $this->app->when($serviceClass)
+        $this->app->when($service)
             ->needs(BaseRepositoryInterface::class)
-            ->give(function (Application $app) use ($repositoryClass, $repositoryInterface, $module) {
-                return $this->resolveModuleRepository(
-                    $app,
-                    $repositoryClass,
-                    $repositoryInterface,
-                    $module
-                );
-            });
+            ->give(fn ($app) => $this->makeRepo($app, $repo, $interface, $module));
     }
 
-    /**
-     * Validate that module classes exist.
-     *
-     * @param string $serviceClass Service class name
-     * @param string $repositoryClass Repository class name
-     * @param string $repositoryInterface Repository interface name
-     * @return bool True if all classes exist
-     */
-    private function validateModuleClasses(
-        string $serviceClass,
-        string $repositoryClass,
-        string $repositoryInterface
-    ): bool {
-        return class_exists($serviceClass)
-            && class_exists($repositoryClass)
-            && interface_exists($repositoryInterface);
-    }
-
-    /**
-     * Resolve and validate module repository.
-     *
-     * Creates repository instance and validates it implements
-     * the required interface.
-     *
-     * @param Application $app Application instance
-     * @param string $repositoryClass Repository class name
-     * @param string $repositoryInterface Required interface name
-     * @param string $module Module name (for error messages)
-     * @return object Repository instance
-     * @throws RuntimeException If repository doesn't implement interface
-     */
-    private function resolveModuleRepository(
-        Application $app,
-        string $repositoryClass,
-        string $repositoryInterface,
-        string $module
-    ): object {
-        $repository = $app->make($repositoryClass);
-
-        // Validate interface implementation
-        if (!$repository instanceof $repositoryInterface) {
-            throw new RuntimeException(sprintf(
-                'Module "%s": %s must implement %s',
-                $module,
-                $repositoryClass,
-                $repositoryInterface
-            ));
+    private function exists(string ...$classes): bool
+    {
+        foreach ($classes as $class) {
+            if (! class_exists($class) && ! interface_exists($class)) {
+                return false;
+            }
         }
 
-        return $repository;
+        return true;
     }
 
-    // ==================== PROVIDER METADATA ====================
-
-    /**
-     * Get the services provided by this provider.
-     *
-     * For deferred providers, return array of provided services.
-     * Not used currently as we want eager loading.
-     *
-     * @return array<string>
-     */
-    public function provides(): array
+    private function makeRepo(Application $app, string $class, string $interface, string $module): object
     {
-        return [
-            ModuleRequestService::class,
-            BaseRepository::class,
-            BaseRepositoryCache::class,
-            BaseService::class,
-            PivotRepository::class,
-            PivotService::class,
-            BaseResource::class,
-            BaseCollection::class,
-        ];
-    }
+        $repo = $app->make($class);
 
-    // ==================== DEBUGGING ====================
-
-    /**
-     * Get registered module bindings for debugging.
-     *
-     * @return array<string, array> Module name => binding info
-     */
-    public function getRegisteredModules(): array
-    {
-        $controllers = $this->discoverControllers();
-        $modules = [];
-
-        foreach ($controllers as $controller) {
-            $module = ModulePathResolver::extractModuleFromController($controller);
-
-            $modules[$module] = [
-                'controller' => $controller,
-                'service' => ModulePathResolver::buildServiceClass($module),
-                'repository' => ModulePathResolver::buildRepositoryClass($module),
-                'interface' => ModulePathResolver::buildRepositoryInterface($module),
-                'exists' => [
-                    'service' => class_exists(ModulePathResolver::buildServiceClass($module)),
-                    'repository' => class_exists(ModulePathResolver::buildRepositoryClass($module)),
-                    'interface' => interface_exists(ModulePathResolver::buildRepositoryInterface($module)),
-                ],
-            ];
+        if (! $repo instanceof $interface) {
+            throw new RuntimeException(
+                "Module '{$module}': {$class} must implement {$interface}"
+            );
         }
 
-        return $modules;
-    }
-
-    /**
-     * Get provider statistics.
-     *
-     * @return array Statistics data
-     */
-    public function getStats(): array
-    {
-        $controllers = $this->discoverControllers();
-        $modules = $this->getRegisteredModules();
-
-        $validModules = collect($modules)
-            ->filter(fn($m) => $m['exists']['service']
-                && $m['exists']['repository']
-                && $m['exists']['interface'])
-            ->count();
-
-        return [
-            'total_controllers' => count($controllers),
-            'total_modules' => count($modules),
-            'valid_modules' => $validModules,
-            'invalid_modules' => count($modules) - $validModules,
-            'excluded_controllers' => count(self::EXCLUDED_CONTROLLERS),
-        ];
+        return $repo;
     }
 }

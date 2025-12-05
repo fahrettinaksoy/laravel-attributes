@@ -42,7 +42,7 @@ final class ModuleRequestService
             throw $e;
         } catch (Throwable $e) {
             throw new InvalidArgumentException(
-                'Failed to resolve form request: ' . $e->getMessage(),
+                'Failed to resolve form request: '.$e->getMessage(),
                 previous: $e
             );
         }
@@ -124,34 +124,34 @@ final class ModuleRequestService
         $relation = $request->attributes->get('relationName');
         $table = $request->attributes->get('tableName');
 
-        if (!$mainPath || !$relation || !$table) {
+        if (! $mainPath || ! $relation || ! $table) {
             return null;
         }
 
         $parts = array_map([Str::class, 'studly'], explode('/', $mainPath));
-        $namespace = 'App\\Http\\Requests\\' . implode('\\', $parts)
-            . '\\Pivot\\' . Str::studly($table) . Str::studly($relation);
+        $namespace = 'App\\Http\\Requests\\'.implode('\\', $parts)
+            .'\\Pivot\\'.Str::studly($table).Str::studly($relation);
 
-        $class = Str::studly($table) . Str::studly($relation)
-            . Str::studly($action) . 'Request';
+        $class = Str::studly($table).Str::studly($relation)
+            .Str::studly($action).'Request';
 
-        return $namespace . '\\' . $class;
+        return $namespace.'\\'.$class;
     }
 
     private function buildMainClass(Request $request, string $action): ?string
     {
         $modelPath = $request->attributes->get('mainModelPath');
 
-        if (!$modelPath) {
+        if (! $modelPath) {
             return null;
         }
 
         $segments = explode('/', $modelPath);
         $parts = array_map([Str::class, 'studly'], $segments);
-        $namespace = 'App\\Http\\Requests\\' . implode('\\', $parts);
-        $class = Str::studly(end($segments)) . Str::studly($action) . 'Request';
+        $namespace = 'App\\Http\\Requests\\'.implode('\\', $parts);
+        $class = Str::studly(end($segments)).Str::studly($action).'Request';
 
-        return $namespace . '\\' . $class;
+        return $namespace.'\\'.$class;
     }
 
     // ==================== ACTION EXTRACTION ====================
@@ -160,7 +160,7 @@ final class ModuleRequestService
     {
         $route = $request->route();
 
-        if (!$route) {
+        if (! $route) {
             return 'unknown';
         }
 
@@ -173,6 +173,7 @@ final class ModuleRequestService
 
         // Standard route (e.g., Controller@store)
         $action = $route->getActionName();
+
         return Str::afterLast($action, '@') ?: 'unknown';
     }
 
@@ -230,13 +231,13 @@ final class ModuleRequestService
         $table = end($segments);
 
         $parts = array_map([Str::class, 'studly'], $segments);
-        $namespace = 'App\\Http\\Requests\\' . implode('\\', $parts)
-            . '\\Pivot\\' . Str::studly($table) . Str::studly($relation);
+        $namespace = 'App\\Http\\Requests\\'.implode('\\', $parts)
+            .'\\Pivot\\'.Str::studly($table).Str::studly($relation);
 
-        $class = Str::studly($table) . Str::studly($relation)
-            . Str::studly($action) . 'Request';
+        $class = Str::studly($table).Str::studly($relation)
+            .Str::studly($action).'Request';
 
-        return $namespace . '\\' . $class;
+        return $namespace.'\\'.$class;
     }
 
     private function validateItem(string $requestClass, array $data): array
@@ -244,7 +245,7 @@ final class ModuleRequestService
         $formRequest = $this->container->make($requestClass);
         $formRequest->merge($data);
         $formRequest->setMethod('POST');
-        $formRequest->setRouteResolver(fn() => request()->route());
+        $formRequest->setRouteResolver(fn () => request()->route());
         $formRequest->validateResolved();
 
         return $formRequest->validated();
@@ -256,8 +257,8 @@ final class ModuleRequestService
         int $index
     ): ValidationException {
         $errors = collect($e->errors())
-            ->mapWithKeys(fn($msgs, $field) => [
-                "{$relation}.{$index}.{$field}" => $msgs
+            ->mapWithKeys(fn ($msgs, $field) => [
+                "{$relation}.{$index}.{$field}" => $msgs,
             ])
             ->toArray();
 
@@ -277,7 +278,8 @@ final class ModuleRequestService
         array_pop($parts);   // Remove class name
 
         $path = strtolower(implode('/', $parts));
-        return $path ? $path . '/' . strtolower($name) : strtolower($name);
+
+        return $path ? $path.'/'.strtolower($name) : strtolower($name);
     }
 
     private function resolveFallback(mixed $fallback, string $action): object

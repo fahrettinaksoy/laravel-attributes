@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Middleware\ValidateModule;
+use App\Http\Middleware\ResolveModelFromRoute;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append(ValidateModule::class);
+        $middleware->append(ResolveModelFromRoute::class);
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -48,8 +48,6 @@ use ReflectionProperty;
  * - $allowedShowing = ['name', 'brand']
  * - $allowedFiltering = ['name', 'brand']
  * - $allowedSorting = ['name']
- *
- * @package App\Traits
  */
 trait SetFieldFromAttributes
 {
@@ -81,8 +79,6 @@ trait SetFieldFromAttributes
      *
      * Scans all protected properties and adds their names to $fillable array.
      * Uses caching to avoid repeated reflection.
-     *
-     * @return void
      */
     protected function setFillableFromAttributes(): void
     {
@@ -102,8 +98,6 @@ trait SetFieldFromAttributes
      * - $allowedShowing
      * - $allowedFiltering
      * - $allowedSorting
-     *
-     * @return void
      */
     protected function setTableColumnsFromAttributes(): void
     {
@@ -142,7 +136,7 @@ trait SetFieldFromAttributes
         return Cache::remember(
             $this->cacheKey('properties'),
             self::CACHE_TTL,
-            fn() => $this->extractPropertyNames()
+            fn () => $this->extractPropertyNames()
         );
     }
 
@@ -156,19 +150,19 @@ trait SetFieldFromAttributes
         return Cache::remember(
             $this->cacheKey('metadata'),
             self::CACHE_TTL,
-            fn() => $this->extractPropertyMetadata()
+            fn () => $this->extractPropertyMetadata()
         );
     }
 
     /**
      * Generate cache key for this model class.
      *
-     * @param string $suffix Cache key suffix ('properties' or 'metadata')
+     * @param  string  $suffix  Cache key suffix ('properties' or 'metadata')
      * @return string Cache key
      */
     private function cacheKey(string $suffix): string
     {
-        return self::CACHE_PREFIX . md5(static::class) . '_' . $suffix;
+        return self::CACHE_PREFIX.md5(static::class).'_'.$suffix;
     }
 
     // ==================== REFLECTION LAYER ====================
@@ -187,7 +181,7 @@ trait SetFieldFromAttributes
         $properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
 
         return array_map(
-            fn(ReflectionProperty $property) => $property->getName(),
+            fn (ReflectionProperty $property) => $property->getName(),
             $properties
         );
     }
@@ -209,7 +203,7 @@ trait SetFieldFromAttributes
         foreach ($properties as $property) {
             $actions = $this->extractActionsFromProperty($property);
 
-            if (!empty($actions)) {
+            if (! empty($actions)) {
                 $metadata[$property->getName()] = array_unique($actions);
             }
         }
@@ -223,7 +217,7 @@ trait SetFieldFromAttributes
      * A property can have multiple TableColumn attributes,
      * each with its own actions array. This method merges all actions.
      *
-     * @param ReflectionProperty $property Property to scan
+     * @param  ReflectionProperty  $property  Property to scan
      * @return array<string> Merged and unique actions
      */
     private function extractActionsFromProperty(ReflectionProperty $property): array
@@ -259,14 +253,13 @@ trait SetFieldFromAttributes
      * add the column name to the corresponding property
      * (e.g., 'filtering' => $allowedFiltering).
      *
-     * @param string $columnName Property/column name
-     * @param array<string> $actions Actions array from TableColumn
-     * @return void
+     * @param  string  $columnName  Property/column name
+     * @param  array<string>  $actions  Actions array from TableColumn
      */
     private function assignColumnToActions(string $columnName, array $actions): void
     {
         foreach (self::COLUMN_ACTIONS as $action => $propertyName) {
-            if (!in_array($action, $actions, true)) {
+            if (! in_array($action, $actions, true)) {
                 continue;
             }
 
@@ -281,9 +274,8 @@ trait SetFieldFromAttributes
      * - Property exists and is an array
      * - No duplicate entries
      *
-     * @param string $propertyName Target property name ('allowedFiltering', etc.)
-     * @param string $columnName Column/property name to add
-     * @return void
+     * @param  string  $propertyName  Target property name ('allowedFiltering', etc.)
+     * @param  string  $columnName  Column/property name to add
      */
     private function addColumnToProperty(string $propertyName, string $columnName): void
     {
@@ -291,7 +283,7 @@ trait SetFieldFromAttributes
         $this->ensureArrayProperty($propertyName);
 
         // Add if not already present
-        if (!in_array($columnName, $this->{$propertyName}, true)) {
+        if (! in_array($columnName, $this->{$propertyName}, true)) {
             $this->{$propertyName}[] = $columnName;
         }
     }
@@ -302,12 +294,11 @@ trait SetFieldFromAttributes
      * If property doesn't exist or is not an array, initialize it as empty array.
      * This prevents errors when model doesn't declare these properties.
      *
-     * @param string $propertyName Property name to check
-     * @return void
+     * @param  string  $propertyName  Property name to check
      */
     private function ensureArrayProperty(string $propertyName): void
     {
-        if (!property_exists($this, $propertyName) || !is_array($this->{$propertyName})) {
+        if (! property_exists($this, $propertyName) || ! is_array($this->{$propertyName})) {
             $this->{$propertyName} = [];
         }
     }
@@ -356,8 +347,6 @@ trait SetFieldFromAttributes
      * - Application warmup scripts
      * - After deployment
      * - Testing
-     *
-     * @return void
      */
     public function warmUpReflectionCache(): void
     {
@@ -393,7 +382,7 @@ trait SetFieldFromAttributes
 
             $result[$property->getName()] = [
                 'type' => $property->getType()?->getName() ?? 'mixed',
-                'has_table_column' => !empty($attributes),
+                'has_table_column' => ! empty($attributes),
                 'actions' => array_unique($actions),
                 'will_be_fillable' => true,
                 'will_be_showing' => in_array('showing', $actions, true),

@@ -11,88 +11,46 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
-/**
- * Dynamically resolves API routes to Eloquent model classes.
- *
- * Extracts model information from URL segments and attaches metadata
- * to the request for downstream usage (controllers, repositories, services).
- *
- * Examples:
- * - GET /api/v1/catalog/vehicles/123
- *   → Resolves to VehiclesModel, sets request attributes
- *
- * - GET /api/v1/catalog/vehicles/123/features
- *   → Detects pivot route, resolves parent->relation
- *
- * - GET /api/v1/catalog/vehicles/123/features/456
- *   → Pivot route with specific relation item ID
- */
 class ResolveModelFromRoute
 {
-    /**
-     * Runtime cache to avoid repeated resolution within same request.
-     */
-    private array $runtimeCache = [];
+    private array $cache = [];
 
-    /**
-     * Persistent cache TTL in seconds.
-     */
     private const CACHE_TTL = 3600;
 
-    /**
-     * Minimum URL segments required (e.g., api/v1/module).
-     */
     private const MIN_SEGMENTS = 3;
 
-    /**
-     * Segments to skip from URL (typically 'api' and 'v1').
-     */
     private const SKIP_SEGMENTS = 2;
 
-    /**
-     * Routes that should bypass resolution.
-     */
+    private const RELATION_PATTERN = '/^[a-zA-Z_-]+$/';
+
     private const EXCEPTION_ROUTES = [
         'auth/login',
         'auth/register',
         'auth/logout',
-        'definition/location/search',
-        'catalog/availability/check',
     ];
 
-    /**
-     * Handle incoming request.
-     */
     public function handle(Request $request, Closure $next): mixed
     {
-        // Skip resolution if conditions not met
-        if (!$this->shouldResolve($request)) {
+        if (! $this->shouldResolve($request)) {
             return $next($request);
         }
 
-        // Extract path segments after API prefix
         $segments = array_slice($request->segments(), self::SKIP_SEGMENTS);
+        $result = $this->cached($segments, fn () => $this->resolve($segments));
 
-        // Resolve with caching
-        $result = $this->resolveWithCache($segments);
-
-        // Attach resolved data to request attributes
-        $this->attachToRequest($request, $result);
+        foreach ($result as $key => $value) {
+            $request->attributes->set($key, $value);
+        }
 
         return $next($request);
     }
 
-    /**
-     * Determine if request should be resolved.
-     */
     private function shouldResolve(Request $request): bool
     {
-        // Must have minimum segments
         if (count($request->segments()) < self::MIN_SEGMENTS) {
             return false;
         }
 
-        // Check if route is in exception list
         $path = implode('/', array_slice($request->segments(), self::SKIP_SEGMENTS));
 
         foreach (self::EXCEPTION_ROUTES as $exception) {
@@ -104,60 +62,39 @@ class ResolveModelFromRoute
         return true;
     }
 
-    /**
-     * Resolve with multi-layer caching.
-     */
-    private function resolveWithCache(array $segments): array
+    private function cached(array $segments, callable $callback): array
     {
-        $cacheKey = $this->generateCacheKey($segments);
+        $key = 'model_res_'.md5(implode('/', $segments));
 
-        // Check runtime cache first
-        if (isset($this->runtimeCache[$cacheKey])) {
-            return $this->runtimeCache[$cacheKey];
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
         }
 
-        // Check persistent cache
-        $cached = Cache::get($cacheKey);
-        if (is_array($cached)) {
-            return $this->runtimeCache[$cacheKey] = $cached;
+        if ($cached = Cache::get($key)) {
+            return $this->cache[$key] = $cached;
         }
 
-        // Fresh resolution
-        $result = $this->resolve($segments);
+        $result = $callback();
 
-        // Cache the result
-        $this->runtimeCache[$cacheKey] = $result;
-        Cache::put($cacheKey, $result, self::CACHE_TTL);
+        $this->cache[$key] = $result;
+        Cache::put($key, $result, self::CACHE_TTL);
 
         return $result;
     }
 
-    /**
-     * Main resolution logic - determines route type and resolves accordingly.
-     */
     private function resolve(array $segments): array
     {
-        return $this->isPivotRoute($segments)
-            ? $this->resolvePivotRoute($segments)
-            : $this->resolveMainRoute($segments);
+        return $this->hasPivotPattern($segments) ? $this->resolvePivot($segments) : $this->resolveMain($segments);
     }
 
-    /**
-     * Detect if route follows pivot pattern (ID followed by relation name).
-     */
-    private function isPivotRoute(array $segments): bool
+    private function hasPivotPattern(array $segments): bool
     {
         if (count($segments) < 3) {
             return false;
         }
 
-        // Look for pattern: numeric ID followed by alphabetic relation name
-        foreach ($segments as $i => $segment) {
-            if (is_numeric($segment)
-                && isset($segments[$i + 1])
-                && !is_numeric($segments[$i + 1])
-                && preg_match('/^[a-zA-Z_-]+$/', $segments[$i + 1])
-            ) {
+        for ($i = 0; $i < count($segments) - 1; $i++) {
+            if ($this->isIdRelationPair($segments, $i)) {
                 return true;
             }
         }
@@ -165,193 +102,142 @@ class ResolveModelFromRoute
         return false;
     }
 
-    /**
-     * Resolve standard CRUD route.
-     *
-     * Pattern: /module/submodule[/id]
-     * Example: /catalog/vehicles/123
-     */
-    private function resolveMainRoute(array $segments): array
+    private function resolveMain(array $segments): array
     {
-        // Remove trailing numeric ID if present
-        $modelPath = is_numeric(end($segments))
+        $path = is_numeric(end($segments))
             ? array_slice($segments, 0, -1)
             : $segments;
 
-        if (empty($modelPath)) {
+        if (empty($path)) {
             throw new InvalidArgumentException('Empty model path');
         }
 
-        // Build model class using helper
-        $modelClass = ModulePathResolver::buildModelClass($modelPath);
-
         return [
             'isPivotRoute' => false,
-            'modelClass' => $modelClass,
-            'tableName' => end($modelPath),
-            'mainModelPath' => implode('/', $modelPath),
+            'modelClass' => ModulePathResolver::buildModelClass($path),
+            'tableName' => end($path),
+            'mainModelPath' => implode('/', $path),
             'fullPath' => implode('/', $segments),
         ];
     }
 
-    /**
-     * Resolve pivot/relationship route.
-     *
-     * Pattern: /parent-path/parent-id/relation-name[/relation-id]
-     * Example: /catalog/vehicles/123/features/456
-     */
-    private function resolvePivotRoute(array $segments): array
+    private function resolvePivot(array $segments): array
     {
-        // Parse pivot pattern to extract components
-        $pivotInfo = $this->parsePivotPattern($segments);
+        $pivot = $this->findLastPivot($segments);
+        $parentClass = $this->resolveChain($segments, $pivot);
+        $parentModel = new $parentClass;
+        $relationMethod = Str::snake($pivot['relation']);
 
-        // Build parent model class
-        $parentModelClass = ModulePathResolver::buildModelClass($pivotInfo['parentPath']);
-        $parentModel = new $parentModelClass;
-
-        // Get relation method (convert to snake_case)
-        $relationMethod = Str::snake($pivotInfo['relation']);
-
-        // Validate relation exists
-        if (!method_exists($parentModel, $relationMethod)) {
+        if (! method_exists($parentModel, $relationMethod)) {
             throw new InvalidArgumentException(
-                "Relation '{$relationMethod}' not found on {$parentModelClass}"
+                "Relation '{$relationMethod}' not found on {$parentClass}"
             );
         }
 
-        // Resolve relation to get related model
-        $relationObj = $parentModel->{$relationMethod}();
-        $relatedModel = $relationObj->getRelated();
+        $related = $parentModel->{$relationMethod}()->getRelated();
 
         return [
             'isPivotRoute' => true,
-            'modelClass' => get_class($relatedModel),
-            'parentModelClass' => $parentModelClass,
-            'pivotModelClass' => get_class($relatedModel),
+            'modelClass' => get_class($related),
+            'parentModelClass' => $parentClass,
+            'pivotModelClass' => get_class($related),
             'relationName' => $relationMethod,
-            'originalRelationName' => $pivotInfo['relation'],
-            'parentId' => $pivotInfo['parentId'],
-            'relationId' => $pivotInfo['relationId'],
-            'tableName' => end($pivotInfo['parentPath']),
-            'pivotTableName' => $relatedModel->getTable(),
-            'mainModelPath' => implode('/', $pivotInfo['parentPath']),
+            'originalRelationName' => $pivot['relation'],
+            'parentId' => $pivot['parentId'],
+            'relationId' => $pivot['relationId'],
+            'tableName' => end($pivot['basePath']),
+            'pivotTableName' => $related->getTable(),
+            'mainModelPath' => implode('/', $pivot['basePath']),
             'fullPath' => implode('/', $segments),
-            'fullPathWithIds' => $this->buildPathWithIds($segments),
+            'fullPathWithIds' => $this->pathWithIds($segments),
         ];
     }
 
-    /**
-     * Parse pivot route pattern to extract components.
-     *
-     * Scans from end to find: ID -> relation pattern
-     * Example: ['catalog', 'vehicles', '123', 'features', '456']
-     * Returns: [parentId => 123, relation => 'features', relationId => 456, parentPath => ['catalog', 'vehicles']]
-     */
-    private function parsePivotPattern(array $segments): array
+    private function findLastPivot(array $segments): array
     {
-        // Reverse scan to find last ID -> relation pattern
         for ($i = count($segments) - 1; $i > 0; $i--) {
-            $current = $segments[$i];
-            $previous = $segments[$i - 1];
-
-            // Check for: non-numeric relation name preceded by numeric ID
-            if (!is_numeric($current)
-                && preg_match('/^[a-zA-Z_-]+$/', $current)
-                && is_numeric($previous)
-            ) {
+            if ($this->isIdRelationPair($segments, $i - 1)) {
                 return [
-                    'parentId' => (int) $previous,
-                    'relation' => $current,
-                    'relationId' => $this->extractRelationId($segments, $i),
-                    'parentPath' => $this->extractParentPath($segments, $i - 1),
+                    'parentId' => (int) $segments[$i - 1],
+                    'parentIdIndex' => $i - 1,
+                    'relation' => $segments[$i],
+                    'relationId' => isset($segments[$i + 1]) && is_numeric($segments[$i + 1]) ? (int) $segments[$i + 1] : null,
+                    'basePath' => $this->extractBasePath($segments, $i - 1),
                 ];
             }
         }
 
-        throw new InvalidArgumentException('Invalid pivot route structure');
+        throw new InvalidArgumentException('Invalid pivot structure');
     }
 
-    /**
-     * Extract optional relation ID (segment after relation name).
-     */
-    private function extractRelationId(array $segments, int $relationIndex): ?int
+    private function resolveChain(array $segments, array $pivot): string
     {
-        $potentialId = $segments[$relationIndex + 1] ?? null;
+        $basePath = $this->extractBasePath($segments, $pivot['parentIdIndex']);
 
-        return is_numeric($potentialId) ? (int) $potentialId : null;
+        if (empty($basePath)) {
+            throw new InvalidArgumentException('Cannot determine base path');
+        }
+
+        $modelClass = ModulePathResolver::buildModelClass($basePath);
+
+        for ($i = 0; $i < $pivot['parentIdIndex'] - 1; $i++) {
+            if ($this->isIdRelationPair($segments, $i)) {
+                $relation = Str::snake($segments[$i + 1]);
+                $model = new $modelClass;
+
+                if (! method_exists($model, $relation)) {
+                    throw new InvalidArgumentException(
+                        "Relation '{$relation}' not found on {$modelClass}"
+                    );
+                }
+
+                $modelClass = get_class($model->{$relation}()->getRelated());
+                $i++;
+            }
+        }
+
+        return $modelClass;
     }
 
-    /**
-     * Extract parent model path (non-numeric segments before parent ID).
-     */
-    private function extractParentPath(array $segments, int $beforeIndex): array
+    private function extractBasePath(array $segments, int $before): array
     {
         $path = [];
 
-        for ($i = 0; $i < $beforeIndex; $i++) {
-            if (!is_numeric($segments[$i])) {
-                $path[] = $segments[$i];
+        for ($i = 0; $i < $before; $i++) {
+            if (is_numeric($segments[$i])) {
+                continue;
             }
+
+            if ($i > 0 && is_numeric($segments[$i - 1])) {
+                continue;
+            }
+
+            $path[] = $segments[$i];
         }
 
         return $path;
     }
 
-    /**
-     * Build path including parent IDs for pivot routes.
-     *
-     * Example: ['catalog', 'vehicles', '123', 'features']
-     *       -> 'catalog/vehicles/123/features'
-     */
-    private function buildPathWithIds(array $segments): string
+    private function pathWithIds(array $segments): string
     {
         $result = [];
 
         for ($i = 0; $i < count($segments); $i++) {
-            $current = $segments[$i];
-            $next = $segments[$i + 1] ?? null;
-
-            // Include non-numeric segments
-            if (!is_numeric($current)) {
-                $result[] = $current;
-                continue;
-            }
-
-            // Include numeric if followed by relation name
-            if ($next !== null
-                && !is_numeric($next)
-                && preg_match('/^[a-zA-Z_-]+$/', $next)
-            ) {
-                $result[] = $current;
+            if (! is_numeric($segments[$i])) {
+                $result[] = $segments[$i];
+            } elseif ($this->isIdRelationPair($segments, $i)) {
+                $result[] = $segments[$i];
             }
         }
 
         return implode('/', $result);
     }
 
-    /**
-     * Generate cache key from segments.
-     */
-    private function generateCacheKey(array $segments): string
+    private function isIdRelationPair(array $segments, int $i): bool
     {
-        return 'model_resolution_' . md5(implode('/', $segments));
-    }
-
-    /**
-     * Attach resolved data to request attributes.
-     */
-    private function attachToRequest(Request $request, array $data): void
-    {
-        foreach ($data as $key => $value) {
-            $request->attributes->set($key, $value);
-        }
-    }
-
-    /**
-     * Clear all resolution caches (for testing/debugging).
-     */
-    public static function clearCache(): void
-    {
-        Cache::flush();
+        return isset($segments[$i], $segments[$i + 1])
+            && is_numeric($segments[$i])
+            && ! is_numeric($segments[$i + 1])
+            && preg_match(self::RELATION_PATTERN, $segments[$i + 1]);
     }
 }

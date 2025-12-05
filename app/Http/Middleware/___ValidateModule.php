@@ -15,7 +15,9 @@ class ValidateModule
     private array $cache = [];
 
     private const CACHE_TTL = 3600;
+
     private const MIN_SEGMENTS = 3;
+
     private const SKIP_SEGMENTS = 2;
 
     private const EXCEPTION_ROUTES = [
@@ -26,7 +28,7 @@ class ValidateModule
 
     public function handle(Request $request, Closure $next): mixed
     {
-        if (!$this->shouldProcess($request)) {
+        if (! $this->shouldProcess($request)) {
             return $next($request);
         }
 
@@ -59,7 +61,7 @@ class ValidateModule
 
     private function resolveWithCache(Request $request, array $segments): array
     {
-        $key = 'model_resolution_' . md5(implode('/', $request->segments()));
+        $key = 'model_resolution_'.md5(implode('/', $request->segments()));
 
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
@@ -92,7 +94,7 @@ class ValidateModule
         foreach ($segments as $i => $segment) {
             $next = $segments[$i + 1] ?? null;
 
-            if (is_numeric($segment) && $next && !is_numeric($next) && ctype_alpha($next)) {
+            if (is_numeric($segment) && $next && ! is_numeric($next) && ctype_alpha($next)) {
                 return true;
             }
         }
@@ -126,7 +128,7 @@ class ValidateModule
             $parentModel = new $parentClass;
             $intermediateRelationName = null;
             for ($i = $pivot['parentModelEndIndex'] + 1; $i < count($segments); $i++) {
-                if (!is_numeric($segments[$i]) && $i < count($segments) - 1 && is_numeric($segments[$i - 1])) {
+                if (! is_numeric($segments[$i]) && $i < count($segments) - 1 && is_numeric($segments[$i - 1])) {
                     $intermediateRelationName = Str::snake($segments[$i]);
                     break;
                 }
@@ -143,7 +145,7 @@ class ValidateModule
 
         $relationMethod = Str::snake($pivot['relation']);
 
-        if (!method_exists($parentModel, $relationMethod)) {
+        if (! method_exists($parentModel, $relationMethod)) {
             throw new InvalidArgumentException(
                 "Relation '{$relationMethod}' not found on {$parentClass}"
             );
@@ -174,7 +176,7 @@ class ValidateModule
             $current = $segments[$i];
             $prev = $segments[$i - 1];
 
-            if (!is_numeric($current) && ctype_alpha($current) && is_numeric($prev)) {
+            if (! is_numeric($current) && ctype_alpha($current) && is_numeric($prev)) {
                 $parentModelEndIndex = $i - 1;
                 for ($j = $i - 2; $j >= 0; $j--) {
                     if (is_numeric($segments[$j])) {
@@ -185,7 +187,7 @@ class ValidateModule
 
                 $parentPath = [];
                 for ($j = 0; $j < $parentModelEndIndex; $j++) {
-                    if (!is_numeric($segments[$j])) {
+                    if (! is_numeric($segments[$j])) {
                         $parentPath[] = $segments[$j];
                     }
                 }
@@ -206,9 +208,9 @@ class ValidateModule
     private function buildModelClass(array $segments): string
     {
         $parts = array_map([Str::class, 'studly'], $segments);
-        $namespace = 'App\\Models\\' . implode('\\', $parts);
-        $className = Str::studly(end($segments)) . 'Model';
+        $namespace = 'App\\Models\\'.implode('\\', $parts);
+        $className = Str::studly(end($segments)).'Model';
 
-        return $namespace . '\\' . $className;
+        return $namespace.'\\'.$className;
     }
 }

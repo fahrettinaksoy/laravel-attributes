@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Common\CommonController;
 use App\Http\Controllers\Parameter\ParameterController;
-use App\Http\Middleware\ValidateModule;
+use App\Http\Middleware\ResolveModelFromRoute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->middleware(['api', ValidateModule::class])->group(function () {
+Route::prefix('v1')->middleware(['api', ResolveModelFromRoute::class])->group(function () {
 
     Route::name('parameter.')->prefix('parameter')->group(function () {
         Route::get('/', [ParameterController::class, 'index'])->name('index');

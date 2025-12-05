@@ -45,7 +45,7 @@ class RepositoryServiceProvider extends ServiceProvider
         // BaseRepository needs Model
         $this->app->when(BaseRepository::class)
             ->needs(Model::class)
-            ->give(fn() => $this->resolveModel());
+            ->give(fn () => $this->resolveModel());
 
         // BaseRepositoryCache -> BaseRepository
         $this->app->when(BaseRepositoryCache::class)
@@ -103,9 +103,9 @@ class RepositoryServiceProvider extends ServiceProvider
     private function getControllers(): array
     {
         return collect($this->app['router']->getRoutes()->getRoutes())
-            ->map(fn(Route $route) => $this->extractController($route))
+            ->map(fn (Route $route) => $this->extractController($route))
             ->filter()
-            ->reject(fn($c) => in_array($c, self::COMMON_CONTROLLERS, true))
+            ->reject(fn ($c) => in_array($c, self::COMMON_CONTROLLERS, true))
             ->unique()
             ->values()
             ->all();
@@ -128,7 +128,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $interface = "App\\Repositories\\{$module}\\{$module}RepositoryInterface";
 
         // Skip if classes don't exist
-        if (!class_exists($service) || !class_exists($repository) || !interface_exists($interface)) {
+        if (! class_exists($service) || ! class_exists($repository) || ! interface_exists($interface)) {
             return;
         }
 
@@ -137,7 +137,7 @@ class RepositoryServiceProvider extends ServiceProvider
             ->give(function () use ($repository, $interface) {
                 $repo = $this->app->make($repository);
 
-                if (!$repo instanceof $interface) {
+                if (! $repo instanceof $interface) {
                     throw new RuntimeException(
                         sprintf('%s must implement %s', get_class($repo), $interface)
                     );

@@ -13,8 +13,8 @@ use App\Http\Requests\BaseUpdateRequest;
 use App\Http\Resources\BaseCollection;
 use App\Http\Resources\BaseResource;
 use App\Services\BaseService;
-use App\Services\PivotService;
 use App\Services\Module\ModuleRequestService;
+use App\Services\PivotService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
